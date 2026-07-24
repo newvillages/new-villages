@@ -93,7 +93,19 @@ export function Profile() {
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-6">
             <div className="relative">
-              <img src={getUserAvatar(currentUser)} className="w-28 h-28 rounded-full border-4 border-white shadow-lg object-cover" alt="Profile" />
+              <img
+                src={getUserAvatar(currentUser)}
+                onError={(e) => {
+                  const role = currentUser?.role?.toUpperCase();
+                  let fallback = '/avatars/member.png';
+                  if (role === 'ADMIN') fallback = '/avatars/admin.png';
+                  else if (role === 'COMMUNITY_LEADER' || role === 'LEADER') fallback = '/avatars/leader.png';
+                  else if (role === 'ORGANIZATION' || role === 'ORG') fallback = '/avatars/org.png';
+                  (e.target as HTMLImageElement).src = fallback;
+                }}
+                className="w-28 h-28 rounded-full border-4 border-white shadow-lg object-cover"
+                alt="Profile"
+              />
               {editing && (
                 <>
                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />

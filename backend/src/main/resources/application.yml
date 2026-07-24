@@ -62,7 +62,7 @@ app:
     base-url: ${FRONTEND_BASE_URL:http://localhost:5173}
   uploads:
     dir: ${UPLOADS_DIR:./uploads}
-    public-base-url: ${UPLOADS_BASE_URL:http://localhost:8080/uploads}
+    public-base-url: ${UPLOADS_BASE_URL:https://new-villages.onrender.com/uploads}
   stripe:
     secret-key: ${STRIPE_SECRET_KEY:}
     webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
