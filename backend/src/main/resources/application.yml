@@ -89,6 +89,9 @@ logging:
     org.hibernate.SQL: WARN
 
 management:
+  health:
+    mail:
+      enabled: false
   endpoints:
     web:
       exposure:
