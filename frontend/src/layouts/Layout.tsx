@@ -16,7 +16,7 @@ import {
   Calendar,
   Sparkles
 } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn, getUserAvatar } from '../lib/utils';
 import { useStore } from '../store/useStore';
 import { useLogout } from '../hooks/useAuth';
 import { useNotifications } from '../hooks/useNotifications';
@@ -255,7 +255,7 @@ export function Layout() {
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                   className="flex items-center gap-2 hover:bg-slate-50 rounded-full pl-1 pr-2 py-1 transition-colors border border-transparent hover:border-slate-200"
                 >
-                  <img src={currentUser?.avatarUrl || "https://i.pravatar.cc/150?u=1"} className="w-8 h-8 rounded-full border border-slate-200" alt="avatar" />
+                  <img src={getUserAvatar(currentUser)} className="w-8 h-8 rounded-full border border-slate-200 object-cover" alt="avatar" />
                   <ChevronDown size={14} className="text-slate-500" />
                 </button>
 
@@ -336,7 +336,7 @@ export function Layout() {
                   onClick={() => setIsMobileProfileOpen(!isMobileProfileOpen)}
                   className="flex items-center gap-1 p-0.5 hover:bg-slate-100 rounded-full transition-colors border border-slate-200"
                 >
-                  <img src={currentUser?.avatarUrl || "https://i.pravatar.cc/150?u=1"} className="w-7 h-7 rounded-full object-cover" alt="avatar" />
+                  <img src={getUserAvatar(currentUser)} className="w-7 h-7 rounded-full object-cover" alt="avatar" />
                   <ChevronDown size={12} className="text-slate-500 mr-0.5" />
                 </button>
 

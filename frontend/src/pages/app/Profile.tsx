@@ -8,6 +8,7 @@ import { toast } from '../../store/useToastStore';
 import { useUpdateProfile, useUploadAvatar } from '../../hooks/useUser';
 import { useMyCommunities } from '../../hooks/useCommunities';
 import { ApiError } from '../../lib/apiClient';
+import { getUserAvatar } from '../../lib/utils';
 
 const LANGUAGES = ['English', 'French', 'Spanish', 'Mandarin', 'Arabic', 'Portuguese'];
 
@@ -92,7 +93,7 @@ export function Profile() {
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6 mb-6">
             <div className="relative">
-              <img src={currentUser?.avatarUrl || `https://i.pravatar.cc/150?u=${currentUser?.id}`} className="w-28 h-28 rounded-full border-4 border-white shadow-lg object-cover" alt="Profile" />
+              <img src={getUserAvatar(currentUser)} className="w-28 h-28 rounded-full border-4 border-white shadow-lg object-cover" alt="Profile" />
               {editing && (
                 <>
                   <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleAvatarChange} />
