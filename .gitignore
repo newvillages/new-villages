@@ -1,0 +1,25 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+
+# Maven / Java Build output
+target/
+backend/target/
+
+# Environment and secret files
+.env
+*.env
+frontend/.env
+backend/.env
+
+# IDE & OS files
+.vscode/
+.claude/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Uploads & Logs
+*.log
+backend/uploads/*
+!backend/uploads/.gitkeep
