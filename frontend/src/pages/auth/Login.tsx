@@ -39,7 +39,7 @@ export function Login() {
             }
             setFormError(err.message);
           } else {
-            setFormError('Something went wrong. Please try again.');
+            setFormError((err as Error)?.message || 'Something went wrong. Please try again.');
           }
         },
       }
