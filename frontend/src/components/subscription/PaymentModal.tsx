@@ -112,14 +112,21 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
           </div>
 
           {/* Payment Method Switcher Tabs */}
-          <div className="grid grid-cols-2 gap-1.5 sm:gap-2 p-1.5 bg-black/20 rounded-xl sm:rounded-2xl border border-white/10 mt-4">
+          <div className="grid grid-cols-2 gap-1.5 sm:gap-2 p-1.5 bg-black/30 rounded-xl sm:rounded-2xl border border-white/15 mt-4 relative z-30">
             <button
               type="button"
-              onClick={() => setMethod('interac')}
-              className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              onClick={(e) => {
+                e.stopPropagation();
+                setMethod('interac');
+              }}
+              onTouchEnd={(e) => {
+                e.stopPropagation();
+                setMethod('interac');
+              }}
+              className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer touch-manipulation select-none active:scale-95 ${
                 method === 'interac'
-                  ? 'bg-white text-[#2D2159] shadow-md scale-[1.02]'
-                  : 'text-white/80 hover:text-white hover:bg-white/5'
+                  ? 'bg-white text-[#2D2159] shadow-lg scale-[1.02]'
+                  : 'text-white/80 hover:text-white hover:bg-white/10 active:bg-white/20'
               }`}
             >
               <Send size={15} className={method === 'interac' ? 'text-amber-600' : ''} />
@@ -129,11 +136,18 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
 
             <button
               type="button"
-              onClick={() => setMethod('card')}
-              className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all ${
+              onClick={(e) => {
+                e.stopPropagation();
+                setMethod('card');
+              }}
+              onTouchEnd={(e) => {
+                e.stopPropagation();
+                setMethod('card');
+              }}
+              className={`flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-2 sm:px-4 rounded-lg sm:rounded-xl text-xs sm:text-sm font-bold transition-all cursor-pointer touch-manipulation select-none active:scale-95 ${
                 method === 'card'
-                  ? 'bg-white text-[#2D2159] shadow-md scale-[1.02]'
-                  : 'text-white/80 hover:text-white hover:bg-white/5'
+                  ? 'bg-white text-[#2D2159] shadow-lg scale-[1.02]'
+                  : 'text-white/80 hover:text-white hover:bg-white/10 active:bg-white/20'
               }`}
             >
               <CreditCard size={15} className={method === 'card' ? 'text-primary' : ''} />
@@ -144,7 +158,7 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
 
         {/* Tab Contents */}
         <CardContent className="p-4 sm:p-8">
-          <AnimatePresence mode="wait">
+          <AnimatePresence mode="popLayout">
             {method === 'interac' ? (
               <motion.div
                 key="interac-tab"
