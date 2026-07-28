@@ -6,7 +6,7 @@ import { cn } from '../../lib/utils';
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
-  title: string;
+  title?: string;
   children: React.ReactNode;
   className?: string;
 }
@@ -22,9 +22,7 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
     };
     if (isOpen) {
       document.addEventListener('keydown', handleKeyDown);
-      // Prevent scrolling on body when modal is open
       document.body.style.overflow = 'hidden';
-      // Focus modal for screen readers
       modalRef.current?.focus();
     }
     return () => {
@@ -56,18 +54,20 @@ export function Modal({ isOpen, onClose, title, children, className }: ModalProp
             <div 
               ref={modalRef}
               tabIndex={-1}
-              className={cn("bg-white rounded-2xl shadow-xl w-full max-w-lg pointer-events-auto flex flex-col max-h-[90vh] outline-none", className)}
+              className={cn("bg-white rounded-2xl shadow-xl w-full max-w-lg pointer-events-auto flex flex-col max-h-[90vh] outline-none overflow-y-auto", className)}
             >
-              <div className="flex items-center justify-between p-6 border-b border-gray-100">
-                <h2 id="modal-title" className="text-xl font-heading font-semibold">{title}</h2>
-                <button
-                  onClick={onClose}
-                  className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500 focus:ring-2 focus:ring-primary outline-none"
-                  aria-label="Close modal"
-                >
-                  <X size={20} />
-                </button>
-              </div>
+              {title && (
+                <div className="flex items-center justify-between p-6 border-b border-gray-100">
+                  <h2 id="modal-title" className="text-xl font-heading font-semibold">{title}</h2>
+                  <button
+                    onClick={onClose}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-500 focus:ring-2 focus:ring-primary outline-none"
+                    aria-label="Close modal"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+              )}
               <div className="p-6 overflow-y-auto flex-1">
                 {children}
               </div>

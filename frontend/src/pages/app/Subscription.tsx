@@ -1,13 +1,13 @@
 import { useState, useEffect } from 'react';
-import { Check, Zap, ArrowLeft } from 'lucide-react';
-import { Card, CardContent } from '../../components/ui/Card';
+import { Check } from 'lucide-react';
+import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import confetti from 'canvas-confetti';
 import { toast } from '../../store/useToastStore';
 import { PageTransition } from '../../components/ui/PageTransition';
+import { PaymentModal } from '../../components/subscription/PaymentModal';
 
 export function Subscription() {
   const [selected, setSelected] = useState('leader');
@@ -79,10 +79,10 @@ export function Subscription() {
                   <h2 className="text-3xl md:text-5xl font-heading font-extrabold text-[#2D2159]">Free for members, built to grow.</h2>
                 </div>
                 
-                <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto items-center">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 max-w-5xl mx-auto items-center">
                   {/* Free */}
                   <Card 
-                    className={cn("p-8 border-2 rounded-3xl bg-white shadow-sm cursor-pointer transition-all", selected === 'free' ? 'border-[#2D2159]' : 'border-gray-200 hover:border-gray-300')}
+                    className={cn("p-6 sm:p-8 border-2 rounded-3xl bg-white shadow-sm cursor-pointer transition-all", selected === 'free' ? 'border-[#2D2159]' : 'border-gray-200 hover:border-gray-300')}
                     onClick={() => setSelected('free')}
                   >
                     <div className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-4">{plans[0].tag}</div>
@@ -148,36 +148,12 @@ export function Subscription() {
                 </div>
               </motion.div>
             ) : (
-              <motion.div key="checkout" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="max-w-md mx-auto mt-8">
-                <Button variant="ghost" className="mb-6 hover:bg-transparent px-0 font-semibold text-[#2D2159]" onClick={() => setCheckout(false)}>
-                  <ArrowLeft size={16} className="mr-2" /> Back to Plans
-                </Button>
-                <Card className="rounded-3xl border-gray-100 shadow-xl overflow-hidden">
-                  <div className="bg-[#2D2159] text-white p-6">
-                    <div className="text-xs font-bold text-primary-200 uppercase tracking-widest mb-1">Upgrading to</div>
-                    <div className="flex justify-between items-end">
-                      <span className="text-xl font-bold">{selectedPlan.label}</span>
-                      <span className="font-extrabold text-3xl">{selectedPlan.price}<span className="text-sm font-normal opacity-80">{selectedPlan.period}</span></span>
-                    </div>
-                  </div>
-                  <CardContent className="p-8 space-y-6">
-                    <div className="space-y-4">
-                      <div><label className="block text-sm font-bold text-gray-700 mb-1.5">Cardholder Name</label><Input placeholder="Jane Doe" className="bg-gray-50 border-gray-200 rounded-xl py-5" required /></div>
-                      <div><label className="block text-sm font-bold text-gray-700 mb-1.5">Card Number</label><Input placeholder="4242 4242 4242 4242" className="bg-gray-50 border-gray-200 rounded-xl py-5" required /></div>
-                      <div className="grid grid-cols-2 gap-4">
-                        <div><label className="block text-sm font-bold text-gray-700 mb-1.5">Expiry</label><Input placeholder="MM/YY" className="bg-gray-50 border-gray-200 rounded-xl py-5" required /></div>
-                        <div><label className="block text-sm font-bold text-gray-700 mb-1.5">CVC</label><Input placeholder="•••" className="bg-gray-50 border-gray-200 rounded-xl py-5" required /></div>
-                      </div>
-                    </div>
-                    <div className="flex items-center justify-center gap-2 text-xs font-semibold text-[#2D2159] bg-[#F2F0FA] rounded-xl p-4">
-                      <Zap size={14} className="text-primary" />
-                      This is a demo checkout. No real payment will be processed.
-                    </div>
-                    <Button className="w-full py-6 rounded-full bg-[#2D2159] hover:bg-[#3F2A78] font-bold text-lg" onClick={() => setSuccess(true)}>
-                      Pay {selectedPlan.price}{selectedPlan.period}
-                    </Button>
-                  </CardContent>
-                </Card>
+              <motion.div key="checkout" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
+                <PaymentModal 
+                  plan={selectedPlan} 
+                  onBack={() => setCheckout(false)} 
+                  onSuccess={() => setSuccess(true)} 
+                />
               </motion.div>
             )}
           </AnimatePresence>

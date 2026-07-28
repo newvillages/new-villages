@@ -8,6 +8,7 @@ import { ApiError } from '../../lib/apiClient';
 import { UserCircle, Shield, Building2, CheckCircle2, Circle, Loader2, ArrowLeft } from 'lucide-react';
 import { cn } from '../../lib/utils';
 import { PageTransition } from '../../components/ui/PageTransition';
+import { PaymentModal } from '../../components/subscription/PaymentModal';
 
 export function Register() {
   const navigate = useNavigate();
@@ -26,19 +27,12 @@ export function Register() {
   const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [termsOpened, setTermsOpened] = useState(false);
   const [termsAccepted, setTermsAccepted] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
 
   const [formError, setFormError] = useState<string | null>(null);
 
-  const handleRegister = (e: React.FormEvent) => {
-    e.preventDefault();
-    setFormError(null);
-
-    if (!termsAccepted || !terms) return;
-    if (password !== confirmPassword) {
-      setFormError('Passwords do not match.');
-      return;
-    }
-
+  const executeRegistration = () => {
+    if (!terms) return;
     registerMutation.mutate(
       {
         fullName,
@@ -53,6 +47,7 @@ export function Register() {
       {
         onSuccess: () => navigate('/verify-email', { state: { email } }),
         onError: (err) => {
+          setShowPaymentModal(false);
           if (err instanceof ApiError) {
             setFormError(err.message);
           } else {
@@ -61,6 +56,23 @@ export function Register() {
         },
       }
     );
+  };
+
+  const handleRegister = (e: React.FormEvent) => {
+    e.preventDefault();
+    setFormError(null);
+
+    if (!termsAccepted || !terms) return;
+    if (password !== confirmPassword) {
+      setFormError('Passwords do not match.');
+      return;
+    }
+
+    if (role === 'COMMUNITY_LEADER' || role === 'ORGANIZATION') {
+      setShowPaymentModal(true);
+    } else {
+      executeRegistration();
+    }
   };
 
   const openTerms = (e: React.MouseEvent) => {
@@ -157,27 +169,35 @@ export function Register() {
               {/* I'M JOINING AS A... */}
               <div className="space-y-4">
                 <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">I'm joining as a...</h3>
-                <div className="grid md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   {[
-                    { id: 'MEMBER' as const, label: 'Member', icon: UserCircle, desc: 'Join and take part in communities.' },
-                    { id: 'COMMUNITY_LEADER' as const, label: 'Community Leader', icon: Shield, desc: 'Create and manage a community.' },
-                    { id: 'ORGANIZATION' as const, label: 'Organization', icon: Building2, desc: 'Represent a business or nonprofit.' }
+                    { id: 'MEMBER' as const, label: 'Member', price: 'Free', icon: UserCircle, desc: 'Join and take part in communities.' },
+                    { id: 'COMMUNITY_LEADER' as const, label: 'Community Leader', price: '$10/mo CAD', icon: Shield, desc: 'Create and manage a community.' },
+                    { id: 'ORGANIZATION' as const, label: 'Organization', price: '$20/mo CAD', icon: Building2, desc: 'Represent a business or nonprofit.' }
                   ].map((type) => (
                     <button
                       key={type.id}
                       type="button"
                       onClick={() => setRole(type.id)}
                       className={cn(
-                        "flex flex-col text-left p-6 rounded-2xl border-2 transition-all bg-white shadow-sm",
+                        "flex flex-col text-left p-4 sm:p-6 rounded-2xl border-2 transition-all bg-white shadow-sm relative overflow-hidden",
                         role === type.id
                           ? "border-[#2D2159] bg-[#F2F0FA]"
                           : "border-transparent hover:border-gray-200 text-gray-600"
                       )}
                     >
-                      <div className={cn("w-10 h-10 rounded-full flex items-center justify-center mb-4", role === type.id ? "bg-[#2D2159] text-white" : "bg-gray-100 text-gray-500")}>
-                        <type.icon size={20} />
+                      <div className="flex justify-between items-start mb-4">
+                        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", role === type.id ? "bg-[#2D2159] text-white" : "bg-gray-100 text-gray-500")}>
+                          <type.icon size={20} />
+                        </div>
+                        <span className={cn(
+                          "text-xs font-extrabold px-2.5 py-1 rounded-full",
+                          type.id === 'MEMBER' ? "bg-emerald-100 text-emerald-800" : "bg-indigo-100 text-indigo-900"
+                        )}>
+                          {type.price}
+                        </span>
                       </div>
-                      <span className={cn("font-bold mb-1", role === type.id ? "text-[#2D2159]" : "text-gray-900")}>{type.label}</span>
+                      <span className={cn("font-bold mb-1 text-base", role === type.id ? "text-[#2D2159]" : "text-gray-900")}>{type.label}</span>
                       <span className="text-xs text-gray-500 leading-relaxed">{type.desc}</span>
                     </button>
                   ))}
@@ -212,12 +232,12 @@ export function Register() {
                   size="lg"
                   className={cn(
                     "w-full py-6 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2",
-                    termsAccepted ? "bg-[#9A7DCA] hover:bg-[#8565b8] text-white" : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    termsAccepted ? "bg-[#2D2159] hover:bg-[#3F2A78] text-white" : "bg-gray-200 text-gray-400 cursor-not-allowed"
                   )}
                   disabled={!termsAccepted || registerMutation.isPending}
                 >
                   {registerMutation.isPending && <Loader2 size={18} className="animate-spin" />}
-                  Create account
+                  {role === 'MEMBER' ? 'Create Free Account' : `Proceed to Payment (${role === 'COMMUNITY_LEADER' ? '$10' : '$20'} CAD)`}
                 </Button>
                 <p className="text-center text-sm text-gray-500">
                   Already a member? <Link to="/login" className="text-[#2D2159] font-bold hover:underline">Log in</Link>
@@ -228,6 +248,25 @@ export function Register() {
           </div>
         </div>
       </div>
+
+      {/* Payment Modal for Leader / Org Registration */}
+      <Modal isOpen={showPaymentModal} onClose={() => setShowPaymentModal(false)} className="max-w-2xl">
+        <PaymentModal
+          plan={{
+            id: role.toLowerCase(),
+            label: role === 'COMMUNITY_LEADER' ? 'Community Leader' : 'Organization',
+            price: role === 'COMMUNITY_LEADER' ? '$10' : '$20',
+            period: '/month',
+            features: role === 'COMMUNITY_LEADER' 
+              ? ['Create & manage a community', 'Publish announcements & events', 'Analytics']
+              : ['Verified Org page', 'Contact communities directly', 'Team seats']
+          }}
+          onBack={() => setShowPaymentModal(false)}
+          onSuccess={() => {
+            executeRegistration();
+          }}
+        />
+      </Modal>
 
       {/* Legal Modal */}
       <Modal isOpen={termsModalOpen} onClose={() => setTermsModalOpen(false)} title={`Terms of Use & Privacy Policy${terms ? ` (v${terms.version})` : ''}`} className="max-w-2xl">

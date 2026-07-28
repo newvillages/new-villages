@@ -36,12 +36,12 @@ export function Footer() {
             <Heart size={14} className="fill-red-500 text-red-500 animate-pulse" />
             <span>by</span>
             <a
-              href="https://www.linkedin.com/in/mutabazi-christian/"
+              href="https://www.luminex.rw"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:underline font-bold text-[#38BDF8] hover:text-white transition-colors"
             >
-              MJPC
+              Luminex
             </a>
           </span>
         </div>

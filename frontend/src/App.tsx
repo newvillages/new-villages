@@ -70,7 +70,7 @@ export function App() {
           <Route path="messages" element={<RequireAuth><Messaging /></RequireAuth>} />
           <Route path="profile" element={<RequireAuth><Profile /></RequireAuth>} />
           <Route path="settings" element={<RequireAuth><Settings /></RequireAuth>} />
-          <Route path="pricing" element={<RequireAuth><Subscription /></RequireAuth>} />
+          <Route path="pricing" element={<Subscription />} />
           <Route path="re-consent" element={<RequireAuth><ReConsent /></RequireAuth>} />
           <Route path="org/:id" element={<RequireAuth><OrganizationPage /></RequireAuth>} />
           <Route

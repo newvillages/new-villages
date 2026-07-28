@@ -82,6 +82,7 @@ export function Layout() {
       : { label: 'Home', icon: Home, href: '/' },
     { label: 'Communities', icon: Users, href: '/communities' },
     { label: 'Events', icon: Calendar, href: '/events' },
+    { label: 'Pricing', icon: Sparkles, href: '/pricing' },
     ...(!isAuthenticated ? [{ label: 'Contact', icon: Mail, href: '/contact' }] : []),
     ...(isAuthenticated ? [{ label: 'Messages', icon: MessageSquare, href: '/messages' }] : []),
   ];
@@ -109,6 +110,7 @@ export function Layout() {
       : { label: 'Home', icon: Home, href: '/', isAction: false },
     { label: 'Communities', icon: Users, href: '/communities', isAction: false },
     { label: 'Events', icon: Calendar, href: '/events', isAction: false },
+    { label: 'Pricing', icon: Sparkles, href: '/pricing', isAction: false },
     ...(canCreateEvent
       ? [{ label: 'Create', icon: PlusCircle, href: '/create-event', isAction: true }]
       : []),
@@ -299,6 +301,10 @@ export function Layout() {
                         <Link to="/settings" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#486581] hover:bg-slate-50 hover:text-[#1D4ED8] rounded-xl transition-colors">
                           <Settings size={16} /> Settings
                         </Link>
+
+                        <Link to="/pricing" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#1D4ED8] hover:bg-blue-50 rounded-xl transition-colors font-bold">
+                          <Sparkles size={16} className="text-[#38BDF8]" /> Upgrade Plan
+                        </Link>
                       </div>
                       <div className="p-2 border-t border-slate-50">
                         <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors text-left">
@@ -373,6 +379,9 @@ export function Layout() {
                         </Link>
                         <Link to="/settings" className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#486581] hover:bg-slate-50 hover:text-[#1D4ED8] rounded-xl transition-colors">
                           <Settings size={15} className="text-[#1D4ED8]" /> Settings
+                        </Link>
+                        <Link to="/pricing" className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-[#1D4ED8] hover:bg-blue-50 rounded-xl transition-colors">
+                          <Sparkles size={15} className="text-[#38BDF8]" /> Upgrade Plan
                         </Link>
 
                         {canCreateEvent && (
