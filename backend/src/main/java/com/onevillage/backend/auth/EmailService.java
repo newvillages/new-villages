@@ -52,12 +52,19 @@ public class EmailService {
     }
 
     public void sendPaymentReceiptEmail(String toEmail, String name, String planLabel, String amount, String memoCode) {
+        String loginLink = frontendBaseUrl + "/login";
+        String dashboardLink = frontendBaseUrl + "/dashboard";
+
         log.info("Sending payment receipt email to {} for plan {} ({})", toEmail, planLabel, amount);
         send(toEmail, "NewVillages Payment Confirmation - " + planLabel + " Plan",
                 "Hi " + (name != null && !name.isBlank() ? name : "Leader") + ",\n\n"
                         + "Thank you for subscribing to the NewVillages " + planLabel + " plan (" + amount + ")!\n\n"
                         + "We have received your payment details (Reference Code: " + memoCode + ").\n"
                         + "Our admin team is reviewing your payment and will enable your full leader/org account features shortly.\n\n"
+                        + "🔑 Log back into your account anytime to enjoy your dashboard and features:\n"
+                        + loginLink + "\n\n"
+                        + "🚀 Access your dashboard directly:\n"
+                        + dashboardLink + "\n\n"
                         + "If you have any questions, reply directly to this email or contact support@newvillages.ca.\n\n"
                         + "Warm regards,\n"
                         + "The NewVillages Canada Team\n"
