@@ -204,6 +204,17 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
                 <div className="bg-gray-50 border border-gray-200/80 rounded-2xl p-4 sm:p-5 space-y-3.5">
                   <div className="text-[11px] font-bold uppercase tracking-wider text-gray-500">e-Transfer Instructions</div>
 
+                  {/* Strict Minimum Due Amount Badge */}
+                  <div className="flex items-center justify-between p-3 bg-red-50/70 border border-red-200/80 rounded-xl">
+                    <div>
+                      <div className="text-[10px] sm:text-[11px] font-bold text-red-600 uppercase tracking-wider">Strict Required Amount</div>
+                      <div className="font-extrabold text-sm sm:text-base text-red-950">{currencyAmountCAD}</div>
+                    </div>
+                    <span className="text-[10px] font-extrabold bg-red-100 text-red-800 px-2.5 py-1 rounded-full border border-red-200 shrink-0">
+                      Underpayments Rejected 🔒
+                    </span>
+                  </div>
+
                   {/* Recipient Email */}
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-white border border-gray-200 rounded-xl">
                     <div className="min-w-0 flex-1">

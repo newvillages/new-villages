@@ -51,6 +51,23 @@ public class SubscriptionService {
         return PLANS;
     }
 
+    public BigDecimal getRequiredPlanAmountCAD(SubscriptionPlan plan) {
+        return switch (plan) {
+            case COMMUNITY_LEADER -> new BigDecimal("10.00");
+            case ORGANIZATION -> new BigDecimal("20.00");
+            default -> BigDecimal.ZERO;
+        };
+    }
+
+    public void validatePlanPaymentAmount(SubscriptionPlan plan, BigDecimal submittedAmount) {
+        BigDecimal required = getRequiredPlanAmountCAD(plan);
+        if (submittedAmount == null || submittedAmount.compareTo(required) < 0) {
+            throw ApiException.badRequest("Underpayment rejected: Required minimum for " + plan.name() 
+                    + " is $" + required + " CAD. Submitted amount of $" + (submittedAmount == null ? "0.00" : submittedAmount) 
+                    + " CAD is insufficient.");
+        }
+    }
+
     public SubscriptionResponse getMine(UUID userId) {
         return subscriptionRepository.findByUserId(userId)
                 .map(this::toResponse)
