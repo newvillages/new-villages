@@ -9,10 +9,15 @@ import {
   Send, 
   ShieldCheck, 
   Building2, 
-  ArrowLeft
+  ArrowLeft,
+  Fingerprint,
+  CheckCircle2,
+  Lock,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from '../../store/useToastStore';
+import { cn } from '../../lib/utils';
 
 export interface Plan {
   id: string;
@@ -30,6 +35,8 @@ interface PaymentModalProps {
 
 export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
   const [method, setMethod] = useState<'interac' | 'card'>('interac');
+  const [activeWallet, setActiveWallet] = useState<'apple' | 'google' | null>(null);
+  const [isWalletProcessing, setIsWalletProcessing] = useState(false);
   
   // Unique auto-generated reference code for Canadian Interac e-Transfer
   const memoCode = React.useMemo(() => {
@@ -289,13 +296,7 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
                     <button
                       type="button"
                       disabled={isSubmitting}
-                      onClick={() => {
-                        setIsSubmitting(true);
-                        setTimeout(() => {
-                          setIsSubmitting(false);
-                          onSuccess();
-                        }, 1000);
-                      }}
+                      onClick={() => setActiveWallet('apple')}
                       className="w-full py-3.5 px-4 rounded-xl bg-black hover:bg-gray-900 text-white font-medium flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer"
                     >
                       <span className="text-xs font-semibold">Pay with</span>
@@ -306,13 +307,7 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
                     <button
                       type="button"
                       disabled={isSubmitting}
-                      onClick={() => {
-                        setIsSubmitting(true);
-                        setTimeout(() => {
-                          setIsSubmitting(false);
-                          onSuccess();
-                        }, 1000);
-                      }}
+                      onClick={() => setActiveWallet('google')}
                       className="w-full py-3.5 px-4 rounded-xl bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 font-medium flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer"
                     >
                       <span className="text-xs font-semibold">Pay with</span>
@@ -412,6 +407,137 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
           </AnimatePresence>
         </CardContent>
       </Card>
+
+      {/* Apple Pay & Google Pay Express Wallet Authorization Sheet */}
+      <AnimatePresence>
+        {activeWallet && (
+          <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/65 backdrop-blur-sm">
+            <motion.div
+              initial={{ opacity: 0, y: 120 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 120 }}
+              className="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden text-gray-900 border border-gray-100"
+            >
+              {/* Wallet Sheet Header */}
+              <div className={cn(
+                "p-5 text-white flex justify-between items-center",
+                activeWallet === 'apple' ? "bg-black" : "bg-[#1A73E8]"
+              )}>
+                <div className="flex items-center gap-2">
+                  {activeWallet === 'apple' ? (
+                    <span className="text-xl font-extrabold tracking-tight">Pay</span>
+                  ) : (
+                    <span className="text-xl font-extrabold tracking-tight flex items-center gap-0.5">
+                      <span>Google Pay</span>
+                    </span>
+                  )}
+                  <span className="text-xs opacity-80 font-medium ml-2 border-l border-white/20 pl-2">Payment Authorization</span>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setActiveWallet(null)}
+                  disabled={isWalletProcessing}
+                  className="p-1.5 rounded-full hover:bg-white/20 transition-colors text-white"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+
+              {/* Sheet Body */}
+              <div className="p-6 space-y-5">
+                {/* Payee Info */}
+                <div className="flex justify-between items-start pb-4 border-b border-gray-100">
+                  <div>
+                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Merchant</div>
+                    <div className="font-extrabold text-gray-900 text-base">NewVillages Canada Inc.</div>
+                    <div className="text-xs text-gray-500 font-medium">{plan.label} Plan</div>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider">Total Amount</div>
+                    <div className="text-2xl font-black text-[#2D2159]">{currencyAmountCAD}</div>
+                  </div>
+                </div>
+
+                {/* Selected Wallet Card */}
+                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200/80 space-y-2">
+                  <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Payment Instrument</div>
+                  <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+                    <div className="flex items-center gap-3">
+                      <div className={cn(
+                        "w-10 h-7 rounded-md flex items-center justify-center font-black text-[11px] text-white tracking-wider",
+                        activeWallet === 'apple' ? "bg-slate-900" : "bg-blue-600"
+                      )}>
+                        {activeWallet === 'apple' ? 'VISA' : 'MC'}
+                      </div>
+                      <div>
+                        <div className="text-xs sm:text-sm font-bold text-gray-900">
+                          {activeWallet === 'apple' ? 'RBC Visa Infinite (•••• 4829)' : 'TD Mastercard (•••• 8912)'}
+                        </div>
+                        <div className="text-[11px] text-gray-500">Default Wallet Payment Method</div>
+                      </div>
+                    </div>
+                    <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
+                  </div>
+                </div>
+
+                {/* Biometric Prompt */}
+                <div className="bg-slate-50 p-4 rounded-2xl border border-slate-200/80 flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-slate-900 text-white flex items-center justify-center shrink-0">
+                    <Fingerprint size={22} className="animate-pulse text-sky-400" />
+                  </div>
+                  <div className="text-xs text-gray-600 leading-relaxed font-medium">
+                    {activeWallet === 'apple' 
+                      ? 'Double-click side button to confirm payment using Face ID or Touch ID.'
+                      : 'Confirm payment using Google Biometric Authentication or Device PIN.'
+                    }
+                  </div>
+                </div>
+
+                {/* Action Buttons */}
+                <div className="space-y-2.5 pt-2">
+                  <Button
+                    type="button"
+                    disabled={isWalletProcessing}
+                    onClick={() => {
+                      setIsWalletProcessing(true);
+                      setTimeout(() => {
+                        setIsWalletProcessing(false);
+                        setActiveWallet(null);
+                        onSuccess();
+                      }, 1200);
+                    }}
+                    className={cn(
+                      "w-full py-6 rounded-full font-bold text-base shadow-xl transition-all flex items-center justify-center gap-2",
+                      activeWallet === 'apple' ? "bg-black hover:bg-gray-900 text-white" : "bg-[#1A73E8] hover:bg-[#1557B0] text-white"
+                    )}
+                  >
+                    {isWalletProcessing ? (
+                      <span className="flex items-center gap-2">
+                        <Lock size={16} className="animate-spin" /> Authorizing Payment...
+                      </span>
+                    ) : (
+                      <>
+                        <Lock size={16} />
+                        <span>Confirm &amp; Pay {currencyAmountCAD}</span>
+                      </>
+                    )}
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="ghost"
+                    disabled={isWalletProcessing}
+                    onClick={() => setActiveWallet(null)}
+                    className="w-full py-3 text-xs font-semibold text-gray-500 hover:text-gray-900"
+                  >
+                    Cancel Payment
+                  </Button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }
