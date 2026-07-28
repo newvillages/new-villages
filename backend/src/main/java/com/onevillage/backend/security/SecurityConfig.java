@@ -53,7 +53,9 @@ public class SecurityConfig {
         configuration.setAllowedOriginPatterns(List.of(
                 "https://*.vercel.app",
                 "http://localhost:*",
-                "https://*.onrender.com"
+                "https://*.onrender.com",
+                "https://newvillages.ca",
+                "https://*.newvillages.ca"
         ));
         java.util.Arrays.stream(allowedOrigins.split(","))
                 .map(String::trim)
