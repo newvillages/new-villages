@@ -13,7 +13,8 @@ import {
   Fingerprint,
   CheckCircle2,
   Lock,
-  X
+  X,
+  ChevronDown
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from '../../store/useToastStore';
@@ -37,6 +38,16 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
   const [method, setMethod] = useState<'interac' | 'card'>('interac');
   const [activeWallet, setActiveWallet] = useState<'apple' | 'google' | null>(null);
   const [isWalletProcessing, setIsWalletProcessing] = useState(false);
+
+  const availableWalletCards = [
+    { id: 'card-1', name: 'TD Mastercard', number: '•••• 8912', type: 'MC', badgeBg: 'bg-blue-600' },
+    { id: 'card-2', name: 'RBC Visa Infinite', number: '•••• 4829', type: 'VISA', badgeBg: 'bg-slate-900' },
+    { id: 'card-3', name: 'Scotiabank Passport', number: '•••• 3012', type: 'VISA', badgeBg: 'bg-red-600' },
+    { id: 'card-4', name: 'CIBC Dividend Visa', number: '•••• 5541', type: 'VISA', badgeBg: 'bg-emerald-700' }
+  ];
+
+  const [selectedWalletCard, setSelectedWalletCard] = useState(availableWalletCards[0]);
+  const [showCardSelector, setShowCardSelector] = useState(false);
   
   // Unique auto-generated reference code for Canadian Interac e-Transfer
   const memoCode = React.useMemo(() => {
@@ -459,25 +470,78 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
                 </div>
 
                 {/* Selected Wallet Card */}
-                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200/80 space-y-2">
-                  <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Payment Instrument</div>
-                  <div className="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 shadow-sm">
+                <div className="bg-gray-50 p-4 rounded-2xl border border-gray-200/80 space-y-2 relative">
+                  <div className="flex items-center justify-between">
+                    <div className="text-[11px] font-bold text-gray-500 uppercase tracking-wider">Payment Instrument</div>
+                    <button
+                      type="button"
+                      onClick={() => setShowCardSelector(!showCardSelector)}
+                      className="text-xs font-bold text-[#1A73E8] hover:underline flex items-center gap-1"
+                    >
+                      <span>{showCardSelector ? 'Close' : 'Change Card'}</span>
+                      <ChevronDown size={14} className={cn("transition-transform", showCardSelector && "rotate-180")} />
+                    </button>
+                  </div>
+
+                  {/* Main Active Card Box */}
+                  <div 
+                    onClick={() => setShowCardSelector(!showCardSelector)}
+                    className="flex items-center justify-between bg-white p-3 rounded-xl border border-gray-200 shadow-sm cursor-pointer hover:border-gray-300 transition-colors"
+                  >
                     <div className="flex items-center gap-3">
                       <div className={cn(
-                        "w-10 h-7 rounded-md flex items-center justify-center font-black text-[11px] text-white tracking-wider",
-                        activeWallet === 'apple' ? "bg-slate-900" : "bg-blue-600"
+                        "w-10 h-7 rounded-md flex items-center justify-center font-black text-[11px] text-white tracking-wider shadow-xs",
+                        selectedWalletCard.badgeBg
                       )}>
-                        {activeWallet === 'apple' ? 'VISA' : 'MC'}
+                        {selectedWalletCard.type}
                       </div>
                       <div>
                         <div className="text-xs sm:text-sm font-bold text-gray-900">
-                          {activeWallet === 'apple' ? 'RBC Visa Infinite (•••• 4829)' : 'TD Mastercard (•••• 8912)'}
+                          {selectedWalletCard.name} ({selectedWalletCard.number})
                         </div>
-                        <div className="text-[11px] text-gray-500">Default Wallet Payment Method</div>
+                        <div className="text-[11px] text-gray-500">Selected Wallet Payment Method</div>
                       </div>
                     </div>
                     <CheckCircle2 size={18} className="text-emerald-600 shrink-0" />
                   </div>
+
+                  {/* Dropdown Card List */}
+                  <AnimatePresence>
+                    {showCardSelector && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -5 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -5 }}
+                        className="bg-white rounded-xl border border-gray-200 shadow-lg p-2 space-y-1 mt-2"
+                      >
+                        <div className="text-[10px] font-bold text-gray-400 uppercase tracking-wider px-2 py-1">
+                          Select from your saved cards
+                        </div>
+                        {availableWalletCards.map((card) => (
+                          <button
+                            key={card.id}
+                            type="button"
+                            onClick={() => {
+                              setSelectedWalletCard(card);
+                              setShowCardSelector(false);
+                            }}
+                            className={cn(
+                              "w-full flex items-center justify-between p-2.5 rounded-lg text-left transition-colors text-xs font-semibold",
+                              selectedWalletCard.id === card.id ? "bg-blue-50 text-[#1A73E8]" : "hover:bg-gray-50 text-gray-700"
+                            )}
+                          >
+                            <div className="flex items-center gap-2.5">
+                              <span className={cn("px-2 py-0.5 rounded text-[10px] font-black text-white", card.badgeBg)}>
+                                {card.type}
+                              </span>
+                              <span>{card.name} ({card.number})</span>
+                            </div>
+                            {selectedWalletCard.id === card.id && <CheckCircle2 size={16} className="text-[#1A73E8]" />}
+                          </button>
+                        ))}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
 
                 {/* Biometric Prompt */}

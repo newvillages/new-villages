@@ -46,20 +46,29 @@ export function Subscription() {
   useEffect(() => {
     if (success) {
       confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-      toast.success(`Welcome to the ${selectedPlan.label} tier!`);
+      toast.success(`Payment submitted! Sent to admin for enablement.`);
     }
   }, [success, selectedPlan.label]);
 
   if (success) {
     return (
       <div className="flex items-center justify-center min-h-[60vh] p-6 bg-[#F6F5FB]">
-        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center max-w-sm bg-white p-10 rounded-3xl shadow-xl">
-          <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-            <Check size={40} className="text-green-600" />
+        <motion.div initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="text-center max-w-md bg-white p-8 sm:p-10 rounded-3xl shadow-xl border border-gray-100">
+          <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <Check size={40} className="text-amber-600" />
           </div>
-          <h2 className="text-2xl font-heading font-bold mb-2 text-[#2D2159]">You're all set! 🎉</h2>
-          <p className="text-gray-600 mb-8 font-medium">Welcome to the <strong>{selectedPlan.label}</strong> plan. Your new features are active immediately.</p>
-          <Button className="w-full py-6 rounded-full bg-[#2D2159] hover:bg-[#3F2A78] text-white font-bold" onClick={() => { setSuccess(false); setCheckout(false); }}>
+          
+          <div className="inline-flex items-center gap-1.5 bg-amber-50 text-amber-900 border border-amber-200/80 text-xs font-extrabold px-3.5 py-1.5 rounded-full mb-4">
+            <span className="w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+            <span>Pending Admin Enablement</span>
+          </div>
+
+          <h2 className="text-2xl font-heading font-extrabold mb-2 text-[#2D2159]">Payment Submitted! 🎉</h2>
+          <p className="text-gray-600 mb-6 text-sm font-medium leading-relaxed">
+            Your payment details for the <strong>{selectedPlan.label}</strong> plan ($10/mo CAD) have been received. An admin will verify the payment and enable your leader/org account shortly!
+          </p>
+
+          <Button className="w-full py-6 rounded-full bg-[#2D2159] hover:bg-[#3F2A78] text-white font-bold text-base shadow-md" onClick={() => { setSuccess(false); setCheckout(false); }}>
             Back to Dashboard
           </Button>
         </motion.div>
