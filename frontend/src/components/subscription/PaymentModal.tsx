@@ -280,6 +280,63 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
                 exit={{ opacity: 0, x: -10 }}
                 className="space-y-6"
               >
+                {/* Express Digital Wallets (Apple Pay & Google Pay) */}
+                <div className="space-y-3">
+                  <div className="text-[11px] font-bold uppercase tracking-wider text-gray-400 text-center">Express Wallet Checkout</div>
+                  
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    {/* Apple Pay Button */}
+                    <button
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() => {
+                        setIsSubmitting(true);
+                        setTimeout(() => {
+                          setIsSubmitting(false);
+                          onSuccess();
+                        }, 1000);
+                      }}
+                      className="w-full py-3.5 px-4 rounded-xl bg-black hover:bg-gray-900 text-white font-medium flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer"
+                    >
+                      <span className="text-xs font-semibold">Pay with</span>
+                      <span className="text-base font-extrabold tracking-tight">Pay</span>
+                    </button>
+
+                    {/* Google Pay Button */}
+                    <button
+                      type="button"
+                      disabled={isSubmitting}
+                      onClick={() => {
+                        setIsSubmitting(true);
+                        setTimeout(() => {
+                          setIsSubmitting(false);
+                          onSuccess();
+                        }, 1000);
+                      }}
+                      className="w-full py-3.5 px-4 rounded-xl bg-white hover:bg-gray-50 text-gray-800 border border-gray-300 font-medium flex items-center justify-center gap-2 transition-all shadow-sm active:scale-95 cursor-pointer"
+                    >
+                      <span className="text-xs font-semibold">Pay with</span>
+                      <span className="text-base font-extrabold tracking-tight flex items-center gap-0.5">
+                        <span className="text-blue-500">G</span>
+                        <span className="text-red-500">o</span>
+                        <span className="text-yellow-500">o</span>
+                        <span className="text-blue-500">g</span>
+                        <span className="text-green-500">l</span>
+                        <span className="text-red-500">e</span>
+                        <span className="ml-1 text-gray-800">Pay</span>
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Divider */}
+                <div className="relative flex items-center justify-center my-2">
+                  <div className="border-t border-gray-200 w-full" />
+                  <span className="bg-white px-3 text-[10px] font-bold uppercase tracking-wider text-gray-400 shrink-0">
+                    Or pay with credit / debit card
+                  </span>
+                </div>
+
                 <form onSubmit={handleCardSubmit} className="space-y-4">
                   <div>
                     <label className="block text-xs font-bold text-gray-700 mb-1">Cardholder Name</label>
