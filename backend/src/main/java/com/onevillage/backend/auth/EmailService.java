@@ -51,6 +51,19 @@ public class EmailService {
                         + "If you didn't request this, you can safely ignore this email. This link expires in 1 hour.");
     }
 
+    public void sendPaymentReceiptEmail(String toEmail, String name, String planLabel, String amount, String memoCode) {
+        log.info("Sending payment receipt email to {} for plan {} ({})", toEmail, planLabel, amount);
+        send(toEmail, "NewVillages Payment Confirmation - " + planLabel + " Plan",
+                "Hi " + (name != null && !name.isBlank() ? name : "Leader") + ",\n\n"
+                        + "Thank you for subscribing to the NewVillages " + planLabel + " plan (" + amount + ")!\n\n"
+                        + "We have received your payment details (Reference Code: " + memoCode + ").\n"
+                        + "Our admin team is reviewing your payment and will enable your full leader/org account features shortly.\n\n"
+                        + "If you have any questions, reply directly to this email or contact support@newvillages.ca.\n\n"
+                        + "Warm regards,\n"
+                        + "The NewVillages Canada Team\n"
+                        + "https://www.luminex.rw");
+    }
+
     private void send(String to, String subject, String text) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();

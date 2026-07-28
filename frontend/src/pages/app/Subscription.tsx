@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Check } from 'lucide-react';
+import { Check, Mail } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { cn } from '../../lib/utils';
@@ -67,6 +67,14 @@ export function Subscription() {
           <p className="text-gray-600 mb-6 text-sm font-medium leading-relaxed">
             Your payment details for the <strong>{selectedPlan.label}</strong> plan ($10/mo CAD) have been received. An admin will verify the payment and enable your leader/org account shortly!
           </p>
+
+          <div className="bg-slate-50 border border-slate-200/80 rounded-2xl p-4 mb-6 text-left flex items-start gap-3">
+            <Mail size={18} className="text-[#1D4ED8] mt-0.5 shrink-0" />
+            <div className="text-xs text-slate-600 leading-relaxed">
+              <span className="font-bold text-slate-900 block mb-0.5">Confirmation Email Sent 📩</span>
+              A receipt with your payment reference code has been emailed to your input address for your records.
+            </div>
+          </div>
 
           <Button className="w-full py-6 rounded-full bg-[#2D2159] hover:bg-[#3F2A78] text-white font-bold text-base shadow-md" onClick={() => { setSuccess(false); setCheckout(false); }}>
             Back to Dashboard
