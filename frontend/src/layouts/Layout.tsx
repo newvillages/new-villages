@@ -76,13 +76,15 @@ export function Layout() {
     setIsCreateMenuOpen(false);
   }, [pathname]);
 
+  const isLeaderOrOrg = role === 'COMMUNITY_LEADER' || role === 'ORGANIZATION';
+
   const mainNavItems = [
     isAuthenticated
       ? { label: 'Dashboard', icon: Home, href: '/dashboard' }
       : { label: 'Home', icon: Home, href: '/' },
     { label: 'Communities', icon: Users, href: '/communities' },
     { label: 'Events', icon: Calendar, href: '/events' },
-    { label: 'Pricing', icon: Sparkles, href: '/pricing' },
+    ...(!isLeaderOrOrg ? [{ label: 'Pricing', icon: Sparkles, href: '/pricing' }] : []),
     ...(!isAuthenticated ? [{ label: 'Contact', icon: Mail, href: '/contact' }] : []),
     ...(isAuthenticated ? [{ label: 'Messages', icon: MessageSquare, href: '/messages' }] : []),
   ];
@@ -110,7 +112,7 @@ export function Layout() {
       : { label: 'Home', icon: Home, href: '/', isAction: false },
     { label: 'Communities', icon: Users, href: '/communities', isAction: false },
     { label: 'Events', icon: Calendar, href: '/events', isAction: false },
-    { label: 'Pricing', icon: Sparkles, href: '/pricing', isAction: false },
+    ...(!isLeaderOrOrg ? [{ label: 'Pricing', icon: Sparkles, href: '/pricing', isAction: false }] : []),
     ...(canCreateEvent
       ? [{ label: 'Create', icon: PlusCircle, href: '/create-event', isAction: true }]
       : []),
