@@ -19,6 +19,7 @@ import {
   MessageSquare,
   Flag,
   Send,
+  Copy,
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import {
@@ -208,6 +209,17 @@ export function LeaderDashboard() {
               ))}
             </select>
           )}
+          <Button
+            size="sm"
+            variant="outline"
+            className="flex items-center gap-1.5 border-primary text-primary hover:bg-primary/5"
+            onClick={() => {
+              navigator.clipboard.writeText(`${window.location.origin}/communities/${selectedCommunity?.id}`);
+              toast.success('Community invitation link copied to clipboard!');
+            }}
+          >
+            <Copy size={16} /> Copy Invite Link
+          </Button>
           <Button
             size="sm"
             className="flex items-center gap-1.5 bg-[#2D2159] hover:bg-[#3F2A78]"

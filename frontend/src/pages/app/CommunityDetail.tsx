@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Users, Calendar, MapPin, ArrowLeft, Flag, UserPlus, UserMinus, ShieldAlert, Clock, MessageSquare } from 'lucide-react';
+import { Users, Calendar, MapPin, ArrowLeft, Flag, UserPlus, UserMinus, ShieldAlert, Clock, MessageSquare, Share2 } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { CardSkeleton } from '../../components/ui/CardSkeleton';
@@ -150,6 +150,17 @@ export function CommunityDetail() {
                 {joined ? <><UserMinus size={16} className="mr-2"/> Leave</> : <><UserPlus size={16} className="mr-2"/>Join</>}
               </Button>
             )}
+            <Button
+              variant="outline"
+              onClick={() => {
+                navigator.clipboard.writeText(window.location.href);
+                toast.success('Community link copied to clipboard!');
+              }}
+              className="flex items-center gap-1.5"
+              title="Share community link"
+            >
+              <Share2 size={16} /> Share Link
+            </Button>
             <button
               onClick={() => setReportModalOpen(true)}
               className="p-2 text-gray-400 hover:text-red-500 transition-colors"
