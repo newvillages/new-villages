@@ -29,6 +29,14 @@ spring:
     password: ${MAIL_PASSWORD:Testpassword2026}
     properties:
       mail:
+        transport:
+          protocol: ${MAIL_PROTOCOL:smtps}
+        smtps:
+          auth: ${MAIL_SMTP_AUTH:true}
+          ssl:
+            enable: ${MAIL_SMTP_SSL:true}
+            trust: ${MAIL_SMTP_SSL_TRUST:*}
+            checkserveridentity: false
         smtp:
           auth: ${MAIL_SMTP_AUTH:true}
           starttls:
@@ -37,6 +45,10 @@ spring:
             enable: ${MAIL_SMTP_SSL:true}
             trust: ${MAIL_SMTP_SSL_TRUST:*}
             checkserveridentity: false
+          socketFactory:
+            port: ${MAIL_PORT:465}
+            class: javax.net.ssl.SSLSocketFactory
+            fallback: false
           connectiontimeout: 10000
           timeout: 10000
           writetimeout: 10000
