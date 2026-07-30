@@ -85,6 +85,7 @@ public class EmailService {
     }
 
     private void send(String to, String subject, String text) {
+        log.info("Sending email to [{}] | Subject: '{}'", to, subject);
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromAddress);
@@ -92,9 +93,10 @@ public class EmailService {
             message.setSubject(subject);
             message.setText(text);
             mailSender.send(message);
+            log.info("Email successfully sent to [{}]", to);
         } catch (Exception e) {
-            // Never let a flaky mail provider break registration/reset flows; log and move on.
-            log.error("Failed to send email to {}: {}", to, e.getMessage());
+            // Log error with cause details without throwing to avoid breaking workflow
+            log.error("Failed to send email to [{}]: {} (Cause: {})", to, e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "none", e);
         }
     }
 }

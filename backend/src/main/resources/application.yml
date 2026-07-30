@@ -35,7 +35,7 @@ spring:
             enable: ${MAIL_SMTP_STARTTLS:false}
           ssl:
             enable: ${MAIL_SMTP_SSL:true}
-            trust: ${MAIL_HOST:mail.carmani-business.com}
+            trust: ${MAIL_SMTP_SSL_TRUST:*}
             checkserveridentity: false
           connectiontimeout: 10000
           timeout: 10000

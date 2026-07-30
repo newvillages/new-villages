@@ -17,6 +17,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import com.onevillage.backend.notification.NotificationDispatcher;
+import com.onevillage.backend.notification.NotificationType;
+
 @Service
 public class CommunityService {
 
@@ -27,6 +30,7 @@ public class CommunityService {
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
     private final EmailService emailService;
+    private final NotificationDispatcher notificationDispatcher;
 
     public CommunityService(CommunityRepository communityRepository,
                              CommunityMembershipRepository membershipRepository,
@@ -34,7 +38,8 @@ public class CommunityService {
                              CommunityInvitationRepository invitationRepository,
                              UserRepository userRepository,
                              EventRepository eventRepository,
-                             EmailService emailService) {
+                             EmailService emailService,
+                             NotificationDispatcher notificationDispatcher) {
         this.communityRepository = communityRepository;
         this.membershipRepository = membershipRepository;
         this.creationRequestRepository = creationRequestRepository;
@@ -42,6 +47,7 @@ public class CommunityService {
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
         this.emailService = emailService;
+        this.notificationDispatcher = notificationDispatcher;
     }
 
     // --- Reads ---
@@ -125,7 +131,19 @@ public class CommunityService {
         CommunityInvitation invitation = new CommunityInvitation();
         invitation.setCommunityId(communityId);
         invitation.setInvitedEmail(invitedEmail.toLowerCase());
-        userRepository.findByEmailIgnoreCase(invitedEmail).ifPresent(u -> invitation.setInvitedUserId(u.getId()));
+
+        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(invitedEmail);
+        existingUser.ifPresent(u -> {
+            invitation.setInvitedUserId(u.getId());
+            notificationDispatcher.dispatch(
+                    u.getId(),
+                    NotificationType.INVITATION,
+                    "Community Invitation",
+                    inviterName + " invited you to join " + community.getName(),
+                    communityId
+            );
+        });
+
         invitation.setInvitedBy(inviterId);
         invitationRepository.save(invitation);
 

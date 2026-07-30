@@ -613,11 +613,12 @@ export function LeaderDashboard() {
       )}
 
       {/* Send Email Invite Modal */}
-      <Modal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} title="Send Direct Email Invitation">
+      <Modal isOpen={isInviteModalOpen} onClose={() => setIsInviteModalOpen(false)} title="Send Direct Email & Invitation Link">
         <form onSubmit={handleSendInvite} className="space-y-4">
           <p className="text-xs text-gray-600">
-            Send an official email invitation to a potential member to join <strong>{selectedCommunity?.name}</strong>.
+            Invite a potential member to join <strong>{selectedCommunity?.name}</strong>. An email is dispatched and registered members receive an immediate in-app notification bell update.
           </p>
+
           <div>
             <label className="block text-xs font-semibold text-gray-600 mb-1">Recipient Email Address</label>
             <input
@@ -629,6 +630,31 @@ export function LeaderDashboard() {
               required
             />
           </div>
+
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-3 space-y-1.5">
+            <span className="text-[11px] font-bold text-gray-700 block">Shareable Direct Invitation Link</span>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={`${window.location.origin}/communities/${selectedCommunity?.id}`}
+                className="w-full bg-white border border-gray-300 rounded-lg p-2 text-[11px] text-gray-600 focus:outline-none"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                className="shrink-0 text-xs py-2"
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/communities/${selectedCommunity?.id}`);
+                  toast.success('Invitation link copied to clipboard!');
+                }}
+              >
+                Copy Link
+              </Button>
+            </div>
+          </div>
+
           <div className="flex gap-2 pt-2">
             <Button type="button" variant="ghost" className="flex-1" onClick={() => setIsInviteModalOpen(false)}>
               Cancel
