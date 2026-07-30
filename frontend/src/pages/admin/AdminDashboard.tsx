@@ -214,72 +214,82 @@ function OverviewSection({ stats, reports }: { stats: AdminStats | undefined; re
 function BroadcastSection() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
+  const [targetMode, setTargetMode] = useState<'ALL' | 'SELECT' | 'EXCLUDE'>('ALL');
+  const [selectedCommunityIds, setSelectedCommunityIds] = useState<string[]>([]);
+  const [searchCommunity, setSearchCommunity] = useState('');
+
   const { data: communities } = useAdminCommunities();
   const activeCommunities = (communities ?? []).filter((c) => c.status === 'ACTIVE');
 
-  // Track selected community IDs. Default to all active communities.
-  const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  if (!isInitialized && activeCommunities.length > 0) {
-    setSelectedIds(activeCommunities.map((c) => c.id));
-    setIsInitialized(true);
-  }
-
   const broadcastMutation = useAdminBroadcast();
 
-  const toggleCommunity = (id: string) => {
-    setSelectedIds((prev) =>
+  const handleToggleCommunity = (id: string) => {
+    setSelectedCommunityIds((prev) =>
       prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
     );
   };
 
-  const selectAll = () => setSelectedIds(activeCommunities.map((c) => c.id));
-  const deselectAll = () => setSelectedIds([]);
+  const handleSelectAll = () => {
+    setSelectedCommunityIds(activeCommunities.map((c) => c.id));
+  };
+
+  const handleClearAll = () => {
+    setSelectedCommunityIds([]);
+  };
 
   const handleBroadcast = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
-    if (selectedIds.length === 0) {
+
+    if (targetMode === 'SELECT' && selectedCommunityIds.length === 0) {
       toast.info('Please select at least one community to receive the broadcast.');
       return;
     }
 
-    const isAllSelected = selectedIds.length === activeCommunities.length;
+    const payload = {
+      title: title.trim() || undefined,
+      message,
+      targetCommunityIds: targetMode === 'SELECT' ? selectedCommunityIds : undefined,
+      excludedCommunityIds: targetMode === 'EXCLUDE' ? selectedCommunityIds : undefined,
+    };
 
-    broadcastMutation.mutate(
-      {
-        title: title.trim() || undefined,
-        message,
-        targetCommunityIds: isAllSelected ? undefined : selectedIds,
+    broadcastMutation.mutate(payload, {
+      onSuccess: () => {
+        toast.success('Admin broadcast announcement published successfully!');
+        setTitle('');
+        setMessage('');
+        setSelectedCommunityIds([]);
+        setTargetMode('ALL');
       },
-      {
-        onSuccess: () => {
-          toast.success(
-            isAllSelected
-              ? 'Broadcast published to all active community groups!'
-              : `Broadcast published to ${selectedIds.length} selected community group(s)!`
-          );
-          setTitle('');
-          setMessage('');
-        },
-        onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Failed to send broadcast.'),
-      }
-    );
+      onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Failed to send broadcast.'),
+    });
   };
 
+  const filteredCommunities = activeCommunities.filter(
+    (c) =>
+      c.name.toLowerCase().includes(searchCommunity.toLowerCase()) ||
+      (c.category && c.category.toLowerCase().includes(searchCommunity.toLowerCase()))
+  );
+
+  const recipientCount =
+    targetMode === 'ALL'
+      ? activeCommunities.length
+      : targetMode === 'SELECT'
+      ? selectedCommunityIds.length
+      : Math.max(0, activeCommunities.length - selectedCommunityIds.length);
+
   return (
-    <div className="space-y-4 max-w-4xl">
+    <div className="space-y-4 max-w-3xl">
       <div>
         <h1 className="text-2xl font-heading font-bold text-gray-900">Admin Broadcast Announcement</h1>
         <p className="text-sm text-gray-500">
-          Send an official broadcast message / announcement. Select specific communities or target all groups simultaneously.
+          Send an official broadcast message / announcement to all active groups or target specific communities.
         </p>
       </div>
 
       <Card>
         <CardContent className="p-6">
-          <form onSubmit={handleBroadcast} className="space-y-5">
+          <form onSubmit={handleBroadcast} className="space-y-6">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Announcement Title (Optional)</label>
               <input
@@ -297,78 +307,113 @@ function BroadcastSection() {
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
                 rows={5}
-                placeholder="Type your platform announcement here. This message will be published to feed of selected communities and sent as a system notification..."
+                placeholder="Type your platform announcement here. This message will be published to target community feeds and sent as system notifications..."
                 className="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:outline-none"
                 required
               />
             </div>
 
-            {/* Target Communities Multi-select & Filter */}
-            <div className="border border-gray-200 rounded-2xl p-4 bg-slate-50 space-y-3">
-              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 pb-3">
-                <div>
-                  <h3 className="font-bold text-sm text-gray-900 flex items-center gap-2">
-                    <Radio size={16} className="text-primary" /> Target Communities
-                  </h3>
-                  <p className="text-xs text-gray-500">
-                    {selectedIds.length} of {activeCommunities.length} active communities selected
-                    {selectedIds.length < activeCommunities.length && selectedIds.length > 0 && (
-                      <span className="text-amber-600 font-semibold ml-1.5">
-                        ({activeCommunities.length - selectedIds.length} excluded)
-                      </span>
+            {/* Target Mode Selector */}
+            <div className="space-y-3 pt-2 border-t border-gray-100">
+              <label className="block text-sm font-semibold text-gray-700">Target Community Audience</label>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                {[
+                  { id: 'ALL', label: 'All Active Groups', desc: `All ${activeCommunities.length} communities` },
+                  { id: 'SELECT', label: 'Select Specific Groups', desc: 'Target chosen communities' },
+                  { id: 'EXCLUDE', label: 'Exclude Specific Groups', desc: 'Exclude chosen communities' },
+                ].map((mode) => (
+                  <button
+                    key={mode.id}
+                    type="button"
+                    onClick={() => {
+                      setTargetMode(mode.id as typeof targetMode);
+                      setSelectedCommunityIds([]);
+                    }}
+                    className={cn(
+                      'p-3 rounded-xl border text-left transition-all',
+                      targetMode === mode.id
+                        ? 'border-primary bg-primary/5 ring-2 ring-primary/20 font-semibold'
+                        : 'border-gray-200 hover:border-gray-300'
                     )}
-                  </p>
-                </div>
-                <div className="flex gap-2">
-                  <Button type="button" variant="ghost" size="sm" onClick={selectAll} className="text-xs py-1">
-                    Select All
-                  </Button>
-                  <Button type="button" variant="ghost" size="sm" onClick={deselectAll} className="text-xs py-1 text-gray-500">
-                    Deselect All
-                  </Button>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-56 overflow-y-auto pt-1">
-                {activeCommunities.map((c) => {
-                  const checked = selectedIds.includes(c.id);
-                  return (
-                    <label
-                      key={c.id}
-                      className={cn(
-                        'flex items-center gap-2.5 p-2.5 rounded-xl border text-xs font-medium cursor-pointer transition-all',
-                        checked ? 'bg-white border-primary text-primary shadow-sm' : 'bg-white/60 border-gray-200 text-gray-500 hover:bg-white'
-                      )}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={checked}
-                        onChange={() => toggleCommunity(c.id)}
-                        className="rounded text-primary focus:ring-primary"
-                      />
-                      <span className="truncate flex-1 font-semibold">{c.name}</span>
-                      <span className="text-[10px] text-gray-400 font-normal shrink-0">{c.memberCount} members</span>
-                    </label>
-                  );
-                })}
+                  >
+                    <p className="text-xs font-bold text-gray-900">{mode.label}</p>
+                    <p className="text-[11px] text-gray-500 mt-0.5">{mode.desc}</p>
+                  </button>
+                ))}
               </div>
             </div>
 
-            <div className="flex justify-between items-center pt-2">
-              <p className="text-xs text-gray-500">
-                Will send broadcast to <strong>{selectedIds.length}</strong> community circle(s).
-              </p>
-              <Button
-                type="submit"
-                className="bg-primary hover:bg-primary-hover flex items-center gap-2 px-6"
-                disabled={broadcastMutation.isPending || selectedIds.length === 0}
-              >
+            {/* Community Multi-Select Grid when SELECT or EXCLUDE */}
+            {targetMode !== 'ALL' && (
+              <div className="space-y-3 p-4 bg-gray-50 rounded-2xl border border-gray-200">
+                <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-2">
+                  <span className="text-xs font-bold text-gray-700">
+                    {targetMode === 'SELECT'
+                      ? `Select Communities to Include (${selectedCommunityIds.length} selected)`
+                      : `Select Communities to Exclude (${selectedCommunityIds.length} excluded)`}
+                  </span>
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={handleSelectAll}
+                      className="text-xs text-primary font-semibold hover:underline"
+                    >
+                      Select All
+                    </button>
+                    <span className="text-gray-300">|</span>
+                    <button
+                      type="button"
+                      onClick={handleClearAll}
+                      className="text-xs text-gray-500 font-semibold hover:underline"
+                    >
+                      Clear
+                    </button>
+                  </div>
+                </div>
+
+                <input
+                  type="text"
+                  value={searchCommunity}
+                  onChange={(e) => setSearchCommunity(e.target.value)}
+                  placeholder="Filter communities by name or category..."
+                  className="w-full border border-gray-300 rounded-lg p-2 text-xs bg-white focus:outline-none focus:ring-2 focus:ring-primary"
+                />
+
+                <div className="max-h-48 overflow-y-auto grid grid-cols-1 sm:grid-cols-2 gap-2 pr-1">
+                  {filteredCommunities.map((community) => {
+                    const isSelected = selectedCommunityIds.includes(community.id);
+                    return (
+                      <label
+                        key={community.id}
+                        className={cn(
+                          'flex items-center gap-2.5 p-2.5 rounded-lg border text-xs cursor-pointer transition-colors bg-white',
+                          isSelected ? 'border-primary bg-primary/5 font-semibold text-primary' : 'border-gray-200 hover:bg-gray-100 text-gray-700'
+                        )}
+                      >
+                        <input
+                          type="checkbox"
+                          checked={isSelected}
+                          onChange={() => handleToggleCommunity(community.id)}
+                          className="rounded text-primary focus:ring-primary"
+                        />
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-medium">{community.name}</p>
+                          <p className="text-[10px] text-gray-400 truncate">{community.category || 'General'}</p>
+                        </div>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between pt-2 border-t border-gray-100">
+              <span className="text-xs font-semibold text-gray-500">
+                Will broadcast to <strong>{recipientCount}</strong> active {recipientCount === 1 ? 'community' : 'communities'}
+              </span>
+              <Button type="submit" className="bg-primary hover:bg-primary-hover flex items-center gap-2" disabled={broadcastMutation.isPending}>
                 <Send size={16} />
-                {broadcastMutation.isPending
-                  ? 'Sending Broadcast…'
-                  : selectedIds.length === activeCommunities.length
-                  ? 'Send Broadcast to All Groups'
-                  : `Send Broadcast to ${selectedIds.length} Group(s)`}
+                {broadcastMutation.isPending ? 'Sending Broadcast…' : `Send Broadcast to ${recipientCount} ${recipientCount === 1 ? 'Group' : 'Groups'}`}
               </Button>
             </div>
           </form>
