@@ -6,16 +6,18 @@ import { Input } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
 import { cn } from '../../lib/utils';
 import { useConversations, useMessages, useSendMessage, useStartConversation } from '../../hooks/useMessaging';
-import { useMyCommunities } from '../../hooks/useCommunities';
+import { useMyCommunities, useCommunityMembers } from '../../hooks/useCommunities';
 import { useOrganizationsList } from '../../hooks/useOrganizations';
 import { useBlockUser } from '../../hooks/useUser';
 import { useSubmitReport } from '../../hooks/useReports';
 import { ApiError } from '../../lib/apiClient';
 import { toast } from '../../store/useToastStore';
+import { useStore } from '../../store/useStore';
 
 export function Messaging() {
   const location = useLocation();
   const stateLocation = location.state as { targetUserId?: string; targetUserName?: string } | null;
+  const currentUser = useStore((s) => s.currentUser);
 
   const { data: conversations } = useConversations();
   const [selectedId, setSelectedId] = useState<string | null>(null);
@@ -50,6 +52,9 @@ export function Messaging() {
 
   const { data: myCommunities } = useMyCommunities();
   const { data: organizations } = useOrganizationsList();
+  const { data: rosterMembers, isLoading: rosterLoading } = useCommunityMembers(
+    composeTo === 'USER' ? composeCommunityId : undefined
+  );
 
   useEffect(() => {
     if (stateLocation?.targetUserId) {
@@ -340,16 +345,70 @@ export function Messaging() {
           )}
 
           {composeTo === 'USER' && (
-            <div>
-              <label className="block text-sm font-medium mb-1">Target Member User ID</label>
-              <input
-                type="text"
-                value={composeTargetUserId}
-                onChange={(e) => setComposeTargetUserId(e.target.value)}
-                required
-                placeholder="Enter member user UUID or select from roster"
-                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary focus:outline-none"
-              />
+            <div className="space-y-3">
+              {stateLocation?.targetUserId && composeTargetUserId === stateLocation.targetUserId ? (
+                <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-center justify-between text-xs text-primary font-semibold">
+                  <span>Messaging Member: {stateLocation.targetUserName || 'Selected Member'}</span>
+                  <button
+                    type="button"
+                    onClick={() => setComposeTargetUserId('')}
+                    className="underline text-gray-500 hover:text-gray-700"
+                  >
+                    Select Different Member
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Community Circle</label>
+                    <select
+                      value={composeCommunityId}
+                      onChange={(e) => {
+                        setComposeCommunityId(e.target.value);
+                        setComposeTargetUserId('');
+                      }}
+                      required={!composeTargetUserId}
+                      className="w-full border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-primary focus:outline-none"
+                    >
+                      <option value="" disabled>
+                        Choose a community to view member roster...
+                      </option>
+                      {(myCommunities ?? []).map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {composeCommunityId && (
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-1">Choose Member from Roster</label>
+                      {rosterLoading ? (
+                        <p className="text-xs text-gray-400 py-2">Loading member roster...</p>
+                      ) : (
+                        <select
+                          value={composeTargetUserId}
+                          onChange={(e) => setComposeTargetUserId(e.target.value)}
+                          required
+                          className="w-full border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-primary focus:outline-none"
+                        >
+                          <option value="" disabled>
+                            Select a member to start conversation...
+                          </option>
+                          {(rosterMembers ?? [])
+                            .filter((m) => m.userId !== currentUser?.id)
+                            .map((m) => (
+                              <option key={m.userId} value={m.userId}>
+                                {m.fullName || 'Member'} ({m.roleInCommunity.toLowerCase()})
+                              </option>
+                            ))}
+                        </select>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
             </div>
           )}
 

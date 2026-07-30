@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import { Users, Calendar, MapPin, ArrowLeft, Flag, UserPlus, UserMinus, ShieldAlert, Clock, MessageSquare } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -15,11 +15,14 @@ import { motion } from 'framer-motion';
 import { GlobalReportModal } from '../../components/ui/GlobalReportModal';
 import { CommunityTermsModal } from '../../components/ui/CommunityTermsModal';
 import { useStartConversation } from '../../hooks/useMessaging';
+import { useStore } from '../../store/useStore';
 import { toast } from '../../store/useToastStore';
 
 type Tab = 'feed' | 'members' | 'events' | 'about';
 
 export function CommunityDetail() {
+  const navigate = useNavigate();
+  const currentUser = useStore((s) => s.currentUser);
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<Tab>('feed');
   const [reportModalOpen, setReportModalOpen] = useState(false);
@@ -240,12 +243,24 @@ export function CommunityDetail() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {(members ?? []).map(member => (
                 <Card key={member.userId}>
-                  <CardContent className="p-4 flex items-center gap-3">
-                    <img src={member.avatarUrl || `https://i.pravatar.cc/150?u=${member.userId}`} alt="" className="w-12 h-12 rounded-full" />
-                    <div>
-                      <p className="font-semibold text-gray-900">{member.fullName ?? 'Member'}</p>
-                      <p className="text-xs text-gray-500 capitalize">{member.roleInCommunity.toLowerCase()}</p>
+                  <CardContent className="p-4 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <img src={member.avatarUrl || `https://i.pravatar.cc/150?u=${member.userId}`} alt="" className="w-12 h-12 rounded-full shrink-0" />
+                      <div className="min-w-0">
+                        <p className="font-semibold text-gray-900 truncate">{member.fullName ?? 'Member'}</p>
+                        <p className="text-xs text-gray-500 capitalize">{member.roleInCommunity.toLowerCase()}</p>
+                      </div>
                     </div>
+                    {member.userId !== currentUser?.id && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="shrink-0 text-xs flex items-center gap-1"
+                        onClick={() => navigate('/messages', { state: { targetUserId: member.userId, targetUserName: member.fullName } })}
+                      >
+                        <MessageSquare size={14} /> Message
+                      </Button>
+                    )}
                   </CardContent>
                 </Card>
               ))}
