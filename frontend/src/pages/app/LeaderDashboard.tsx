@@ -279,6 +279,12 @@ export function LeaderDashboard() {
                           />
                           <div>
                             <p className="font-semibold text-gray-900">{member.fullName ?? 'Member'}</p>
+                            {(member.email || member.city) && (
+                              <p className="text-xs text-gray-400">
+                                {member.city ? `${member.city} ` : ''}
+                                {member.email ? `(${member.email})` : ''}
+                              </p>
+                            )}
                           </div>
                         </td>
                         <td className="px-4 py-3 capitalize">{member.roleInCommunity.toLowerCase()}</td>

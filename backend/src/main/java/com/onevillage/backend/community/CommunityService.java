@@ -320,8 +320,17 @@ public class CommunityService {
 
     private CommunityMemberResponse toMemberResponse(CommunityMembership m) {
         User user = userRepository.findById(m.getUserId()).orElse(null);
-        return new CommunityMemberResponse(m.getUserId(), user == null ? null : user.getFullName(),
-                user == null ? null : user.getAvatarUrl(), m.getRoleInCommunity(), m.getStatus(), m.getRequestedAt(), m.getJoinedAt());
+        return new CommunityMemberResponse(
+                m.getUserId(),
+                user == null ? null : user.getFullName(),
+                user == null ? null : user.getEmail(),
+                user == null ? null : user.getCity(),
+                user == null ? null : user.getAvatarUrl(),
+                m.getRoleInCommunity(),
+                m.getStatus(),
+                m.getRequestedAt(),
+                m.getJoinedAt()
+        );
     }
 
     private CommunityCreationRequestResponse toCreationRequestResponse(CommunityCreationRequest r) {

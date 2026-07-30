@@ -33,6 +33,8 @@ export interface CommunityInvitation {
 export interface CommunityMember {
   userId: string;
   fullName: string | null;
+  email?: string | null;
+  city?: string | null;
   avatarUrl: string | null;
   roleInCommunity: 'LEADER' | 'MEMBER';
   status: 'JOINED' | 'PENDING_REQUEST';

@@ -248,7 +248,10 @@ export function CommunityDetail() {
                       <img src={member.avatarUrl || `https://i.pravatar.cc/150?u=${member.userId}`} alt="" className="w-12 h-12 rounded-full shrink-0" />
                       <div className="min-w-0">
                         <p className="font-semibold text-gray-900 truncate">{member.fullName ?? 'Member'}</p>
-                        <p className="text-xs text-gray-500 capitalize">{member.roleInCommunity.toLowerCase()}</p>
+                        <p className="text-xs text-gray-500 capitalize">
+                          {member.roleInCommunity.toLowerCase()} {member.city ? `• ${member.city}` : ''}
+                        </p>
+                        {member.email && <p className="text-[11px] text-gray-400 truncate">{member.email}</p>}
                       </div>
                     </div>
                     {member.userId !== currentUser?.id && (

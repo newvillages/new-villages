@@ -400,7 +400,10 @@ export function Messaging() {
                             .filter((m) => m.userId !== currentUser?.id)
                             .map((m) => (
                               <option key={m.userId} value={m.userId}>
-                                {m.fullName || 'Member'} ({m.roleInCommunity.toLowerCase()})
+                                {m.fullName || 'Member'}
+                                {m.city ? ` — ${m.city}` : ''}
+                                {m.email ? ` (${m.email})` : ''}
+                                {` [${m.roleInCommunity.toLowerCase()}]`}
                               </option>
                             ))}
                         </select>

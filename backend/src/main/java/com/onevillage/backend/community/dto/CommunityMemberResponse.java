@@ -9,6 +9,8 @@ import java.util.UUID;
 public record CommunityMemberResponse(
         UUID userId,
         String fullName,
+        String email,
+        String city,
         String avatarUrl,
         CommunityMemberRole roleInCommunity,
         MembershipStatus status,
