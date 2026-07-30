@@ -5,9 +5,10 @@ import type { PageResponse } from '../types/api';
 import type { Conversation, Message } from '../types/message';
 
 export interface StartConversationPayload {
-  type: 'LEADER' | 'ORG' | 'ADMIN';
+  type: 'LEADER' | 'ORG' | 'ADMIN' | 'USER' | 'MEMBER';
   communityId?: string;
   organizationId?: string;
+  targetUserId?: string;
   initialMessage: string;
 }
 

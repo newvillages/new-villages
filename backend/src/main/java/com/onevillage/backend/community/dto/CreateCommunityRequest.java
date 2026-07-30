@@ -9,6 +9,7 @@ public record CreateCommunityRequest(
         String category,
         String city,
         String visibility,
-        String coverImageUrl
+        String coverImageUrl,
+        String customTerms
 ) {
 }

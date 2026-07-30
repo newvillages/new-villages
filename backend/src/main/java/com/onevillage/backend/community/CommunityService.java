@@ -1,5 +1,6 @@
 package com.onevillage.backend.community;
 
+import com.onevillage.backend.auth.EmailService;
 import com.onevillage.backend.common.ApiException;
 import com.onevillage.backend.community.dto.*;
 import com.onevillage.backend.event.EventRepository;
@@ -25,19 +26,22 @@ public class CommunityService {
     private final CommunityInvitationRepository invitationRepository;
     private final UserRepository userRepository;
     private final EventRepository eventRepository;
+    private final EmailService emailService;
 
     public CommunityService(CommunityRepository communityRepository,
                              CommunityMembershipRepository membershipRepository,
                              CommunityCreationRequestRepository creationRequestRepository,
                              CommunityInvitationRepository invitationRepository,
                              UserRepository userRepository,
-                             EventRepository eventRepository) {
+                             EventRepository eventRepository,
+                             EmailService emailService) {
         this.communityRepository = communityRepository;
         this.membershipRepository = membershipRepository;
         this.creationRequestRepository = creationRequestRepository;
         this.invitationRepository = invitationRepository;
         this.userRepository = userRepository;
         this.eventRepository = eventRepository;
+        this.emailService = emailService;
     }
 
     // --- Reads ---
@@ -114,12 +118,18 @@ public class CommunityService {
     @Transactional
     public void invite(UUID communityId, UUID inviterId, String invitedEmail) {
         requireLeader(communityId, inviterId);
+        Community community = getEntity(communityId);
+        User inviter = userRepository.findById(inviterId).orElse(null);
+        String inviterName = inviter != null ? inviter.getFullName() : "Community Leader";
+
         CommunityInvitation invitation = new CommunityInvitation();
         invitation.setCommunityId(communityId);
         invitation.setInvitedEmail(invitedEmail.toLowerCase());
         userRepository.findByEmailIgnoreCase(invitedEmail).ifPresent(u -> invitation.setInvitedUserId(u.getId()));
         invitation.setInvitedBy(inviterId);
         invitationRepository.save(invitation);
+
+        emailService.sendCommunityInvitationEmail(invitedEmail, inviterName, community.getName(), communityId.toString());
     }
 
     @Transactional
@@ -284,6 +294,14 @@ public class CommunityService {
         return communityRepository.countByStatus(status);
     }
 
+    @Transactional
+    public void updateCustomTerms(UUID communityId, UUID leaderId, String customTerms) {
+        requireLeader(communityId, leaderId);
+        Community community = getEntity(communityId);
+        community.setCustomTerms(customTerms);
+        communityRepository.save(community);
+    }
+
     // --- Mapping helpers ---
 
     private CommunityResponse toResponse(Community c, UUID currentUserId) {
@@ -297,7 +315,7 @@ public class CommunityService {
         }
         return new CommunityResponse(c.getId(), c.getName(), c.getDescription(), c.getCategory(), c.getVisibility(),
                 c.getCoverImageUrl(), c.getIconName(), c.getColor(), c.getStatus(), c.getLeaderId(), leaderName,
-                memberCount, membershipState, c.getCreatedAt());
+                memberCount, membershipState, c.getCustomTerms(), c.getCreatedAt());
     }
 
     private CommunityMemberResponse toMemberResponse(CommunityMembership m) {

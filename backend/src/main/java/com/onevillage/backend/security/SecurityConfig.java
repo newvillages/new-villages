@@ -89,7 +89,9 @@ public class SecurityConfig {
                                 "/actuator/health",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/api/categories",
+                                "/api/pricing-plans"
                         ).permitAll()
                         // Anyone can browse the community directory; joining, viewing full
                         // detail, and every other community endpoint still require a session.

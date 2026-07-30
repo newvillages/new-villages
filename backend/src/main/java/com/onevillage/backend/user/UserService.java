@@ -147,6 +147,15 @@ public class UserService {
         userRepository.save(user);
     }
 
+    @Transactional
+    public void removeLeaderRole(UUID userId) {
+        User user = getEntity(userId);
+        if (user.getRole() == UserRole.COMMUNITY_LEADER) {
+            user.setRole(UserRole.MEMBER);
+            userRepository.save(user);
+        }
+    }
+
     public long countByRole(UserRole role) {
         return userRepository.countByRole(role);
     }

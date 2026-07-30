@@ -46,3 +46,39 @@ export interface TermsStatusResponse {
   currentVersion: string;
   acceptedVersion: string | null;
 }
+
+export interface CommunityCategory {
+  id: string;
+  name: string;
+  description?: string;
+  iconName?: string;
+  createdAt: string;
+}
+
+export interface PricingPlan {
+  id: string;
+  code: string;
+  name: string;
+  price: number;
+  currency: string;
+  billingPeriod: string;
+  tag?: string;
+  description?: string;
+  features?: string;
+  active: boolean;
+  createdAt: string;
+}
+
+export interface RefundRequest {
+  id: string;
+  userId: string;
+  userName?: string;
+  userEmail?: string;
+  amount?: number;
+  reason: string;
+  details?: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  reviewedBy?: string;
+  reviewedAt?: string;
+  createdAt: string;
+}

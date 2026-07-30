@@ -6,6 +6,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { cn } from '../../lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useCategories } from '../../hooks/useAdmin';
 import { useCreateCommunityRequest } from '../../hooks/useCommunities';
 import { useUploadImage } from '../../hooks/useUpload';
 import { useStore } from '../../store/useStore';
@@ -13,11 +14,14 @@ import { ApiError } from '../../lib/apiClient';
 import { toast } from '../../store/useToastStore';
 
 const STEPS = ['Basic Info', 'Details', 'Privacy', 'Review'];
-const CATEGORIES = ['Professional', 'Social', 'Support', 'Cultural', 'Alumni', 'Sports', 'Arts', 'Faith'];
+const DEFAULT_CATEGORIES = ['Culture & Heritage', 'Tech & Innovation', 'Sports & Wellness', 'Arts & Entertainment', 'Parents & Families', 'Local Support'];
 
 export function CreateCommunity() {
   const navigate = useNavigate();
   const currentUser = useStore((s) => s.currentUser);
+  const { data: dynamicCategories } = useCategories();
+
+  const categoriesList = dynamicCategories && dynamicCategories.length > 0 ? dynamicCategories.map(c => c.name) : DEFAULT_CATEGORIES;
 
   useEffect(() => {
     if (currentUser && currentUser.role !== 'COMMUNITY_LEADER') {
@@ -103,7 +107,7 @@ export function CreateCommunity() {
                     <div>
                       <label className="block text-sm font-medium mb-2">Category *</label>
                       <div className="flex flex-wrap gap-2">
-                        {CATEGORIES.map(cat => (
+                        {categoriesList.map(cat => (
                           <button key={cat} type="button" onClick={() => update('category', cat)} className={cn("px-3 py-1.5 rounded-full border text-sm font-medium transition-colors", form.category === cat ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-600 hover:border-primary/50')}>{cat}</button>
                         ))}
                       </div>

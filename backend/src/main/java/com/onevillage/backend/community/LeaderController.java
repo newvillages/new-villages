@@ -40,4 +40,10 @@ public class LeaderController {
     public CommunityAnalyticsResponse analytics(@PathVariable UUID communityId) {
         return communityService.getAnalytics(communityId, SecurityUtils.currentUserId());
     }
+
+    @PutMapping("/terms")
+    public ResponseEntity<Void> updateTerms(@PathVariable UUID communityId, @RequestBody com.onevillage.backend.community.dto.UpdateCommunityTermsRequest request) {
+        communityService.updateCustomTerms(communityId, SecurityUtils.currentUserId(), request.customTerms());
+        return ResponseEntity.noContent().build();
+    }
 }

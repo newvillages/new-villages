@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { Users, Calendar, MapPin, ArrowLeft, Flag, UserPlus, UserMinus, ShieldAlert, Clock } from 'lucide-react';
+import { Users, Calendar, MapPin, ArrowLeft, Flag, UserPlus, UserMinus, ShieldAlert, Clock, MessageSquare } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { CardSkeleton } from '../../components/ui/CardSkeleton';
@@ -13,6 +13,8 @@ import { formatEventDate, formatEventTime, formatRelativeTime } from '../../lib/
 import { cn } from '../../lib/utils';
 import { motion } from 'framer-motion';
 import { GlobalReportModal } from '../../components/ui/GlobalReportModal';
+import { CommunityTermsModal } from '../../components/ui/CommunityTermsModal';
+import { useStartConversation } from '../../hooks/useMessaging';
 import { toast } from '../../store/useToastStore';
 
 type Tab = 'feed' | 'members' | 'events' | 'about';
@@ -21,6 +23,8 @@ export function CommunityDetail() {
   const { id } = useParams<{ id: string }>();
   const [activeTab, setActiveTab] = useState<Tab>('feed');
   const [reportModalOpen, setReportModalOpen] = useState(false);
+  const [reportLeaderOpen, setReportLeaderOpen] = useState(false);
+  const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [postDraft, setPostDraft] = useState('');
 
   const { data: community, isLoading: communityLoading } = useCommunity(id);
@@ -30,6 +34,7 @@ export function CommunityDetail() {
   const joinMutation = useJoinCommunity();
   const leaveMutation = useLeaveCommunity();
   const createPost = useCreatePost(id ?? '');
+  const startConversation = useStartConversation();
 
   const communityEvents = eventsPage?.content ?? [];
   const posts = postsPage?.content ?? [];
@@ -53,14 +58,28 @@ export function CommunityDetail() {
   const joined = community.membershipState === 'JOINED';
   const pending = community.membershipState === 'PENDING_REQUEST';
 
-  const handleJoinToggle = () => {
+  const handleJoinClick = () => {
     if (joined) {
       leaveMutation.mutate(community.id, {
         onError: (err) => toast.info(err.message || 'Could not leave this community.'),
       });
     } else if (!pending) {
-      joinMutation.mutate(community.id);
+      if (community.customTerms && community.customTerms.trim().length > 0) {
+        setTermsModalOpen(true);
+      } else {
+        executeJoin();
+      }
     }
+  };
+
+  const executeJoin = () => {
+    joinMutation.mutate(community.id, {
+      onSuccess: () => {
+        toast.success('Join request sent / joined community!');
+        setTermsModalOpen(false);
+      },
+      onError: (err) => toast.info(err.message || 'Could not join this community.'),
+    });
   };
 
   const handlePost = (e: React.FormEvent) => {
@@ -70,6 +89,20 @@ export function CommunityDetail() {
       onSuccess: () => setPostDraft(''),
       onError: (err) => toast.info(err.message || 'Could not publish your post.'),
     });
+  };
+
+  const handleContactLeader = () => {
+    startConversation.mutate(
+      {
+        type: 'LEADER',
+        communityId: community.id,
+        initialMessage: `Hi ${community.leaderName || 'Leader'}, I have a question about ${community.name}.`,
+      },
+      {
+        onSuccess: () => toast.success('Conversation started with community leader!'),
+        onError: (err) => toast.info(err.message || 'Could not start conversation.'),
+      }
+    );
   };
 
   return (
@@ -108,7 +141,7 @@ export function CommunityDetail() {
             ) : (
               <Button
                 variant={joined ? "outline" : "primary"}
-                onClick={handleJoinToggle}
+                onClick={handleJoinClick}
                 disabled={joinMutation.isPending || leaveMutation.isPending}
               >
                 {joined ? <><UserMinus size={16} className="mr-2"/> Leave</> : <><UserPlus size={16} className="mr-2"/>Join</>}
@@ -123,6 +156,19 @@ export function CommunityDetail() {
             </button>
           </div>
         </div>
+
+        {/* Custom terms badge if present */}
+        {community.customTerms && (
+          <div className="mb-4 p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-900 text-xs flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ShieldAlert size={16} className="text-blue-600" />
+              <span>This community has specific Community Terms & Conditions that apply to members.</span>
+            </div>
+            <button onClick={() => setTermsModalOpen(true)} className="text-primary font-bold hover:underline">
+              View Terms
+            </button>
+          </div>
+        )}
 
         {/* Tabs */}
         <div className="flex space-x-1 border-b border-gray-200 mb-6">
@@ -217,7 +263,7 @@ export function CommunityDetail() {
 
         {activeTab === 'about' && (
           <div className="grid md:grid-cols-3 gap-6">
-            <div className="md:col-span-2">
+            <div className="md:col-span-2 space-y-4">
               <Card>
                 <CardContent className="p-6 space-y-4">
                   <div>
@@ -234,6 +280,19 @@ export function CommunityDetail() {
                   )}
                 </CardContent>
               </Card>
+
+              {community.customTerms && (
+                <Card>
+                  <CardContent className="p-6 space-y-2">
+                    <h3 className="font-bold text-gray-900 flex items-center gap-2">
+                      <ShieldAlert size={18} className="text-amber-600" /> Community Specific Terms & Conditions
+                    </h3>
+                    <p className="text-xs text-gray-600 whitespace-pre-wrap bg-gray-50 p-3 rounded-xl border border-gray-200">
+                      {community.customTerms}
+                    </p>
+                  </CardContent>
+                </Card>
+              )}
             </div>
 
             <div>
@@ -249,12 +308,13 @@ export function CommunityDetail() {
                       <p className="text-xs text-gray-500">Community Leader</p>
                     </div>
                   </div>
-                  <div className="pt-2">
-                    <Link to="/messages">
-                      <Button variant="outline" size="sm" className="w-full text-xs">
-                        Contact Leader
-                      </Button>
-                    </Link>
+                  <div className="pt-2 space-y-2">
+                    <Button variant="outline" size="sm" className="w-full text-xs flex items-center justify-center gap-1" onClick={handleContactLeader}>
+                      <MessageSquare size={14} /> Contact Leader
+                    </Button>
+                    <Button variant="ghost" size="sm" className="w-full text-xs text-red-600 hover:bg-red-50 flex items-center justify-center gap-1" onClick={() => setReportLeaderOpen(true)}>
+                      <Flag size={14} /> Report Leader
+                    </Button>
                   </div>
                 </CardContent>
               </Card>
@@ -270,6 +330,25 @@ export function CommunityDetail() {
         targetType="COMMUNITY"
         targetId={community.id}
       />
+
+      <GlobalReportModal
+        isOpen={reportLeaderOpen}
+        onClose={() => setReportLeaderOpen(false)}
+        targetName={community.leaderName || 'Community Leader'}
+        targetType="USER"
+        targetId={community.leaderId}
+      />
+
+      {community.customTerms && (
+        <CommunityTermsModal
+          isOpen={termsModalOpen}
+          onClose={() => setTermsModalOpen(false)}
+          onAccept={executeJoin}
+          communityName={community.name}
+          customTerms={community.customTerms}
+          isPending={joinMutation.isPending}
+        />
+      )}
     </div>
   );
 }

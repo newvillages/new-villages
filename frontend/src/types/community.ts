@@ -16,6 +16,7 @@ export interface Community {
   leaderName: string | null;
   memberCount: number;
   membershipState: MembershipState;
+  customTerms?: string | null;
   createdAt: string;
 }
 

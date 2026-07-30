@@ -43,4 +43,11 @@ public class AdminUserController {
         activityLogService.log(SecurityUtils.currentUserId(), "User reinstated", "USER", id, "Reinstated by admin");
         return ResponseEntity.noContent().build();
     }
+
+    @PatchMapping("/{id}/remove-leader")
+    public ResponseEntity<Void> removeLeaderRole(@PathVariable UUID id) {
+        userService.removeLeaderRole(id);
+        activityLogService.log(SecurityUtils.currentUserId(), "Leader role removed", "USER", id, "Leader role demoted to MEMBER by admin");
+        return ResponseEntity.noContent().build();
+    }
 }

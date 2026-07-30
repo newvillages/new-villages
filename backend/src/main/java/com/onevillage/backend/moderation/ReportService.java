@@ -82,8 +82,9 @@ public class ReportService {
         switch (action) {
             case "REMOVE_CONTENT" -> removeContent(report);
             case "SUSPEND_USER" -> userService.suspend(resolveSubjectUserId(report));
+            case "REMOVE_LEADER" -> userService.removeLeaderRole(resolveSubjectUserId(report));
             case "DISMISS" -> { /* no side effect */ }
-            default -> throw ApiException.badRequest("action must be one of REMOVE_CONTENT, SUSPEND_USER, DISMISS");
+            default -> throw ApiException.badRequest("action must be one of REMOVE_CONTENT, SUSPEND_USER, REMOVE_LEADER, DISMISS");
         }
 
         report.setStatus(ReportStatus.RESOLVED);

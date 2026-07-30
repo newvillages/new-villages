@@ -148,3 +148,11 @@ export function useRejectJoinRequest(communityId: string) {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['leader', communityId] }),
   });
 }
+
+export function useUpdateCommunityTerms(communityId: string) {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (customTerms: string) => api.put<void>(`/api/leader/communities/${communityId}/terms`, { customTerms }),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['communities', communityId] }),
+  });
+}

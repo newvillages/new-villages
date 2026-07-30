@@ -48,6 +48,9 @@ public class Community extends BaseId {
     @Column(name = "leader_id", nullable = false)
     private UUID leaderId;
 
+    @Column(name = "custom_terms", columnDefinition = "text")
+    private String customTerms;
+
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     private Instant createdAt;

@@ -20,6 +20,7 @@ public record CommunityResponse(
         String leaderName,
         long memberCount,
         String membershipState, // NONE | JOINED | PENDING_REQUEST
+        String customTerms,
         Instant createdAt
 ) {
 }

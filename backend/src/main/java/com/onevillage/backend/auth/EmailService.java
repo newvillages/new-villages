@@ -71,6 +71,19 @@ public class EmailService {
                         + "https://www.luminex.rw");
     }
 
+    public void sendCommunityInvitationEmail(String toEmail, String inviterName, String communityName, String communityId) {
+        String inviteLink = frontendBaseUrl + "/communities/" + communityId;
+        log.info("Sending community invitation email to {} from {} for community {}", toEmail, inviterName, communityName);
+        send(toEmail, "Invitation to join " + communityName + " on New Villages",
+                "Hi,\n\n"
+                        + (inviterName != null && !inviterName.isBlank() ? inviterName : "A Community Leader")
+                        + " has invited you to join the community circle \"" + communityName + "\" on New Villages!\n\n"
+                        + "Click the link below to view the community and accept the invitation:\n"
+                        + inviteLink + "\n\n"
+                        + "Welcome to New Villages!\n"
+                        + "The New Villages Team");
+    }
+
     private void send(String to, String subject, String text) {
         try {
             SimpleMailMessage message = new SimpleMailMessage();

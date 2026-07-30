@@ -101,7 +101,16 @@ public class MessagingService {
                 yield org.getOwnerUserId();
             }
             case "ADMIN" -> findAnyAdminId(userId);
-            default -> throw ApiException.badRequest("type must be one of LEADER, ORG, ADMIN");
+            case "USER", "MEMBER" -> {
+                if (request.targetUserId() == null) {
+                    throw ApiException.badRequest("targetUserId is required for direct messaging");
+                }
+                if (!userRepository.existsById(request.targetUserId())) {
+                    throw ApiException.notFound("Target user not found");
+                }
+                yield request.targetUserId();
+            }
+            default -> throw ApiException.badRequest("type must be one of LEADER, ORG, ADMIN, USER, MEMBER");
         };
     }
 
