@@ -214,16 +214,52 @@ function OverviewSection({ stats, reports }: { stats: AdminStats | undefined; re
 function BroadcastSection() {
   const [title, setTitle] = useState('');
   const [message, setMessage] = useState('');
+  const { data: communities } = useAdminCommunities();
+  const activeCommunities = (communities ?? []).filter((c) => c.status === 'ACTIVE');
+
+  // Track selected community IDs. Default to all active communities.
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  if (!isInitialized && activeCommunities.length > 0) {
+    setSelectedIds(activeCommunities.map((c) => c.id));
+    setIsInitialized(true);
+  }
+
   const broadcastMutation = useAdminBroadcast();
+
+  const toggleCommunity = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
+  };
+
+  const selectAll = () => setSelectedIds(activeCommunities.map((c) => c.id));
+  const deselectAll = () => setSelectedIds([]);
 
   const handleBroadcast = (e: React.FormEvent) => {
     e.preventDefault();
     if (!message.trim()) return;
+    if (selectedIds.length === 0) {
+      toast.info('Please select at least one community to receive the broadcast.');
+      return;
+    }
+
+    const isAllSelected = selectedIds.length === activeCommunities.length;
+
     broadcastMutation.mutate(
-      { title: title.trim() || undefined, message },
+      {
+        title: title.trim() || undefined,
+        message,
+        targetCommunityIds: isAllSelected ? undefined : selectedIds,
+      },
       {
         onSuccess: () => {
-          toast.success('Admin broadcast announcement published to all active groups!');
+          toast.success(
+            isAllSelected
+              ? 'Broadcast published to all active community groups!'
+              : `Broadcast published to ${selectedIds.length} selected community group(s)!`
+          );
           setTitle('');
           setMessage('');
         },
@@ -233,14 +269,17 @@ function BroadcastSection() {
   };
 
   return (
-    <div className="space-y-4 max-w-3xl">
+    <div className="space-y-4 max-w-4xl">
       <div>
         <h1 className="text-2xl font-heading font-bold text-gray-900">Admin Broadcast Announcement</h1>
-        <p className="text-sm text-gray-500">Send an official broadcast message / announcement to all community groups simultaneously.</p>
+        <p className="text-sm text-gray-500">
+          Send an official broadcast message / announcement. Select specific communities or target all groups simultaneously.
+        </p>
       </div>
+
       <Card>
         <CardContent className="p-6">
-          <form onSubmit={handleBroadcast} className="space-y-4">
+          <form onSubmit={handleBroadcast} className="space-y-5">
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Announcement Title (Optional)</label>
               <input
@@ -251,21 +290,85 @@ function BroadcastSection() {
                 className="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:outline-none"
               />
             </div>
+
             <div>
               <label className="block text-sm font-semibold text-gray-700 mb-1">Broadcast Message Body *</label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
-                rows={6}
-                placeholder="Type your platform announcement here. This message will be published to every active community feed and sent as a system notification..."
+                rows={5}
+                placeholder="Type your platform announcement here. This message will be published to feed of selected communities and sent as a system notification..."
                 className="w-full border border-gray-300 rounded-xl p-3 text-sm focus:ring-2 focus:ring-primary focus:outline-none"
                 required
               />
             </div>
-            <div className="flex justify-end">
-              <Button type="submit" className="bg-primary hover:bg-primary-hover flex items-center gap-2" disabled={broadcastMutation.isPending}>
+
+            {/* Target Communities Multi-select & Filter */}
+            <div className="border border-gray-200 rounded-2xl p-4 bg-slate-50 space-y-3">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-gray-200 pb-3">
+                <div>
+                  <h3 className="font-bold text-sm text-gray-900 flex items-center gap-2">
+                    <Radio size={16} className="text-primary" /> Target Communities
+                  </h3>
+                  <p className="text-xs text-gray-500">
+                    {selectedIds.length} of {activeCommunities.length} active communities selected
+                    {selectedIds.length < activeCommunities.length && selectedIds.length > 0 && (
+                      <span className="text-amber-600 font-semibold ml-1.5">
+                        ({activeCommunities.length - selectedIds.length} excluded)
+                      </span>
+                    )}
+                  </p>
+                </div>
+                <div className="flex gap-2">
+                  <Button type="button" variant="ghost" size="sm" onClick={selectAll} className="text-xs py-1">
+                    Select All
+                  </Button>
+                  <Button type="button" variant="ghost" size="sm" onClick={deselectAll} className="text-xs py-1 text-gray-500">
+                    Deselect All
+                  </Button>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2.5 max-h-56 overflow-y-auto pt-1">
+                {activeCommunities.map((c) => {
+                  const checked = selectedIds.includes(c.id);
+                  return (
+                    <label
+                      key={c.id}
+                      className={cn(
+                        'flex items-center gap-2.5 p-2.5 rounded-xl border text-xs font-medium cursor-pointer transition-all',
+                        checked ? 'bg-white border-primary text-primary shadow-sm' : 'bg-white/60 border-gray-200 text-gray-500 hover:bg-white'
+                      )}
+                    >
+                      <input
+                        type="checkbox"
+                        checked={checked}
+                        onChange={() => toggleCommunity(c.id)}
+                        className="rounded text-primary focus:ring-primary"
+                      />
+                      <span className="truncate flex-1 font-semibold">{c.name}</span>
+                      <span className="text-[10px] text-gray-400 font-normal shrink-0">{c.memberCount} members</span>
+                    </label>
+                  );
+                })}
+              </div>
+            </div>
+
+            <div className="flex justify-between items-center pt-2">
+              <p className="text-xs text-gray-500">
+                Will send broadcast to <strong>{selectedIds.length}</strong> community circle(s).
+              </p>
+              <Button
+                type="submit"
+                className="bg-primary hover:bg-primary-hover flex items-center gap-2 px-6"
+                disabled={broadcastMutation.isPending || selectedIds.length === 0}
+              >
                 <Send size={16} />
-                {broadcastMutation.isPending ? 'Sending Broadcast…' : 'Send Broadcast to All Groups'}
+                {broadcastMutation.isPending
+                  ? 'Sending Broadcast…'
+                  : selectedIds.length === activeCommunities.length
+                  ? 'Send Broadcast to All Groups'
+                  : `Send Broadcast to ${selectedIds.length} Group(s)`}
               </Button>
             </div>
           </form>

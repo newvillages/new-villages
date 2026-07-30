@@ -46,7 +46,8 @@ public class AdminBroadcastController {
 
     public record BroadcastRequest(
             String title,
-            @NotBlank String message
+            @NotBlank String message,
+            List<UUID> targetCommunityIds
     ) {}
 
     @PostMapping
@@ -56,6 +57,7 @@ public class AdminBroadcastController {
 
         List<Community> activeCommunities = communityRepository.findAll().stream()
                 .filter(c -> c.getStatus() == CommunityStatus.ACTIVE)
+                .filter(c -> request.targetCommunityIds() == null || request.targetCommunityIds().isEmpty() || request.targetCommunityIds().contains(c.getId()))
                 .toList();
 
         for (Community community : activeCommunities) {

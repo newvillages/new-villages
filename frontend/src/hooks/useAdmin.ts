@@ -153,7 +153,7 @@ export function useRemoveLeaderRole() {
 export function useAdminBroadcast() {
   const queryClient = useQueryClient();
   return useMutation({
-    mutationFn: (payload: { title?: string; message: string }) => api.post<void>('/api/admin/broadcast', payload),
+    mutationFn: (payload: { title?: string; message: string; targetCommunityIds?: string[] }) => api.post<void>('/api/admin/broadcast', payload),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin'] }),
   });
 }
