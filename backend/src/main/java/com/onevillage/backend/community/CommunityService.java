@@ -128,11 +128,17 @@ public class CommunityService {
         User inviter = userRepository.findById(inviterId).orElse(null);
         String inviterName = inviter != null ? inviter.getFullName() : "Community Leader";
 
+        if (invitedEmail == null || invitedEmail.trim().isBlank()) {
+            throw ApiException.badRequest("Invitee email address is required");
+        }
+
+        String cleanEmail = invitedEmail.trim().toLowerCase();
+
         CommunityInvitation invitation = new CommunityInvitation();
         invitation.setCommunityId(communityId);
-        invitation.setInvitedEmail(invitedEmail.toLowerCase());
+        invitation.setInvitedEmail(cleanEmail);
 
-        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(invitedEmail);
+        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(cleanEmail);
         existingUser.ifPresent(u -> {
             invitation.setInvitedUserId(u.getId());
             notificationDispatcher.dispatch(
@@ -147,7 +153,7 @@ public class CommunityService {
         invitation.setInvitedBy(inviterId);
         invitationRepository.save(invitation);
 
-        emailService.sendCommunityInvitationEmail(invitedEmail, inviterName, community.getName(), communityId.toString());
+        emailService.sendCommunityInvitationEmail(cleanEmail, inviterName, community.getName(), communityId.toString());
     }
 
     @Transactional

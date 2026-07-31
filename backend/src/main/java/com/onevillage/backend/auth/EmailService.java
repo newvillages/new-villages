@@ -72,31 +72,39 @@ public class EmailService {
     }
 
     public void sendCommunityInvitationEmail(String toEmail, String inviterName, String communityName, String communityId) {
+        String cleanEmail = toEmail != null ? toEmail.trim().toLowerCase() : "";
         String inviteLink = frontendBaseUrl + "/communities/" + communityId;
-        log.info("Sending community invitation email to {} from {} for community {}", toEmail, inviterName, communityName);
-        send(toEmail, "Invitation to join " + communityName + " on New Villages",
+        log.info("Sending community invitation email to {} from {} for community {} — link: {}", cleanEmail, inviterName, communityName, inviteLink);
+        String senderLabel = (inviterName != null && !inviterName.isBlank()) ? inviterName : "A Community Leader";
+        send(cleanEmail, "Invitation to join " + communityName + " on New Villages",
                 "Hi,\n\n"
-                        + (inviterName != null && !inviterName.isBlank() ? inviterName : "A Community Leader")
+                        + senderLabel
                         + " has invited you to join the community circle \"" + communityName + "\" on New Villages!\n\n"
-                        + "Click the link below to view the community and accept the invitation:\n"
+                        + "Please open this link to view the community and accept the invitation:\n"
                         + inviteLink + "\n\n"
                         + "Welcome to New Villages!\n"
                         + "The New Villages Team");
     }
 
     private void send(String to, String subject, String text) {
-        log.info("Sending email to [{}] | Subject: '{}'", to, subject);
+        if (to == null || to.isBlank()) {
+            log.warn("Email dispatch skipped: recipient email address is blank.");
+            return;
+        }
+        String cleanTo = to.trim().toLowerCase();
+        log.info("Sending email to [{}] | Subject: '{}'", cleanTo, subject);
         try {
             SimpleMailMessage message = new SimpleMailMessage();
             message.setFrom(fromAddress);
-            message.setTo(to);
+            message.setTo(cleanTo);
             message.setSubject(subject);
             message.setText(text);
             mailSender.send(message);
-            log.info("Email successfully sent to [{}]", to);
+            log.info("Email successfully sent to [{}]", cleanTo);
         } catch (Exception e) {
             // Log error with cause details without throwing to avoid breaking workflow
-            log.error("Failed to send email to [{}]: {} (Cause: {})", to, e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "none", e);
+            log.error("Failed to send email to [{}]: {} (Cause: {})", cleanTo, e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "none", e);
         }
     }
 }
+

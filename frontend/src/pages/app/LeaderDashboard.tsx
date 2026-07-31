@@ -4,6 +4,7 @@ import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { GlobalReportModal } from '../../components/ui/GlobalReportModal';
+import { CommunityTermsModal } from '../../components/ui/CommunityTermsModal';
 import {
   Users,
   Calendar,
@@ -20,6 +21,9 @@ import {
   Flag,
   Send,
   Copy,
+  Edit3,
+  Eye,
+  CheckCircle2,
 } from 'lucide-react';
 import { useStore } from '../../store/useStore';
 import {
@@ -75,10 +79,13 @@ export function LeaderDashboard() {
 
   // Custom terms state
   const [customTermsText, setCustomTermsText] = useState('');
+  const [isEditingTerms, setIsEditingTerms] = useState(false);
+  const [isPreviewTermsOpen, setIsPreviewTermsOpen] = useState(false);
 
   useEffect(() => {
     if (selectedCommunity) {
       setCustomTermsText(selectedCommunity.customTerms || '');
+      setIsEditingTerms(false);
     }
   }, [selectedCommunity]);
 
@@ -122,10 +129,11 @@ export function LeaderDashboard() {
 
   const handleSendInvite = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!inviteEmail.trim() || !communityId) return;
-    inviteMemberMutation.mutate(inviteEmail, {
+    const cleanEmail = inviteEmail.trim().toLowerCase();
+    if (!cleanEmail || !communityId) return;
+    inviteMemberMutation.mutate(cleanEmail, {
       onSuccess: () => {
-        toast.success(`Email invitation sent to ${inviteEmail}!`);
+        toast.success(`Email invitation sent to ${cleanEmail}!`);
         setInviteEmail('');
         setIsInviteModalOpen(false);
       },
@@ -137,7 +145,10 @@ export function LeaderDashboard() {
     e.preventDefault();
     if (!communityId) return;
     updateTermsMutation.mutate(customTermsText, {
-      onSuccess: () => toast.success('Community Terms & Conditions updated successfully!'),
+      onSuccess: () => {
+        toast.success('Community Terms & Conditions updated successfully!');
+        setIsEditingTerms(false);
+      },
       onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Could not update community terms.'),
     });
   };
@@ -500,33 +511,208 @@ export function LeaderDashboard() {
 
       {/* Group Terms & Conditions */}
       {activeSubTab === 'terms' && (
-        <Card>
-          <CardContent className="p-6 space-y-4">
-            <div>
-              <h3 className="font-bold text-lg text-gray-900 flex items-center gap-2">
-                <FileText size={20} className="text-primary" /> Group Custom Terms & Conditions
-              </h3>
-              <p className="text-xs text-gray-500">
-                Define community rules and specific terms that new members must accept before joining{' '}
-                <strong>{selectedCommunity?.name}</strong>.
-              </p>
-            </div>
-            <form onSubmit={handleSaveTerms} className="space-y-4">
-              <textarea
-                value={customTermsText}
-                onChange={(e) => setCustomTermsText(e.target.value)}
-                rows={8}
-                className="w-full border border-gray-300 rounded-xl p-3 text-xs focus:ring-2 focus:ring-primary focus:outline-none"
-                placeholder="Enter specific community guidelines, rules of conduct, code of respect, or participation terms..."
-              />
-              <div className="flex justify-end">
-                <Button type="submit" disabled={updateTermsMutation.isPending}>
-                  {updateTermsMutation.isPending ? 'Saving…' : 'Save Custom Terms'}
-                </Button>
-              </div>
-            </form>
-          </CardContent>
-        </Card>
+        <div className="space-y-6">
+          {/* Active Terms Display Card (when terms exist and not editing) */}
+          {selectedCommunity?.customTerms && !isEditingTerms ? (
+            <Card className="border-emerald-100 shadow-xs">
+              <CardContent className="p-6 space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                  <div>
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <h3 className="font-heading font-extrabold text-lg text-slate-900 flex items-center gap-2">
+                        <FileText size={20} className="text-primary" /> Current Active Group Terms & Conditions
+                      </h3>
+                      <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full flex items-center gap-1">
+                        <CheckCircle2 size={12} /> Active & Enforced
+                      </span>
+                    </div>
+                    <p className="text-xs text-slate-500 mt-1">
+                      New members must review and accept these specific terms before joining <strong>{selectedCommunity?.name}</strong>.
+                    </p>
+                  </div>
+
+                  <div className="flex items-center gap-2 shrink-0 flex-wrap">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setIsPreviewTermsOpen(true)}
+                      className="text-xs gap-1.5 border-slate-200 hover:bg-slate-50"
+                    >
+                      <Eye size={14} /> Preview Member View
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      onClick={() => {
+                        setCustomTermsText(selectedCommunity.customTerms || '');
+                        setIsEditingTerms(true);
+                      }}
+                      className="text-xs gap-1.5"
+                    >
+                      <Edit3 size={14} /> Edit Terms
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        if (confirm('Are you sure you want to remove all custom terms for this community?')) {
+                          updateTermsMutation.mutate('', {
+                            onSuccess: () => {
+                              toast.success('Custom terms removed.');
+                              setCustomTermsText('');
+                              setIsEditingTerms(false);
+                            },
+                          });
+                        }
+                      }}
+                      className="text-xs text-red-600 hover:bg-red-50 gap-1.5"
+                    >
+                      <Trash2 size={14} /> Remove Terms
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Formatted Terms View */}
+                <div className="bg-slate-50/80 border border-slate-200/80 rounded-2xl p-5 text-sm text-slate-800 leading-relaxed whitespace-pre-wrap">
+                  {selectedCommunity.customTerms}
+                </div>
+
+                <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
+                  <span>Members are required to check and agree to these terms prior to joining.</span>
+                  <span className="font-medium text-slate-500">{selectedCommunity.customTerms.length} characters</span>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            /* Terms Editor Card */
+            <Card>
+              <CardContent className="p-6 space-y-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
+                  <div>
+                    <h3 className="font-heading font-extrabold text-lg text-slate-900 flex items-center gap-2">
+                      <FileText size={20} className="text-primary" />
+                      {selectedCommunity?.customTerms ? 'Edit Group Terms & Conditions' : 'Configure Group Custom Terms & Conditions'}
+                    </h3>
+                    <p className="text-xs text-slate-500 mt-1">
+                      Define community rules, guidelines, code of conduct, or participation agreements for <strong>{selectedCommunity?.name}</strong>.
+                    </p>
+                  </div>
+
+                  {selectedCommunity?.customTerms && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setCustomTermsText(selectedCommunity.customTerms || '');
+                        setIsEditingTerms(false);
+                      }}
+                      className="text-xs text-slate-500 hover:bg-slate-100"
+                    >
+                      Cancel Editing
+                    </Button>
+                  )}
+                </div>
+
+                {/* Preset Guideline Templates */}
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold text-slate-700 block">Insert Preset Guidelines & Rules:</label>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const preset = "1. Respect & Courtesy: All circle members must maintain mutual respect. Harassment, discrimination, or abusive language is strictly prohibited.\n2. Active Participation: Engage constructively in discussions and community events.\n3. Privacy & Safety: Do not share personal member details or private discussions outside the circle.";
+                        setCustomTermsText(prev => prev ? `${prev}\n\n${preset}` : preset);
+                      }}
+                      className="px-3 py-1.5 bg-primary/5 hover:bg-primary/10 border border-primary/20 text-primary text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
+                    >
+                      <Plus size={12} /> Add Respect & Safety Rules
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const preset = "• Attendance & RSVP Policy: Please RSVP for scheduled events in advance. If you cannot attend, notify the event host at least 24 hours prior.";
+                        setCustomTermsText(prev => prev ? `${prev}\n\n${preset}` : preset);
+                      }}
+                      className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200/70 text-slate-700 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
+                    >
+                      <Plus size={12} /> Add Event RSVP Policy
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        const preset = "• No Unsolicited Spam or Advertising: Commercial promotions, external sales, or spam messages are not allowed unless approved by the Community Leader.";
+                        setCustomTermsText(prev => prev ? `${prev}\n\n${preset}` : preset);
+                      }}
+                      className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200/70 text-slate-700 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
+                    >
+                      <Plus size={12} /> Add Anti-Spam Policy
+                    </button>
+                  </div>
+                </div>
+
+                <form onSubmit={handleSaveTerms} className="space-y-4">
+                  <div>
+                    <textarea
+                      value={customTermsText}
+                      onChange={(e) => setCustomTermsText(e.target.value)}
+                      rows={9}
+                      className="w-full border border-slate-300 rounded-xl p-4 text-xs font-sans focus:ring-2 focus:ring-primary focus:border-primary focus:outline-none leading-relaxed"
+                      placeholder="Enter specific community guidelines, rules of conduct, code of respect, or participation terms..."
+                    />
+                    <div className="flex justify-between items-center text-xs text-slate-400 mt-1">
+                      <span>Tip: You can use numbered lists or bullet points to structure your guidelines clearly.</span>
+                      <span>{customTermsText.length} characters</span>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center justify-end gap-2 pt-2">
+                    {selectedCommunity?.customTerms && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => {
+                          setCustomTermsText(selectedCommunity.customTerms || '');
+                          setIsEditingTerms(false);
+                        }}
+                        className="text-xs"
+                      >
+                        Cancel
+                      </Button>
+                    )}
+                    <Button
+                      type="submit"
+                      variant="primary"
+                      disabled={updateTermsMutation.isPending}
+                      className="text-xs font-semibold px-5"
+                    >
+                      {updateTermsMutation.isPending ? 'Saving & Publishing…' : 'Save & Publish Custom Terms'}
+                    </Button>
+                  </div>
+                </form>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Member Preview Modal */}
+          {selectedCommunity && (
+            <CommunityTermsModal
+              isOpen={isPreviewTermsOpen}
+              onClose={() => setIsPreviewTermsOpen(false)}
+              onAccept={() => {
+                toast.success('Preview agreement acknowledged!');
+                setIsPreviewTermsOpen(false);
+              }}
+              communityName={selectedCommunity.name}
+              customTerms={selectedCommunity.customTerms || customTermsText}
+            />
+          )}
+        </div>
       )}
 
       {/* Refund Requests Tab */}
