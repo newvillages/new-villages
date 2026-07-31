@@ -22,13 +22,25 @@ public class EmailService {
     private final String backendBaseUrl;
 
     public EmailService(JavaMailSender mailSender,
-                         @Value("${app.mail.from}") String fromAddress,
+                         @Value("${app.mail.from:}") String fromAddress,
                          @Value("${app.frontend.base-url}") String frontendBaseUrl,
                          @Value("${server.port}") String serverPort) {
         this.mailSender = mailSender;
         this.fromAddress = fromAddress;
         this.frontendBaseUrl = frontendBaseUrl;
         this.backendBaseUrl = "http://localhost:" + serverPort;
+
+        if (fromAddress == null || fromAddress.isBlank() || fromAddress.contains("carmani")) {
+            log.warn("=================================================================================");
+            log.warn("[SMTP CONFIG ALERT] Production SMTP credentials are missing in Environment Variables!");
+            log.warn("To send real emails on Render, set these Environment Variables in Render Dashboard -> Environment:");
+            log.warn("  MAIL_HOST     = smtp.gmail.com (or smtp-relay.brevo.com)");
+            log.warn("  MAIL_PORT     = 587");
+            log.warn("  MAIL_USERNAME = your-email@gmail.com");
+            log.warn("  MAIL_PASSWORD = your-16-char-app-password");
+            log.warn("  MAIL_FROM     = your-email@gmail.com");
+            log.warn("=================================================================================");
+        }
     }
 
     public void sendVerificationEmail(User user, String token) {
