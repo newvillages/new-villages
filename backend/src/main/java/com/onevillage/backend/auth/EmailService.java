@@ -23,14 +23,25 @@ public class EmailService {
 
     public EmailService(JavaMailSender mailSender,
                          @Value("${app.mail.from:}") String fromAddress,
+                         @Value("${spring.mail.username:}") String mailUsername,
                          @Value("${app.frontend.base-url}") String frontendBaseUrl,
                          @Value("${server.port}") String serverPort) {
         this.mailSender = mailSender;
-        this.fromAddress = fromAddress;
         this.frontendBaseUrl = frontendBaseUrl;
         this.backendBaseUrl = "http://localhost:" + serverPort;
 
-        if (fromAddress == null || fromAddress.isBlank() || fromAddress.contains("carmani")) {
+        // Ensure fromAddress matches authenticated mail username when sending via Gmail/SMTP to prevent DMARC / GoDaddy domain rejection
+        if (fromAddress != null && !fromAddress.isBlank() && !fromAddress.contains("carmani")) {
+            this.fromAddress = fromAddress.trim();
+        } else if (mailUsername != null && !mailUsername.isBlank()) {
+            this.fromAddress = mailUsername.trim();
+        } else {
+            this.fromAddress = "newvillagesca@gmail.com";
+        }
+
+        log.info("[EMAIL SERVICE INIT] Configured From Address: {} | Auth Username: {}", this.fromAddress, mailUsername);
+
+        if (mailUsername == null || mailUsername.isBlank() || mailUsername.contains("carmani")) {
             log.warn("=================================================================================");
             log.warn("[SMTP CONFIG ALERT] Production SMTP credentials are missing in Environment Variables!");
             log.warn("To send real emails on Render, set these Environment Variables in Render Dashboard -> Environment:");
