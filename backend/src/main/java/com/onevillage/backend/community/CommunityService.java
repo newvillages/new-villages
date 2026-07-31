@@ -296,7 +296,19 @@ public class CommunityService {
 
     private void requireLeader(UUID communityId, UUID userId) {
         Community community = getEntity(communityId);
-        if (!community.getLeaderId().equals(userId)) {
+        User user = userRepository.findById(userId).orElse(null);
+
+        // Allow primary leader or SUPER_ADMIN platform role
+        if (community.getLeaderId().equals(userId) || (user != null && "SUPER_ADMIN".equalsIgnoreCase(user.getRole()))) {
+            return;
+        }
+
+        // Allow users with LEADER role in community memberships
+        boolean isCommunityLeader = membershipRepository.findByCommunityIdAndUserId(communityId, userId)
+                .map(m -> m.getRoleInCommunity() == CommunityMemberRole.LEADER)
+                .orElse(false);
+
+        if (!isCommunityLeader) {
             throw ApiException.forbidden("Only the community leader can perform this action");
         }
     }

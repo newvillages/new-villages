@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.MimeMessageHelper;
 
+import org.springframework.scheduling.annotation.Async;
+
 @Service
 public class EmailService {
 
@@ -54,6 +56,7 @@ public class EmailService {
         }
     }
 
+    @Async
     public void sendVerificationEmail(User user, String token) {
         String link = frontendBaseUrl + "/verify-email?token=" + token;
         String directApiLink = backendBaseUrl + "/api/auth/verify-email?token=" + token;
@@ -73,6 +76,7 @@ public class EmailService {
         );
     }
 
+    @Async
     public void sendPasswordResetEmail(User user, String token) {
         String link = frontendBaseUrl + "/reset-password?token=" + token;
         log.info("Password reset requested for {} — token: {}", user.getEmail(), token);
@@ -90,6 +94,7 @@ public class EmailService {
         );
     }
 
+    @Async
     public void sendPaymentReceiptEmail(String toEmail, String name, String planLabel, String amount, String memoCode) {
         String loginLink = frontendBaseUrl + "/login";
         String dashboardLink = frontendBaseUrl + "/dashboard";
@@ -110,6 +115,7 @@ public class EmailService {
                         + "https://www.luminex.rw");
     }
 
+    @Async
     public void sendCommunityInvitationEmail(String toEmail, String inviterName, String communityName, String communityId) {
         String cleanEmail = toEmail != null ? toEmail.trim().toLowerCase() : "";
         String inviteLink = frontendBaseUrl + "/communities/" + communityId;
