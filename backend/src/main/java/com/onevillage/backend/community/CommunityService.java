@@ -298,8 +298,8 @@ public class CommunityService {
         Community community = getEntity(communityId);
         User user = userRepository.findById(userId).orElse(null);
 
-        // Allow primary leader or SUPER_ADMIN platform role
-        if (community.getLeaderId().equals(userId) || (user != null && "SUPER_ADMIN".equalsIgnoreCase(user.getRole()))) {
+        // Allow primary leader or ADMIN platform role
+        if (community.getLeaderId().equals(userId) || (user != null && user.getRole() == UserRole.ADMIN)) {
             return;
         }
 
