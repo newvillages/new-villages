@@ -34,12 +34,12 @@ spring:
           auth: ${MAIL_SMTP_AUTH:true}
           starttls:
             enable: ${MAIL_SMTP_STARTTLS:true}
-            required: false
+            required: ${MAIL_SMTP_STARTTLS_REQUIRED:true}
           ssl:
             trust: ${MAIL_SMTP_SSL_TRUST:*}
-          connectiontimeout: 3000
-          timeout: 3000
-          writetimeout: 3000
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
 
   servlet:
     multipart:
