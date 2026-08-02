@@ -60,6 +60,7 @@ public class DataSeeder implements ApplicationRunner {
         seedAdminUser(currentTerms);
         seedTestUser("member@newvillages.ca", "Community Member", UserRole.MEMBER, currentTerms);
         seedTestUser("leader@newvillages.ca", "Community Leader", UserRole.COMMUNITY_LEADER, currentTerms);
+        seedTestUser("christian.leader@newvillages.ca", "Christian Leader", UserRole.COMMUNITY_LEADER, currentTerms);
         seedTestUser("org@newvillages.ca", "Organization Lead", UserRole.ORGANIZATION, currentTerms);
     }
 
