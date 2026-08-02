@@ -162,10 +162,12 @@ public class EmailService {
         String cleanTo = to.trim().toLowerCase();
         log.info("Sending email to [{}] | Subject: '{}'", cleanTo, subject);
         try {
+            jakarta.mail.internet.InternetAddress from = new jakarta.mail.internet.InternetAddress(fromAddress, "New Villages");
             if (htmlText != null && !htmlText.isBlank()) {
                 MimeMessage mimeMessage = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-                helper.setFrom(fromAddress);
+                helper.setFrom(from);
+                helper.setReplyTo(from);
                 helper.setTo(cleanTo);
                 helper.setSubject(subject);
                 helper.setText(plainText, htmlText);
@@ -178,7 +180,7 @@ public class EmailService {
                 message.setText(plainText);
                 mailSender.send(message);
             }
-            log.info("Email successfully sent to [{}]", cleanTo);
+            log.info("Email successfully sent to [{}] via {}", cleanTo, fromAddress);
         } catch (Exception e) {
             log.error("Failed to send email to [{}]: {} (Cause: {})", cleanTo, e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "none", e);
         }
