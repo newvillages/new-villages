@@ -26,14 +26,17 @@ public class EmailService {
     public EmailService(JavaMailSender mailSender,
                          @Value("${app.mail.from:}") String fromAddress,
                          @Value("${spring.mail.username:}") String mailUsername,
+                         @Value("${spring.mail.host:}") String mailHost,
                          @Value("${app.frontend.base-url}") String frontendBaseUrl,
                          @Value("${server.port}") String serverPort) {
         this.mailSender = mailSender;
         this.frontendBaseUrl = frontendBaseUrl;
         this.backendBaseUrl = "http://localhost:" + serverPort;
 
-        // Ensure fromAddress matches authenticated mail username when sending via Gmail/SMTP to prevent DMARC / GoDaddy domain rejection
-        if (fromAddress != null && !fromAddress.isBlank() && !fromAddress.contains("carmani")) {
+        // Gmail SMTP strictly enforces that the From address must match the authenticated Gmail username
+        if (mailHost != null && mailHost.toLowerCase().contains("gmail") && mailUsername != null && !mailUsername.isBlank()) {
+            this.fromAddress = mailUsername.trim();
+        } else if (fromAddress != null && !fromAddress.isBlank() && !fromAddress.contains("carmani")) {
             this.fromAddress = fromAddress.trim();
         } else if (mailUsername != null && !mailUsername.isBlank()) {
             this.fromAddress = mailUsername.trim();
