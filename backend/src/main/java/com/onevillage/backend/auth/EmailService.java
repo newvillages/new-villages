@@ -22,6 +22,8 @@ public class EmailService {
     private final String fromAddress;
     private final String frontendBaseUrl;
     private final String backendBaseUrl;
+    private final String mailHost;
+    private final String mailUsername;
 
     public EmailService(JavaMailSender mailSender,
                          @Value("${app.mail.from:}") String fromAddress,
@@ -32,28 +34,69 @@ public class EmailService {
         this.mailSender = mailSender;
         this.frontendBaseUrl = frontendBaseUrl;
         this.backendBaseUrl = "http://localhost:" + serverPort;
+        this.mailHost = mailHost != null ? mailHost.trim() : "";
+        this.mailUsername = mailUsername != null ? mailUsername.trim() : "";
 
         // Gmail SMTP strictly enforces that the From address must match the authenticated Gmail username
-        if (mailHost != null && mailHost.toLowerCase().contains("gmail") && mailUsername != null && !mailUsername.isBlank()) {
-            this.fromAddress = mailUsername.trim();
+        if (this.mailHost.toLowerCase().contains("gmail") && !this.mailUsername.isBlank()) {
+            this.fromAddress = this.mailUsername;
         } else if (fromAddress != null && !fromAddress.isBlank() && !fromAddress.contains("carmani")) {
             this.fromAddress = fromAddress.trim();
         } else {
             this.fromAddress = "contact@newvillages.ca";
         }
 
-        log.info("[EMAIL SERVICE INIT] Configured From Address: {} | Host: {} | Auth Username: {}", this.fromAddress, mailHost, mailUsername);
+        log.info("[EMAIL SERVICE INIT] Configured From Address: {} | Host: {} | Auth Username: {}", this.fromAddress, this.mailHost, this.mailUsername);
 
-        if (mailUsername == null || mailUsername.isBlank() || mailUsername.contains("carmani")) {
+        if (this.mailUsername.isBlank() || this.mailUsername.contains("carmani")) {
             log.warn("=================================================================================");
             log.warn("[SMTP CONFIG ALERT] Production SMTP credentials are missing in Environment Variables!");
             log.warn("To send real emails on Render, set these Environment Variables in Render Dashboard -> Environment:");
-            log.warn("  MAIL_HOST     = smtp-relay.brevo.com");
+            log.warn("  MAIL_HOST     = smtp-relay.brevo.com (or smtp.gmail.com)");
             log.warn("  MAIL_PORT     = 587");
-            log.warn("  MAIL_USERNAME = b3ee76001@smtp-brevo.com");
-            log.warn("  MAIL_PASSWORD = <your-brevo-smtp-key>");
+            log.warn("  MAIL_USERNAME = your-smtp-username");
+            log.warn("  MAIL_PASSWORD = your-smtp-password-or-app-password");
             log.warn("  MAIL_FROM     = contact@newvillages.ca");
             log.warn("=================================================================================");
+        }
+    }
+
+    public String getEmailDiagnosticInfo() {
+        return String.format("Host: %s | Auth User: %s | From Address: %s | Configured: %s",
+                mailHost.isBlank() ? "NOT_SET (defaults to smtp.gmail.com)" : mailHost,
+                mailUsername.isBlank() ? "NOT_SET" : mailUsername,
+                fromAddress,
+                !mailUsername.isBlank());
+    }
+
+    public String sendTestEmail(String toEmail) {
+        if (toEmail == null || toEmail.isBlank()) {
+            throw com.onevillage.backend.common.ApiException.badRequest("Recipient email address is required");
+        }
+        String cleanTo = toEmail.trim().toLowerCase();
+        log.info("[SMTP TEST] Attempting dispatch to [{}] via Host: {} | From: {}", cleanTo, mailHost, fromAddress);
+        try {
+            jakarta.mail.internet.InternetAddress from = new jakarta.mail.internet.InternetAddress(fromAddress, "New Villages Test");
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
+            helper.setFrom(from);
+            helper.setReplyTo(from);
+            helper.setTo(cleanTo);
+            helper.setSubject("New Villages - SMTP Test Email");
+            helper.setText("Hi,\n\nThis is a test email sent from New Villages backend.\n\n"
+                    + getEmailDiagnosticInfo(),
+                    "<div style=\"font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;\">"
+                    + "<h2 style=\"color: #0F172A;\">SMTP Test Successful!</h2>"
+                    + "<p style=\"color: #334155;\">Your email delivery pipeline on Render is working properly.</p>"
+                    + "<pre style=\"background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 12px;\">" + getEmailDiagnosticInfo() + "</pre>"
+                    + "</div>");
+            mailSender.send(mimeMessage);
+            log.info("[SMTP TEST SUCCESS] Email delivered to [{}]", cleanTo);
+            return "SUCCESS: Test email sent to " + cleanTo + " using " + fromAddress + " via host " + (mailHost.isBlank() ? "smtp.gmail.com" : mailHost);
+        } catch (Exception e) {
+            log.error("[SMTP TEST ERROR] Failed to send email to [{}]: {}", cleanTo, e.getMessage(), e);
+            throw com.onevillage.backend.common.ApiException.badRequest("SMTP Dispatch Failed: " + e.getMessage()
+                    + (e.getCause() != null ? " (Cause: " + e.getCause().getMessage() + ")" : ""));
         }
     }
 
