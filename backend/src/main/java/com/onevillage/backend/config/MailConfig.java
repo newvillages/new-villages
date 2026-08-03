@@ -44,18 +44,19 @@ public class MailConfig {
         props.put("mail.smtp.auth", "true");
         props.put("mail.smtp.ssl.trust", "*");
 
-        if (port == 465) {
+        if (mailSender.getPort() == 465) {
             props.put("mail.smtp.ssl.enable", "true");
             props.put("mail.smtp.socketFactory.port", "465");
             props.put("mail.smtp.socketFactory.class", "javax.net.ssl.SSLSocketFactory");
+            props.put("mail.smtp.socketFactory.fallback", "false");
         } else {
             props.put("mail.smtp.starttls.enable", "true");
             props.put("mail.smtp.starttls.required", "true");
         }
 
-        props.put("mail.smtp.connectiontimeout", "8000");
-        props.put("mail.smtp.timeout", "8000");
-        props.put("mail.smtp.writetimeout", "8000");
+        props.put("mail.smtp.connectiontimeout", "10000");
+        props.put("mail.smtp.timeout", "10000");
+        props.put("mail.smtp.writetimeout", "10000");
 
         log.info("[MAIL CONFIG BEAN] Initialized JavaMailSender -> Host: {}:{} | User: '{}' | Pass configured: {}",
                 mailSender.getHost(), mailSender.getPort(), cleanUsername, !cleanPassword.isBlank());
