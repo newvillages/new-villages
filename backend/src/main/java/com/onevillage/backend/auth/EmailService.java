@@ -24,10 +24,12 @@ public class EmailService {
     private final String backendBaseUrl;
     private final String mailHost;
     private final String mailUsername;
+    private final String mailPassword;
 
     public EmailService(JavaMailSender mailSender,
                          @Value("${app.mail.from:}") String fromAddress,
                          @Value("${spring.mail.username:}") String mailUsername,
+                         @Value("${spring.mail.password:}") String mailPassword,
                          @Value("${spring.mail.host:}") String mailHost,
                          @Value("${app.frontend.base-url}") String frontendBaseUrl,
                          @Value("${server.port}") String serverPort) {
@@ -36,6 +38,7 @@ public class EmailService {
         this.backendBaseUrl = "http://localhost:" + serverPort;
         this.mailHost = mailHost != null ? mailHost.trim() : "";
         this.mailUsername = mailUsername != null ? mailUsername.trim() : "";
+        this.mailPassword = mailPassword != null ? mailPassword.trim() : "";
 
         // Gmail SMTP strictly enforces that the From address must match the authenticated Gmail username
         if (this.mailHost.toLowerCase().contains("gmail") && !this.mailUsername.isBlank()) {
@@ -92,12 +95,69 @@ public class EmailService {
                     + "</div>");
             mailSender.send(mimeMessage);
             log.info("[SMTP TEST SUCCESS] Email delivered to [{}]", cleanTo);
-            return "SUCCESS: Test email sent to " + cleanTo + " using " + fromAddress + " via host " + (mailHost.isBlank() ? "smtp.gmail.com" : mailHost);
+            return "SUCCESS (SMTP): Test email sent to " + cleanTo + " using " + fromAddress + " via host " + (mailHost.isBlank() ? "smtp.gmail.com" : mailHost);
         } catch (Exception e) {
-            log.error("[SMTP TEST ERROR] Failed to send email to [{}]: {}", cleanTo, e.getMessage(), e);
+            log.warn("[SMTP TEST TIMEOUT/ERROR] SMTP dispatch failed: {}. Attempting HTTPS REST API fallback...", e.getMessage());
+            boolean restSuccess = sendViaBrevoApi(cleanTo, "New Villages - Test Email (HTTPS)", "This is a test email sent via Brevo HTTPS REST API fallback.",
+                    "<div style=\"font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;\">"
+                    + "<h2 style=\"color: #0F172A;\">HTTPS REST API Test Successful!</h2>"
+                    + "<p style=\"color: #334155;\">Email delivered via Brevo HTTPS REST API (Port 443 fallback).</p>"
+                    + "</div>");
+            if (restSuccess) {
+                return "SUCCESS (Brevo HTTPS API Fallback): Test email sent to " + cleanTo + " over Port 443! (SMTP port timed out on Render)";
+            }
             throw com.onevillage.backend.common.ApiException.badRequest("SMTP Dispatch Failed: " + e.getMessage()
                     + (e.getCause() != null ? " (Cause: " + e.getCause().getMessage() + ")" : ""));
         }
+    }
+
+    private boolean sendViaBrevoApi(String cleanTo, String subject, String plainText, String htmlContent) {
+        String brevoKey = (mailPassword != null && !mailPassword.isBlank()) ? mailPassword.trim() : "";
+        if (!brevoKey.startsWith("xsmtpsib-") && !brevoKey.startsWith("xkeysib-")) {
+            log.warn("[BREVO REST API] Skipping HTTPS fallback: mailPassword does not match Brevo key format (must start with xsmtpsib- or xkeysib-)");
+            return false;
+        }
+        log.info("[BREVO REST API] Attempting direct HTTPS email dispatch (Port 443) to [{}]", cleanTo);
+        try {
+            String finalHtml = htmlContent != null && !htmlContent.isBlank() ? htmlContent : plainText;
+            String jsonPayload = String.format(
+                    "{\"sender\":{\"name\":\"New Villages\",\"email\":\"%s\"},\"to\":[{\"email\":\"%s\"}],\"subject\":\"%s\",\"htmlContent\":\"%s\"}",
+                    escapeJson(fromAddress),
+                    escapeJson(cleanTo),
+                    escapeJson(subject),
+                    escapeJson(finalHtml)
+            );
+
+            java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+            java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                    .uri(java.net.URI.create("https://api.brevo.com/v3/smtp/email"))
+                    .header("Content-Type", "application/json")
+                    .header("Accept", "application/json")
+                    .header("api-key", brevoKey)
+                    .POST(java.net.http.HttpRequest.BodyPublishers.ofString(jsonPayload, java.nio.charset.StandardCharsets.UTF_8))
+                    .build();
+
+            java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+            if (response.statusCode() >= 200 && response.statusCode() < 300) {
+                log.info("[BREVO REST API SUCCESS] Email successfully delivered to [{}] via HTTPS port 443! Response: {}", cleanTo, response.body());
+                return true;
+            } else {
+                log.warn("[BREVO REST API FAILED] Status: {} | Body: {}", response.statusCode(), response.body());
+                return false;
+            }
+        } catch (Exception ex) {
+            log.error("[BREVO REST API ERROR] Failed to send via HTTPS REST API: {}", ex.getMessage(), ex);
+            return false;
+        }
+    }
+
+    private String escapeJson(String input) {
+        if (input == null) return "";
+        return input.replace("\\", "\\\\")
+                .replace("\"", "\\\"")
+                .replace("\n", "\\n")
+                .replace("\r", "\\r")
+                .replace("\t", "\\t");
     }
 
     @Async
@@ -226,7 +286,11 @@ public class EmailService {
             }
             log.info("Email successfully sent to [{}] via {}", cleanTo, fromAddress);
         } catch (Exception e) {
-            log.error("Failed to send email to [{}]: {} (Cause: {})", cleanTo, e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "none", e);
+            log.warn("SMTP send failed for [{}]: {}. Attempting HTTPS REST API fallback...", cleanTo, e.getMessage());
+            boolean restSuccess = sendViaBrevoApi(cleanTo, subject, plainText, htmlText);
+            if (!restSuccess) {
+                log.error("Failed to send email to [{}]: {} (Cause: {})", cleanTo, e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "none", e);
+            }
         }
     }
 }
