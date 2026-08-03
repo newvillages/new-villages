@@ -77,7 +77,22 @@ public class EmailService {
             throw com.onevillage.backend.common.ApiException.badRequest("Recipient email address is required");
         }
         String cleanTo = toEmail.trim().toLowerCase();
-        log.info("[SMTP TEST] Attempting dispatch to [{}] via Host: {} | From: {}", cleanTo, mailHost, fromAddress);
+        log.info("[EMAIL TEST] Attempting dispatch to [{}] via Host: {} | From: {}", cleanTo, mailHost, fromAddress);
+
+        // Try Brevo HTTPS REST API (Port 443) first if key is present
+        if (!mailPassword.isBlank()) {
+            String restResult = sendViaBrevoApiResult(cleanTo, "New Villages - Test Email (HTTPS Port 443)", "This is a test email sent via Brevo HTTPS REST API.",
+                    "<div style=\"font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;\">"
+                    + "<h2 style=\"color: #0F172A;\">HTTPS REST API Test Successful!</h2>"
+                    + "<p style=\"color: #334155;\">Email delivered via Brevo HTTPS REST API (Port 443).</p>"
+                    + "<pre style=\"background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 12px;\">" + getEmailDiagnosticInfo() + "</pre>"
+                    + "</div>");
+            if (restResult.startsWith("SUCCESS")) {
+                return "SUCCESS (Brevo HTTPS API Port 443): Test email delivered to " + cleanTo + "!";
+            }
+        }
+
+        // Fallback to standard SMTP
         try {
             jakarta.mail.internet.InternetAddress from = new jakarta.mail.internet.InternetAddress(fromAddress, "New Villages Test");
             MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -97,16 +112,8 @@ public class EmailService {
             log.info("[SMTP TEST SUCCESS] Email delivered to [{}]", cleanTo);
             return "SUCCESS (SMTP): Test email sent to " + cleanTo + " using " + fromAddress + " via host " + (mailHost.isBlank() ? "smtp.gmail.com" : mailHost);
         } catch (Exception e) {
-            log.warn("[SMTP TEST TIMEOUT/ERROR] SMTP dispatch failed: {}. Attempting HTTPS REST API fallback...", e.getMessage());
-            String restResult = sendViaBrevoApiResult(cleanTo, "New Villages - Test Email (HTTPS)", "This is a test email sent via Brevo HTTPS REST API fallback.",
-                    "<div style=\"font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;\">"
-                    + "<h2 style=\"color: #0F172A;\">HTTPS REST API Test Successful!</h2>"
-                    + "<p style=\"color: #334155;\">Email delivered via Brevo HTTPS REST API (Port 443 fallback).</p>"
-                    + "</div>");
-            if (restResult.startsWith("SUCCESS")) {
-                return "SUCCESS (Brevo HTTPS API Fallback): Test email sent to " + cleanTo + " over Port 443!";
-            }
-            throw com.onevillage.backend.common.ApiException.badRequest("SMTP Timeout (" + e.getMessage() + ") & HTTPS API Failure: " + restResult);
+            throw com.onevillage.backend.common.ApiException.badRequest("Email Dispatch Failed: " + e.getMessage()
+                    + (e.getCause() != null ? " (Cause: " + e.getCause().getMessage() + ")" : ""));
         }
     }
 
@@ -269,6 +276,17 @@ public class EmailService {
         }
         String cleanTo = to.trim().toLowerCase();
         log.info("Sending email to [{}] | Subject: '{}'", cleanTo, subject);
+
+        // Try direct Brevo HTTPS REST API (Port 443) first if Brevo credentials are in use
+        if (!mailPassword.isBlank() && (mailHost.contains("brevo") || mailPassword.startsWith("xsmtpsib-") || mailPassword.startsWith("xkeysib-"))) {
+            boolean restSuccess = sendViaBrevoApi(cleanTo, subject, plainText, htmlText);
+            if (restSuccess) {
+                log.info("Email successfully sent to [{}] via Brevo HTTPS REST API (Port 443)", cleanTo);
+                return;
+            }
+        }
+
+        // Fallback to standard SMTP
         try {
             jakarta.mail.internet.InternetAddress from = new jakarta.mail.internet.InternetAddress(fromAddress, "New Villages");
             if (htmlText != null && !htmlText.isBlank()) {
@@ -288,13 +306,9 @@ public class EmailService {
                 message.setText(plainText);
                 mailSender.send(message);
             }
-            log.info("Email successfully sent to [{}] via {}", cleanTo, fromAddress);
+            log.info("Email successfully sent to [{}] via SMTP {}", cleanTo, fromAddress);
         } catch (Exception e) {
-            log.warn("SMTP send failed for [{}]: {}. Attempting HTTPS REST API fallback...", cleanTo, e.getMessage());
-            boolean restSuccess = sendViaBrevoApi(cleanTo, subject, plainText, htmlText);
-            if (!restSuccess) {
-                log.error("Failed to send email to [{}]: {} (Cause: {})", cleanTo, e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "none", e);
-            }
+            log.error("Failed to send email to [{}]: {} (Cause: {})", cleanTo, e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "none", e);
         }
     }
 }
