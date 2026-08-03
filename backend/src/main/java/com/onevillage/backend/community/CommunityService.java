@@ -68,6 +68,15 @@ public class CommunityService {
         List<CommunityInvitation> byUser = invitationRepository.findByInvitedUserIdAndStatus(userId, InvitationStatus.PENDING);
         List<CommunityInvitation> byEmail = email == null ? List.of()
                 : invitationRepository.findByInvitedEmailIgnoreCaseAndStatus(email, InvitationStatus.PENDING);
+
+        // Auto-associate invitedUserId for any invitation found by email that has null invitedUserId
+        byEmail.forEach(inv -> {
+            if (inv.getInvitedUserId() == null) {
+                inv.setInvitedUserId(userId);
+                invitationRepository.save(inv);
+            }
+        });
+
         return java.util.stream.Stream.concat(byUser.stream(), byEmail.stream())
                 .distinct()
                 .map(this::toInvitationResponse)
@@ -134,11 +143,26 @@ public class CommunityService {
 
         String cleanEmail = invitedEmail.trim().toLowerCase();
 
-        CommunityInvitation invitation = new CommunityInvitation();
+        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(cleanEmail);
+        if (existingUser.isPresent()) {
+            UUID targetUserId = existingUser.get().getId();
+            Optional<CommunityMembership> existingMembership = membershipRepository.findByCommunityIdAndUserId(communityId, targetUserId);
+            if (existingMembership.isPresent() && existingMembership.get().getStatus() == MembershipStatus.JOINED) {
+                throw ApiException.badRequest(cleanEmail + " is already an active member of this community");
+            }
+        }
+
+        List<CommunityInvitation> existingInvites = invitationRepository.findByInvitedEmailIgnoreCaseAndStatus(cleanEmail, InvitationStatus.PENDING);
+        CommunityInvitation invitation = existingInvites.stream()
+                .filter(inv -> inv.getCommunityId().equals(communityId))
+                .findFirst()
+                .orElseGet(CommunityInvitation::new);
+
         invitation.setCommunityId(communityId);
         invitation.setInvitedEmail(cleanEmail);
+        invitation.setInvitedBy(inviterId);
+        invitation.setStatus(InvitationStatus.PENDING);
 
-        Optional<User> existingUser = userRepository.findByEmailIgnoreCase(cleanEmail);
         existingUser.ifPresent(u -> {
             invitation.setInvitedUserId(u.getId());
             notificationDispatcher.dispatch(
@@ -150,7 +174,6 @@ public class CommunityService {
             );
         });
 
-        invitation.setInvitedBy(inviterId);
         invitationRepository.save(invitation);
 
         emailService.sendCommunityInvitationEmail(cleanEmail, inviterName, community.getName(), communityId.toString());

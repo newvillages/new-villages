@@ -38,23 +38,21 @@ public class EmailService {
             this.fromAddress = mailUsername.trim();
         } else if (fromAddress != null && !fromAddress.isBlank() && !fromAddress.contains("carmani")) {
             this.fromAddress = fromAddress.trim();
-        } else if (mailUsername != null && !mailUsername.isBlank()) {
-            this.fromAddress = mailUsername.trim();
         } else {
-            this.fromAddress = "newvillagesca@gmail.com";
+            this.fromAddress = "contact@newvillages.ca";
         }
 
-        log.info("[EMAIL SERVICE INIT] Configured From Address: {} | Auth Username: {}", this.fromAddress, mailUsername);
+        log.info("[EMAIL SERVICE INIT] Configured From Address: {} | Host: {} | Auth Username: {}", this.fromAddress, mailHost, mailUsername);
 
         if (mailUsername == null || mailUsername.isBlank() || mailUsername.contains("carmani")) {
             log.warn("=================================================================================");
             log.warn("[SMTP CONFIG ALERT] Production SMTP credentials are missing in Environment Variables!");
             log.warn("To send real emails on Render, set these Environment Variables in Render Dashboard -> Environment:");
-            log.warn("  MAIL_HOST     = smtp.gmail.com (or smtp-relay.brevo.com)");
+            log.warn("  MAIL_HOST     = smtp-relay.brevo.com");
             log.warn("  MAIL_PORT     = 587");
-            log.warn("  MAIL_USERNAME = your-email@gmail.com");
-            log.warn("  MAIL_PASSWORD = your-16-char-app-password");
-            log.warn("  MAIL_FROM     = your-email@gmail.com");
+            log.warn("  MAIL_USERNAME = b3ee76001@smtp-brevo.com");
+            log.warn("  MAIL_PASSWORD = <your-brevo-smtp-key>");
+            log.warn("  MAIL_FROM     = contact@newvillages.ca");
             log.warn("=================================================================================");
         }
     }

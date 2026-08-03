@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent } from '../../components/ui/Card';
@@ -9,19 +9,21 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 
 export function Login() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const fromPath = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
   const loginMutation = useLogin();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [loggedInPendingTermsCheck, setLoggedInPendingTermsCheck] = useState(false);
 
-  // Only fires once login succeeds, to decide whether to route to /re-consent.
+  // Only fires once login succeeds, to decide whether to route to /re-consent or target route.
   const { data: termsStatus } = useTermsStatus(loggedInPendingTermsCheck);
 
   React.useEffect(() => {
     if (!termsStatus) return;
-    navigate(termsStatus.upToDate ? '/dashboard' : '/re-consent');
-  }, [termsStatus, navigate]);
+    navigate(termsStatus.upToDate ? fromPath : '/re-consent', { replace: true });
+  }, [termsStatus, navigate, fromPath]);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
