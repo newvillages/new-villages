@@ -80,8 +80,9 @@ public class EmailService {
         log.info("[EMAIL TEST] Attempting dispatch to [{}] via Host: {} | From: {}", cleanTo, mailHost, fromAddress);
 
         // Try Brevo HTTPS REST API (Port 443) first if key is present
+        String restResult = "";
         if (!mailPassword.isBlank()) {
-            String restResult = sendViaBrevoApiResult(cleanTo, "New Villages - Test Email (HTTPS Port 443)", "This is a test email sent via Brevo HTTPS REST API.",
+            restResult = sendViaBrevoApiResult(cleanTo, "New Villages - Test Email (HTTPS Port 443)", "This is a test email sent via Brevo HTTPS REST API.",
                     "<div style=\"font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;\">"
                     + "<h2 style=\"color: #0F172A;\">HTTPS REST API Test Successful!</h2>"
                     + "<p style=\"color: #334155;\">Email delivered via Brevo HTTPS REST API (Port 443).</p>"
@@ -112,8 +113,8 @@ public class EmailService {
             log.info("[SMTP TEST SUCCESS] Email delivered to [{}]", cleanTo);
             return "SUCCESS (SMTP): Test email sent to " + cleanTo + " using " + fromAddress + " via host " + (mailHost.isBlank() ? "smtp.gmail.com" : mailHost);
         } catch (Exception e) {
-            throw com.onevillage.backend.common.ApiException.badRequest("Email Dispatch Failed: " + e.getMessage()
-                    + (e.getCause() != null ? " (Cause: " + e.getCause().getMessage() + ")" : ""));
+            String apiFailInfo = !restResult.isBlank() ? " | API Error: " + restResult : "";
+            throw com.onevillage.backend.common.ApiException.badRequest("Email Dispatch Failed. SMTP: " + e.getMessage() + apiFailInfo);
         }
     }
 
