@@ -65,11 +65,11 @@ public class EmailService {
     }
 
     public String getEmailDiagnosticInfo() {
-        return String.format("Host: %s | Auth User: %s | From Address: %s | Configured: %s",
+        return String.format("Host: %s | Auth User: %s | Pass Configured: %s | From Address: %s",
                 mailHost.isBlank() ? "NOT_SET (defaults to smtp.gmail.com)" : mailHost,
                 mailUsername.isBlank() ? "NOT_SET" : mailUsername,
-                fromAddress,
-                !mailUsername.isBlank());
+                !mailPassword.isBlank() ? "YES (len: " + mailPassword.length() + ")" : "NO",
+                fromAddress);
     }
 
     public String sendTestEmail(String toEmail) {
@@ -98,24 +98,28 @@ public class EmailService {
             return "SUCCESS (SMTP): Test email sent to " + cleanTo + " using " + fromAddress + " via host " + (mailHost.isBlank() ? "smtp.gmail.com" : mailHost);
         } catch (Exception e) {
             log.warn("[SMTP TEST TIMEOUT/ERROR] SMTP dispatch failed: {}. Attempting HTTPS REST API fallback...", e.getMessage());
-            boolean restSuccess = sendViaBrevoApi(cleanTo, "New Villages - Test Email (HTTPS)", "This is a test email sent via Brevo HTTPS REST API fallback.",
+            String restResult = sendViaBrevoApiResult(cleanTo, "New Villages - Test Email (HTTPS)", "This is a test email sent via Brevo HTTPS REST API fallback.",
                     "<div style=\"font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;\">"
                     + "<h2 style=\"color: #0F172A;\">HTTPS REST API Test Successful!</h2>"
                     + "<p style=\"color: #334155;\">Email delivered via Brevo HTTPS REST API (Port 443 fallback).</p>"
                     + "</div>");
-            if (restSuccess) {
-                return "SUCCESS (Brevo HTTPS API Fallback): Test email sent to " + cleanTo + " over Port 443! (SMTP port timed out on Render)";
+            if (restResult.startsWith("SUCCESS")) {
+                return "SUCCESS (Brevo HTTPS API Fallback): Test email sent to " + cleanTo + " over Port 443!";
             }
-            throw com.onevillage.backend.common.ApiException.badRequest("SMTP Dispatch Failed: " + e.getMessage()
-                    + (e.getCause() != null ? " (Cause: " + e.getCause().getMessage() + ")" : ""));
+            throw com.onevillage.backend.common.ApiException.badRequest("SMTP Timeout (" + e.getMessage() + ") & HTTPS API Failure: " + restResult);
         }
     }
 
     private boolean sendViaBrevoApi(String cleanTo, String subject, String plainText, String htmlContent) {
+        String result = sendViaBrevoApiResult(cleanTo, subject, plainText, htmlContent);
+        return result.startsWith("SUCCESS");
+    }
+
+    private String sendViaBrevoApiResult(String cleanTo, String subject, String plainText, String htmlContent) {
         String brevoKey = (mailPassword != null && !mailPassword.isBlank()) ? mailPassword.trim() : "";
-        if (!brevoKey.startsWith("xsmtpsib-") && !brevoKey.startsWith("xkeysib-")) {
-            log.warn("[BREVO REST API] Skipping HTTPS fallback: mailPassword does not match Brevo key format (must start with xsmtpsib- or xkeysib-)");
-            return false;
+        if (brevoKey.isBlank()) {
+            log.warn("[BREVO REST API] Skipping HTTPS fallback: MAIL_PASSWORD is empty in environment variables.");
+            return "FAILED: MAIL_PASSWORD environment variable is missing or empty on Render.";
         }
         log.info("[BREVO REST API] Attempting direct HTTPS email dispatch (Port 443) to [{}]", cleanTo);
         try {
@@ -140,14 +144,14 @@ public class EmailService {
             java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
             if (response.statusCode() >= 200 && response.statusCode() < 300) {
                 log.info("[BREVO REST API SUCCESS] Email successfully delivered to [{}] via HTTPS port 443! Response: {}", cleanTo, response.body());
-                return true;
+                return "SUCCESS: Email sent via Brevo HTTPS API";
             } else {
                 log.warn("[BREVO REST API FAILED] Status: {} | Body: {}", response.statusCode(), response.body());
-                return false;
+                return "Brevo HTTPS API HTTP " + response.statusCode() + ": " + response.body();
             }
         } catch (Exception ex) {
             log.error("[BREVO REST API ERROR] Failed to send via HTTPS REST API: {}", ex.getMessage(), ex);
-            return false;
+            return "Brevo HTTPS API Exception: " + ex.getMessage();
         }
     }
 
