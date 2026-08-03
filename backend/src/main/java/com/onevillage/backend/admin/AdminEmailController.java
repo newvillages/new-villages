@@ -24,13 +24,24 @@ public class AdminEmailController {
         ));
     }
 
-    @RequestMapping(value = "/test", method = {RequestMethod.GET, RequestMethod.POST})
-    public ResponseEntity<Map<String, Object>> sendTestEmail(@RequestParam(required = false, defaultValue = "contact@newvillages.ca") String to) {
+    @RequestMapping(value = {"/test", "/test/{recipient:.*}"}, method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<Map<String, Object>> sendTestEmail(
+            @RequestParam(required = false) String to,
+            @PathVariable(required = false) String recipient) {
+        
+        String targetEmail = "contact@newvillages.ca";
+        if (to != null && !to.isBlank()) {
+            targetEmail = to;
+        } else if (recipient != null && !recipient.isBlank()) {
+            targetEmail = recipient.replace("to=", "").trim();
+        }
+
         try {
-            String result = emailService.sendTestEmail(to);
+            String result = emailService.sendTestEmail(targetEmail);
             return ResponseEntity.ok(Map.of(
                     "status", "SUCCESS",
                     "message", result,
+                    "targetRecipient", targetEmail,
                     "diagnosticInfo", emailService.getEmailDiagnosticInfo()
             ));
         } catch (Exception e) {
@@ -39,6 +50,7 @@ public class AdminEmailController {
                     "status", "FAILED",
                     "error", e.getMessage() != null ? e.getMessage() : "Unknown SMTP error",
                     "cause", causeMsg != null ? causeMsg : "None",
+                    "targetRecipient", targetEmail,
                     "diagnosticInfo", emailService.getEmailDiagnosticInfo()
             ));
         }
