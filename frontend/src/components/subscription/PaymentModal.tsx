@@ -219,14 +219,14 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-white border border-gray-200 rounded-xl">
                     <div className="min-w-0 flex-1">
                       <div className="text-[10px] sm:text-[11px] font-semibold text-gray-400 uppercase">Recipient Email</div>
-                      <div className="font-mono font-bold text-xs sm:text-sm text-[#2D2159] break-all">payments@newvillages.ca</div>
+                      <div className="font-mono font-bold text-xs sm:text-sm text-[#2D2159] break-all">payment@newvillages.ca</div>
                     </div>
                     <Button 
                       type="button" 
                       variant="outline" 
                       size="sm" 
                       className="h-8 sm:h-9 px-3 text-xs gap-1.5 font-bold border-gray-200 w-full sm:w-auto justify-center"
-                      onClick={() => handleCopy('payments@newvillages.ca', 'email')}
+                      onClick={() => handleCopy('payment@newvillages.ca', 'email')}
                     >
                       {copiedEmail ? <Check size={14} className="text-emerald-600" /> : <Copy size={14} />}
                       {copiedEmail ? 'Copied' : 'Copy'}
