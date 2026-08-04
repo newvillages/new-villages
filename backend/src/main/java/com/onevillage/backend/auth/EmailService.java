@@ -225,10 +225,56 @@ public class EmailService {
                         + loginLink + "\n\n"
                         + "🚀 Access your dashboard directly:\n"
                         + dashboardLink + "\n\n"
-                        + "If you have any questions, reply directly to this email or contact support@newvillages.ca.\n\n"
+                        + "If you have any questions, reply directly to this email or contact contact@newvillages.ca.\n\n"
                         + "Warm regards,\n"
                         + "The NewVillages Canada Team\n"
-                        + "https://www.luminex.rw");
+                        + "https://newvillages.ca");
+    }
+
+    @Async
+    public void sendContactSubmissionEmail(String senderName, String senderEmail, String subject, String message) {
+        log.info("[CONTACT FORM] Submission from {} ({}) | Subject: {}", senderName, senderEmail, subject);
+
+        // 1. Notify platform admin at contact@newvillages.ca
+        String adminSubject = "[New Villages Contact] " + subject;
+        String adminPlainText = "New message received via New Villages Contact Form:\n\n"
+                + "Name: " + senderName + "\n"
+                + "Email: " + senderEmail + "\n"
+                + "Subject: " + subject + "\n\n"
+                + "Message:\n" + message;
+
+        String adminHtml = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;\">"
+                + "<h2 style=\"color: #0F172A; margin: 0 0 16px 0;\">New Contact Form Submission</h2>"
+                + "<p style=\"font-size: 14px; color: #334155;\"><strong>Sender Name:</strong> " + escapeJson(senderName) + "</p>"
+                + "<p style=\"font-size: 14px; color: #334155;\"><strong>Sender Email:</strong> <a href=\"mailto:" + escapeJson(senderEmail) + "\">" + escapeJson(senderEmail) + "</a></p>"
+                + "<p style=\"font-size: 14px; color: #334155;\"><strong>Subject:</strong> " + escapeJson(subject) + "</p>"
+                + "<hr style=\"border: 0; border-top: 1px solid #e2e8f0; margin: 16px 0;\" />"
+                + "<p style=\"font-size: 14px; color: #1E293B; white-space: pre-wrap;\">" + escapeJson(message) + "</p>"
+                + "</div>";
+
+        sendHtml("contact@newvillages.ca", adminSubject, adminPlainText, adminHtml);
+
+        // 2. Send auto-reply to submitter
+        String userSubject = "We received your message - New Villages Support";
+        String userPlainText = "Hi " + senderName + ",\n\n"
+                + "Thank you for contacting New Villages! We have received your message regarding \"" + subject + "\".\n"
+                + "Our support team will review your inquiry and get back to you shortly.\n\n"
+                + "Best regards,\n"
+                + "The New Villages Team\n"
+                + "contact@newvillages.ca";
+
+        String userHtml = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;\">"
+                + "<h2 style=\"color: #0F172A; margin: 0 0 8px 0;\">Thank You for Reaching Out!</h2>"
+                + "<p style=\"font-size: 14px; color: #475569;\">Hi <strong>" + escapeJson(senderName) + "</strong>,</p>"
+                + "<p style=\"font-size: 14px; color: #475569;\">We have received your message and our team will get back to you within 24 hours.</p>"
+                + "<div style=\"background-color: #F8FAFC; border-radius: 12px; padding: 16px; margin: 20px 0; border: 1px solid #F1F5F9;\">"
+                + "<p style=\"font-size: 13px; color: #64748B; margin: 0 0 4px 0;\"><strong>Your Message:</strong></p>"
+                + "<p style=\"font-size: 13px; color: #334155; margin: 0;\">" + escapeJson(message) + "</p>"
+                + "</div>"
+                + "<p style=\"font-size: 12px; color: #94A3B8;\">The New Villages Team &bull; contact@newvillages.ca</p>"
+                + "</div>";
+
+        sendHtml(senderEmail, userSubject, userPlainText, userHtml);
     }
 
     @Async

@@ -92,7 +92,8 @@ public class SecurityConfig {
                                 "/v3/api-docs/**",
                                 "/api/categories",
                                 "/api/pricing-plans",
-                                "/api/admin/email/**"
+                                "/api/admin/email/**",
+                                "/api/public/contact"
                         ).permitAll()
                         // Anyone can browse the community directory; joining, viewing full
                         // detail, and every other community endpoint still require a session.

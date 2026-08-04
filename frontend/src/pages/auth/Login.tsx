@@ -48,6 +48,9 @@ export function Login() {
     );
   };
 
+  const searchParams = new URLSearchParams(location.search);
+  const reason = searchParams.get('reason');
+
   return (
     <div className="min-h-screen bg-background-light py-12 px-4 flex flex-col items-center justify-center">
       <div className="w-full max-w-md mb-4 text-left">
@@ -61,6 +64,18 @@ export function Login() {
             <h1 className="text-3xl font-heading font-bold mb-2">Welcome Back</h1>
             <p className="text-gray-600">Log in to your New Villages account.</p>
           </div>
+
+          {reason === 'inactivity' && (
+            <div className="bg-amber-50 border border-amber-200 text-amber-800 text-sm font-medium px-4 py-3 rounded-xl mb-6 text-center">
+              You were automatically logged out due to inactivity to protect your account.
+            </div>
+          )}
+
+          {reason === 'session_expired' && (
+            <div className="bg-blue-50 border border-blue-200 text-blue-800 text-sm font-medium px-4 py-3 rounded-xl mb-6 text-center">
+              Your session has expired. Please log in again to continue.
+            </div>
+          )}
 
           <form onSubmit={handleLogin} className="space-y-4">
             {formError && (
