@@ -15,13 +15,13 @@ interface ToggleProps { label: string; desc?: string; value: boolean; onChange: 
 const Toggle = ({ label, desc, value, onChange }: ToggleProps) => (
   <div className="flex items-start justify-between gap-4 py-4">
     <div>
-      <p className="font-semibold text-gray-900 text-sm">{label}</p>
-      {desc && <p className="text-sm text-gray-500 mt-0.5 leading-relaxed">{desc}</p>}
+      <p className="font-bold text-[#2C1810] text-sm">{label}</p>
+      {desc && <p className="text-xs text-[#52433B] mt-0.5 leading-relaxed">{desc}</p>}
     </div>
     <button
       onClick={onChange}
       aria-label={`Toggle ${label}`}
-      className={`relative w-11 h-6 rounded-full transition-colors shrink-0 mt-1 ${value ? 'bg-[#2D2159]' : 'bg-gray-200'}`}
+      className={`relative w-11 h-6 rounded-full transition-colors shrink-0 mt-1 ${value ? 'bg-[#E86225]' : 'bg-slate-200'}`}
     >
       <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${value ? 'translate-x-5' : 'translate-x-0'}`} />
     </button>
@@ -43,7 +43,7 @@ export function Settings() {
 
   const handleThemeToggle = () => {
     toggleDark();
-    toast.info(isDark ? '☀️ Light mode enabled' : '🌙 Dark mode enabled');
+    toast.info(isDark ? '☀️ Mode clair activé' : '🌙 Mode sombre activé');
   };
 
   // --- Security: change password ---
@@ -57,19 +57,19 @@ export function Settings() {
     e.preventDefault();
     setPasswordError(null);
     if (newPassword !== confirmNewPassword) {
-      setPasswordError('New passwords do not match.');
+      setPasswordError('Les nouveaux mots de passe ne correspondent pas.');
       return;
     }
     changePassword.mutate(
       { currentPassword, newPassword },
       {
         onSuccess: () => {
-          toast.success('Password updated.');
+          toast.success('Mot de passe mis à jour.');
           setCurrentPassword('');
           setNewPassword('');
           setConfirmNewPassword('');
         },
-        onError: (err) => setPasswordError(err instanceof ApiError ? err.message : 'Could not update your password.'),
+        onError: (err) => setPasswordError(err instanceof ApiError ? err.message : 'Impossible de mettre à jour le mot de passe.'),
       }
     );
   };
@@ -83,30 +83,30 @@ export function Settings() {
   const handleDeleteAccount = () => {
     deactivateAccount.mutate(undefined, {
       onSuccess: () => navigate('/'),
-      onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Could not delete your account.'),
+      onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Impossible de supprimer votre compte.'),
     });
   };
 
   const tabs = [
-    { id: 'appearance', label: 'Appearance', icon: isDark ? Moon : Sun, danger: false },
-    { id: 'security', label: 'Security', icon: Lock, danger: false },
+    { id: 'appearance', label: 'Apparence', icon: isDark ? Moon : Sun, danger: false },
+    { id: 'security', label: 'Sécurité', icon: Lock, danger: false },
     { id: 'notifications', label: 'Notifications', icon: Bell, danger: false },
-    { id: 'privacy', label: 'Privacy', icon: EyeOff, danger: false },
-    { id: 'danger', label: 'Danger Zone', icon: Trash2, danger: true },
+    { id: 'privacy', label: 'Confidentialité', icon: EyeOff, danger: false },
+    { id: 'danger', label: 'Zone de danger', icon: Trash2, danger: true },
   ] as const;
 
   return (
     <PageTransition>
-      <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12">
+      <div className="max-w-6xl mx-auto px-4 md:px-8 py-8 md:py-12 font-body">
         <div className="mb-10">
-          <h1 className="text-3xl md:text-4xl font-heading font-bold text-[#2D2159] mb-2">Settings</h1>
-          <p className="text-gray-500">Manage your account preferences and security.</p>
+          <h1 className="text-3xl md:text-4xl font-heading font-extrabold text-[#2C1810] mb-2">Paramètres</h1>
+          <p className="text-xs text-[#52433B]">Gérez vos préférences de compte et la sécurité.</p>
         </div>
 
         <div className="flex flex-col md:flex-row gap-8 md:gap-12">
           {/* Sidebar Navigation */}
           <aside className="md:w-64 shrink-0">
-            <nav className="flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0 hide-scrollbar sticky top-24">
+            <nav className="flex flex-row md:flex-col gap-1 overflow-x-auto md:overflow-visible pb-2 md:pb-0 scrollbar-none sticky top-24">
               {tabs.map(tab => {
                 const Icon = tab.icon;
                 const isActive = activeTab === tab.id;
@@ -115,13 +115,13 @@ export function Settings() {
                     key={tab.id}
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      "flex items-center gap-3 px-4 py-3 rounded-xl font-medium transition-colors text-sm whitespace-nowrap",
+                      "flex items-center gap-3 px-4 py-3 rounded-xl font-bold transition-colors text-xs whitespace-nowrap",
                       isActive
-                        ? (tab.danger ? "bg-red-50 text-red-600" : "bg-[#F2F0FA] text-[#2D2159]")
-                        : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                        ? (tab.danger ? "bg-red-50 text-red-600" : "bg-[#FAF5EF] text-[#E86225]")
+                        : "text-[#52433B] hover:bg-slate-100 hover:text-[#2C1810]"
                     )}
                   >
-                    <Icon size={18} className={cn(isActive ? "opacity-100" : "opacity-50")} />
+                    <Icon size={18} />
                     {tab.label}
                   </button>
                 );
@@ -132,17 +132,17 @@ export function Settings() {
           {/* Main Content Area */}
           <div className="flex-1 max-w-3xl">
             {activeTab === 'appearance' && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="space-y-6">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-1">Appearance</h2>
-                  <p className="text-sm text-gray-500 mb-6">Customize how New Villages looks on your device.</p>
+                  <h2 className="text-xl font-bold text-[#2C1810] mb-1">Apparence</h2>
+                  <p className="text-xs text-[#52433B] mb-6">Personnalisez l'affichage de Bouffe &amp; Amitié sur votre appareil.</p>
                 </div>
-                <Card className="border-gray-100 shadow-sm rounded-2xl overflow-hidden">
-                  <CardContent className="p-0 divide-y divide-gray-100">
+                <Card className="border-[#EFE6DD] shadow-sm rounded-2xl overflow-hidden bg-white">
+                  <CardContent className="p-0 divide-y divide-[#EFE6DD]">
                     <div className="p-6">
                       <Toggle
-                        label="Dark Mode"
-                        desc="Switch between light and dark interface"
+                        label="Mode Sombre"
+                        desc="Basculez entre l'interface claire et sombre"
                         value={isDark}
                         onChange={handleThemeToggle}
                       />
@@ -153,13 +153,13 @@ export function Settings() {
             )}
 
             {activeTab === 'security' && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="space-y-6">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-1">Account Security</h2>
-                  <p className="text-sm text-gray-500 mb-6">Manage your password and authentication methods.</p>
+                  <h2 className="text-xl font-bold text-[#2C1810] mb-1">Sécurité du compte</h2>
+                  <p className="text-xs text-[#52433B] mb-6">Gérez votre mot de passe et l'authentification.</p>
                 </div>
-                <Card className="border-gray-100 shadow-sm rounded-2xl overflow-hidden">
-                  <CardHeader><CardTitle className="text-base">Change password</CardTitle></CardHeader>
+                <Card className="border-[#EFE6DD] shadow-sm rounded-2xl overflow-hidden bg-white">
+                  <CardHeader><CardTitle className="text-sm font-bold text-[#2C1810]">Changer de mot de passe</CardTitle></CardHeader>
                   <CardContent className="pt-0">
                     <form onSubmit={handleChangePassword} className="space-y-3 max-w-sm">
                       {passwordError && (
@@ -167,44 +167,44 @@ export function Settings() {
                           {passwordError}
                         </div>
                       )}
-                      <input type="password" required placeholder="Current password" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)}
-                        className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                      <input type="password" required minLength={8} placeholder="New password" value={newPassword} onChange={e => setNewPassword(e.target.value)}
-                        className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                      <input type="password" required minLength={8} placeholder="Confirm new password" value={confirmNewPassword} onChange={e => setConfirmNewPassword(e.target.value)}
-                        className="w-full border border-gray-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-primary" />
-                      <Button type="submit" size="sm" disabled={changePassword.isPending} className="flex items-center gap-2">
+                      <input type="password" required placeholder="Mot de passe actuel" value={currentPassword} onChange={e => setCurrentPassword(e.target.value)}
+                        className="w-full border border-[#EFE6DD] rounded-xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#E86225]" />
+                      <input type="password" required minLength={8} placeholder="Nouveau mot de passe" value={newPassword} onChange={e => setNewPassword(e.target.value)}
+                        className="w-full border border-[#EFE6DD] rounded-xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#E86225]" />
+                      <input type="password" required minLength={8} placeholder="Confirmer le nouveau mot de passe" value={confirmNewPassword} onChange={e => setConfirmNewPassword(e.target.value)}
+                        className="w-full border border-[#EFE6DD] rounded-xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#E86225]" />
+                      <Button type="submit" size="sm" disabled={changePassword.isPending} className="flex items-center gap-2 bg-[#E86225] hover:bg-[#D0521B] text-white font-bold py-2.5 px-4 rounded-xl text-xs">
                         {changePassword.isPending && <Loader2 size={14} className="animate-spin" />}
-                        Update password
+                        Mettre à jour le mot de passe
                       </Button>
                     </form>
                   </CardContent>
                 </Card>
-                <Card className="border-gray-100 shadow-sm rounded-2xl overflow-hidden">
+                <Card className="border-[#EFE6DD] shadow-sm rounded-2xl overflow-hidden bg-white">
                   <CardContent className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                     <div>
-                      <p className="font-semibold text-gray-900 text-sm mb-1">Two-Factor Authentication (2FA)</p>
-                      <p className="text-sm text-gray-500">Add an extra layer of security to your account</p>
+                      <p className="font-bold text-[#2C1810] text-sm mb-1">Authentification à deux facteurs (2FA)</p>
+                      <p className="text-xs text-[#52433B]">Ajoutez une couche de sécurité supplémentaire à votre compte</p>
                     </div>
-                    <Button variant="outline" onClick={() => toast.info('2FA setup coming soon!')}>Enable 2FA</Button>
+                    <Button variant="outline" className="border-[#E86225] text-[#E86225] font-bold text-xs" onClick={() => toast.info('Option 2FA à venir sous peu !')}>Activer 2FA</Button>
                   </CardContent>
                 </Card>
               </div>
             )}
 
             {activeTab === 'notifications' && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="space-y-6">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-1">Notifications</h2>
-                  <p className="text-sm text-gray-500 mb-6">Choose what you want to be notified about.</p>
+                  <h2 className="text-xl font-bold text-[#2C1810] mb-1">Notifications</h2>
+                  <p className="text-xs text-[#52433B] mb-6">Choisissez les alertes que vous souhaitez recevoir.</p>
                 </div>
-                <Card className="border-gray-100 shadow-sm rounded-2xl overflow-hidden">
-                  <CardContent className="p-0 divide-y divide-gray-100">
+                <Card className="border-[#EFE6DD] shadow-sm rounded-2xl overflow-hidden bg-white">
+                  <CardContent className="p-0 divide-y divide-[#EFE6DD]">
                     <div className="p-6 space-y-2">
-                      <Toggle label="New Messages" desc="Notify me when I receive a direct message" value={notifs.messages} onChange={() => toggle('messages')} />
-                      <Toggle label="Events" desc="When an event is scheduled in my communities" value={notifs.events} onChange={() => toggle('events')} />
-                      <Toggle label="Invitations" desc="When I am invited to join a new community" value={notifs.invitations} onChange={() => toggle('invitations')} />
-                      <Toggle label="Announcements" desc="Important updates from community leaders" value={notifs.announcements} onChange={() => toggle('announcements')} />
+                      <Toggle label="Nouveaux messages" desc="M'avertir lorsque je reçois un message privé" value={notifs.messages} onChange={() => toggle('messages')} />
+                      <Toggle label="Sorties au restaurant" desc="Lorsqu'une sortie est programmée dans mon groupe" value={notifs.events} onChange={() => toggle('events')} />
+                      <Toggle label="Invitations" desc="Lorsque je suis invité(e) à rejoindre un nouveau groupe" value={notifs.invitations} onChange={() => toggle('invitations')} />
+                      <Toggle label="Annonces" desc="Mises à jour importantes des organisateurs" value={notifs.announcements} onChange={() => toggle('announcements')} />
                     </div>
                   </CardContent>
                 </Card>
@@ -212,29 +212,29 @@ export function Settings() {
             )}
 
             {activeTab === 'privacy' && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="space-y-6">
                 <div>
-                  <h2 className="text-xl font-bold text-gray-900 mb-1">Privacy</h2>
-                  <p className="text-sm text-gray-500 mb-6">Control who sees your profile and how you interact.</p>
+                  <h2 className="text-xl font-bold text-[#2C1810] mb-1">Confidentialité</h2>
+                  <p className="text-xs text-[#52433B] mb-6">Contrôlez la visibilité de votre profil.</p>
                 </div>
-                <Card className="border-gray-100 shadow-sm rounded-2xl overflow-hidden">
-                  <CardContent className="p-0 divide-y divide-gray-100">
+                <Card className="border-[#EFE6DD] shadow-sm rounded-2xl overflow-hidden bg-white">
+                  <CardContent className="p-0 divide-y divide-[#EFE6DD]">
                     <div className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div>
-                        <p className="font-semibold text-gray-900 text-sm mb-1">Blocked Users</p>
-                        <p className="text-sm text-gray-500">{(blockedUsers?.length ?? 0)} user{(blockedUsers?.length ?? 0) === 1 ? '' : 's'} blocked</p>
+                        <p className="font-bold text-[#2C1810] text-sm mb-1">Membres bloqués</p>
+                        <p className="text-xs text-[#52433B]">{(blockedUsers?.length ?? 0)} membre{(blockedUsers?.length ?? 0) === 1 ? '' : 's'} bloqué(s)</p>
                       </div>
-                      <Button variant="outline" onClick={() => setBlockedModalOpen(true)}>Manage</Button>
+                      <Button variant="outline" className="border-[#E86225] text-[#E86225] font-bold text-xs" onClick={() => setBlockedModalOpen(true)}>Gérer</Button>
                     </div>
                     <div className="p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div>
-                        <p className="font-semibold text-gray-900 text-sm mb-1">Profile Visibility</p>
-                        <p className="text-sm text-gray-500">Who can view your full profile</p>
+                        <p className="font-bold text-[#2C1810] text-sm mb-1">Visibilité du profil</p>
+                        <p className="text-xs text-[#52433B]">Qui peut voir votre profil complet</p>
                       </div>
-                      <select className="h-10 text-sm font-medium border border-gray-200 rounded-lg px-3 focus:outline-none focus:ring-2 focus:ring-primary bg-white cursor-pointer">
-                        <option>Community Members</option>
-                        <option>Everyone</option>
-                        <option>Only Me</option>
+                      <select className="h-10 text-xs font-bold border border-[#EFE6DD] rounded-xl px-3 focus:outline-none focus:ring-2 focus:ring-[#E86225] bg-[#FAF5EF] text-[#2C1810] cursor-pointer">
+                        <option>Membres du groupe</option>
+                        <option>Tout le monde</option>
+                        <option>Moi uniquement</option>
                       </select>
                     </div>
                   </CardContent>
@@ -243,19 +243,19 @@ export function Settings() {
             )}
 
             {activeTab === 'danger' && (
-              <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="space-y-6">
                 <div>
-                  <h2 className="text-xl font-bold text-red-600 mb-1">Danger Zone</h2>
-                  <p className="text-sm text-gray-500 mb-6">Irreversible actions for your account.</p>
+                  <h2 className="text-xl font-bold text-red-600 mb-1">Zone de danger</h2>
+                  <p className="text-xs text-[#52433B] mb-6">Actions irréversibles pour votre compte.</p>
                 </div>
                 <Card className="border-red-100 shadow-sm rounded-2xl overflow-hidden bg-red-50/30">
                   <CardContent className="p-6">
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                       <div>
-                        <p className="font-bold text-red-700 text-sm mb-1">Delete Account</p>
-                        <p className="text-sm text-red-600/80">Permanently remove your account and all associated data. This action cannot be undone.</p>
+                        <p className="font-bold text-red-700 text-sm mb-1">Supprimer le compte</p>
+                        <p className="text-xs text-red-600/80">Supprimez définitivement votre compte et vos données. Cette action est irréversible.</p>
                       </div>
-                      <Button variant="danger" onClick={() => setDeleteOpen(true)} className="shrink-0 bg-red-600 hover:bg-red-700">Delete Account</Button>
+                      <Button variant="danger" onClick={() => setDeleteOpen(true)} className="shrink-0 bg-red-600 hover:bg-red-700 text-xs font-bold">Supprimer mon compte</Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -265,56 +265,58 @@ export function Settings() {
         </div>
       </div>
 
-      <Modal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)} title="Delete Account">
+      <Modal isOpen={deleteOpen} onClose={() => setDeleteOpen(false)} title="Supprimer le compte">
         <div className="space-y-6 mt-4">
-          <div className="bg-red-50 border border-red-200 rounded-xl p-5 text-sm text-red-800">
-            <p className="font-bold mb-2 text-base">This action cannot be undone.</p>
-            <p>All your data, messages, and community memberships will be permanently deleted from our servers.</p>
+          <div className="bg-red-50 border border-red-200 rounded-xl p-5 text-xs text-red-800">
+            <p className="font-bold mb-2 text-sm">Cette action ne peut pas être annulée.</p>
+            <p>Toutes vos données, messages et participations aux groupes seront définitivement supprimés de nos serveurs.</p>
           </div>
           <div>
-            <p className="text-sm font-medium text-gray-700 mb-2">Type <strong>DELETE</strong> to confirm:</p>
+            <p className="text-xs font-bold text-[#2C1810] mb-2">Tapez <strong>SUPPRIMER</strong> pour confirmer :</p>
             <input
               type="text"
               value={deleteConfirmText}
               onChange={(e) => setDeleteConfirmText(e.target.value)}
-              className="w-full border border-gray-200 rounded-xl p-4 text-sm focus:ring-2 focus:ring-red-500 focus:outline-none"
-              placeholder="DELETE"
+              className="w-full border border-[#EFE6DD] rounded-xl p-4 text-xs focus:ring-2 focus:ring-red-500 focus:outline-none"
+              placeholder="SUPPRIMER"
             />
           </div>
           <div className="flex gap-3 pt-4">
-            <Button variant="outline" className="flex-1 py-5 rounded-xl font-semibold" onClick={() => setDeleteOpen(false)}>Cancel</Button>
+            <Button variant="outline" className="flex-1 py-3 rounded-xl font-bold text-xs" onClick={() => setDeleteOpen(false)}>Annuler</Button>
             <Button
               variant="danger"
-              className="flex-1 py-5 rounded-xl font-semibold bg-red-600 hover:bg-red-700"
-              disabled={deleteConfirmText !== 'DELETE' || deactivateAccount.isPending}
+              className="flex-1 py-3 rounded-xl font-bold text-xs bg-red-600 hover:bg-red-700 text-white"
+              disabled={deleteConfirmText !== 'SUPPRIMER' || deactivateAccount.isPending}
               onClick={handleDeleteAccount}
             >
-              Delete My Account
+              Supprimer définitivement
             </Button>
           </div>
         </div>
       </Modal>
 
-      <Modal isOpen={blockedModalOpen} onClose={() => setBlockedModalOpen(false)} title="Blocked Users">
+      <Modal isOpen={blockedModalOpen} onClose={() => setBlockedModalOpen(false)} title="Membres bloqués">
         <div className="space-y-3">
           {(blockedUsers ?? []).length > 0 ? (blockedUsers ?? []).map((u) => (
-            <div key={u.id} className="flex items-center justify-between gap-3 p-3 border border-gray-100 rounded-xl">
+            <div key={u.id} className="flex items-center justify-between gap-3 p-3 border border-[#EFE6DD] rounded-xl">
               <div className="flex items-center gap-3">
                 <img src={u.avatarUrl || `https://i.pravatar.cc/150?u=${u.id}`} className="w-10 h-10 rounded-full" alt="" />
                 <div>
-                  <p className="font-semibold text-sm text-gray-900">{u.fullName}</p>
-                  <p className="text-xs text-gray-500">{u.city}</p>
+                  <p className="font-bold text-xs text-[#2C1810]">{u.fullName}</p>
+                  <p className="text-xs text-[#52433B]">{u.city}</p>
                 </div>
               </div>
-              <Button size="sm" variant="outline" className="flex items-center gap-1" onClick={() => unblockUser.mutate(u.id)} disabled={unblockUser.isPending}>
-                <UserX size={14} /> Unblock
+              <Button size="sm" variant="outline" className="flex items-center gap-1 text-xs font-bold" onClick={() => unblockUser.mutate(u.id)} disabled={unblockUser.isPending}>
+                <UserX size={14} /> Débloquer
               </Button>
             </div>
           )) : (
-            <p className="text-sm text-gray-500 text-center py-6">No users blocked yet.</p>
+            <p className="text-xs text-[#52433B] text-center py-6">Aucun membre bloqué pour le moment.</p>
           )}
         </div>
       </Modal>
     </PageTransition>
   );
 }
+
+export default Settings;

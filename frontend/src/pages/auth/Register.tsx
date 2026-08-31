@@ -22,7 +22,7 @@ export function Register() {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [country, setCountry] = useState('Canada');
   const [city, setCity] = useState('');
-  const [preferredLanguage, setPreferredLanguage] = useState('English');
+  const [preferredLanguage, setPreferredLanguage] = useState('Français');
 
   const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [termsOpened, setTermsOpened] = useState(false);
@@ -51,7 +51,7 @@ export function Register() {
           if (err instanceof ApiError) {
             setFormError(err.message);
           } else {
-            setFormError('Something went wrong. Please try again.');
+            setFormError('Une erreur est survenue. Veuillez réessayer.');
           }
         },
       }
@@ -64,7 +64,7 @@ export function Register() {
 
     if (!termsAccepted || !terms) return;
     if (password !== confirmPassword) {
-      setFormError('Passwords do not match.');
+      setFormError('Les mots de passe ne correspondent pas.');
       return;
     }
 
@@ -85,21 +85,21 @@ export function Register() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-[#F6F5FB] flex flex-col">
+      <div className="min-h-screen bg-[#FDFBF7] flex flex-col font-body">
         {/* Minimal Header */}
         <header className="flex items-center justify-between px-6 md:px-12 py-6 max-w-[1600px] mx-auto w-full">
           <div className="flex items-center gap-3">
             <Link to="/" className="flex items-center shrink-0">
-              <img src="/logo-new-villages.webp" alt="NewVillages" className="h-11 w-auto object-contain" />
+              <img src="/logo-bouffe-amitie.png" alt="Bouffe &amp; Amitié" className="h-11 w-auto object-contain" />
             </Link>
-            <div className="h-5 w-px bg-gray-300 mx-1" />
-            <Link to="/" className="inline-flex items-center gap-1.5 text-sm font-semibold text-[#2D2159] hover:text-primary transition-colors">
+            <div className="h-5 w-px bg-slate-300 mx-1" />
+            <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-bold text-[#E86225] hover:underline">
               <ArrowLeft size={16} />
-              <span>Back to Home</span>
+              <span>Retour à l'accueil</span>
             </Link>
           </div>
-          <Link to="/login" className="text-[#2D2159] font-semibold text-sm hover:underline">
-            Log in &rarr;
+          <Link to="/login" className="text-[#2C1810] font-bold text-xs hover:underline">
+            Se connecter &rarr;
           </Link>
         </header>
 
@@ -107,73 +107,73 @@ export function Register() {
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
           <div className="w-full max-w-[900px]">
             <div className="mb-10 text-center md:text-left">
-              <h1 className="text-4xl md:text-5xl font-heading font-extrabold text-[#2D2159] mb-3">Create your account</h1>
-              <p className="text-gray-500 text-lg">It only takes a minute. Free forever for members.</p>
+              <h1 className="text-3xl md:text-5xl font-heading font-extrabold text-[#2C1810] mb-2">Créez votre compte</h1>
+              <p className="text-[#52433B] text-base">Rejoignez le club de sorties au restaurant Bouffe &amp; Amitié.</p>
             </div>
 
             <form onSubmit={handleRegister} className="space-y-10">
 
               {formError && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-sm font-medium px-4 py-3 rounded-xl">
+                <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-medium px-4 py-3 rounded-xl">
                   {formError}
                 </div>
               )}
 
-              {/* ABOUT YOU */}
+              {/* À PROPOS DE VOUS */}
               <div className="space-y-4">
-                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">About you</h3>
+                <h3 className="text-xs font-extrabold text-[#1E4D2B] uppercase tracking-widest">Vos informations personnelles</h3>
                 <div className="grid md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full name</label>
-                    <Input required placeholder="Amara Okafor" value={fullName} onChange={(e) => setFullName(e.target.value)} className="bg-white border-gray-200 rounded-xl py-6" />
+                    <label className="block text-xs font-bold text-[#2C1810] mb-1.5">Nom complet *</label>
+                    <Input required placeholder="Marie Tremblay" value={fullName} onChange={(e) => setFullName(e.target.value)} className="bg-white border-[#EFE6DD] rounded-xl py-6 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email</label>
-                    <Input required type="email" placeholder="you@newvillages.ca" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-white border-gray-200 rounded-xl py-6" />
+                    <label className="block text-xs font-bold text-[#2C1810] mb-1.5">Adresse courriel *</label>
+                    <Input required type="email" placeholder="marie@exemple.ca" value={email} onChange={(e) => setEmail(e.target.value)} className="bg-white border-[#EFE6DD] rounded-xl py-6 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
-                    <Input required type="password" placeholder="••••••••" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className="bg-white border-gray-200 rounded-xl py-6" />
+                    <label className="block text-xs font-bold text-[#2C1810] mb-1.5">Mot de passe *</label>
+                    <Input required type="password" placeholder="••••••••" minLength={8} value={password} onChange={(e) => setPassword(e.target.value)} className="bg-white border-[#EFE6DD] rounded-xl py-6 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Confirm password</label>
-                    <Input required type="password" placeholder="••••••••" minLength={8} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="bg-white border-gray-200 rounded-xl py-6" />
+                    <label className="block text-xs font-bold text-[#2C1810] mb-1.5">Confirmer le mot de passe *</label>
+                    <Input required type="password" placeholder="••••••••" minLength={8} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="bg-white border-[#EFE6DD] rounded-xl py-6 text-sm" />
                   </div>
                 </div>
               </div>
 
-              {/* WHERE YOU ARE */}
+              {/* VOTRE LOCALISATION */}
               <div className="space-y-4">
-                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">Where you are</h3>
+                <h3 className="text-xs font-extrabold text-[#1E4D2B] uppercase tracking-widest">Votre arrondissement / ville</h3>
                 <div className="grid md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Country</label>
-                    <select value={country} onChange={(e) => setCountry(e.target.value)} className="w-full h-14 rounded-xl border border-gray-200 bg-white px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none">
+                    <label className="block text-xs font-bold text-[#2C1810] mb-1.5">Pays</label>
+                    <select value={country} onChange={(e) => setCountry(e.target.value)} className="w-full h-14 rounded-xl border border-[#EFE6DD] bg-white px-4 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#E86225] appearance-none text-[#2C1810]">
                       <option>Canada</option>
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">City</label>
-                    <Input required placeholder="Toronto" value={city} onChange={(e) => setCity(e.target.value)} className="bg-white border-gray-200 rounded-xl py-6 h-14" />
+                    <label className="block text-xs font-bold text-[#2C1810] mb-1.5">Ville / Arrondissement *</label>
+                    <Input required placeholder="Montréal - Plateau-Mont-Royal" value={city} onChange={(e) => setCity(e.target.value)} className="bg-white border-[#EFE6DD] rounded-xl py-6 h-14 text-sm" />
                   </div>
                   <div>
-                    <label className="block text-sm font-semibold text-gray-700 mb-1.5">Preferred language</label>
-                    <select value={preferredLanguage} onChange={(e) => setPreferredLanguage(e.target.value)} className="w-full h-14 rounded-xl border border-gray-200 bg-white px-4 text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent appearance-none">
-                      <option>English</option>
+                    <label className="block text-xs font-bold text-[#2C1810] mb-1.5">Langue préférée</label>
+                    <select value={preferredLanguage} onChange={(e) => setPreferredLanguage(e.target.value)} className="w-full h-14 rounded-xl border border-[#EFE6DD] bg-white px-4 text-xs font-bold focus:outline-none focus:ring-2 focus:ring-[#E86225] appearance-none text-[#2C1810]">
                       <option>Français</option>
+                      <option>English</option>
                     </select>
                   </div>
                 </div>
               </div>
 
-              {/* I'M JOINING AS A... */}
+              {/* JE M'INSCRIS EN TANT QUE... */}
               <div className="space-y-4">
-                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-widest">I'm joining as a...</h3>
+                <h3 className="text-xs font-extrabold text-[#1E4D2B] uppercase tracking-widest">Choisissez votre formule</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   {[
-                    { id: 'MEMBER' as const, label: 'Member', price: 'Free', icon: UserCircle, desc: 'Join and take part in communities.' },
-                    { id: 'COMMUNITY_LEADER' as const, label: 'Community Leader', price: '$10/mo CAD', icon: Shield, desc: 'Create and manage a community.' },
-                    { id: 'ORGANIZATION' as const, label: 'Organization', price: '$20/mo CAD', icon: Building2, desc: 'Represent a business or nonprofit.' }
+                    { id: 'MEMBER' as const, label: 'Membre Gratuit', price: 'Gratuit', icon: UserCircle, desc: 'Consultez les sorties et l\'annuaire des groupes.' },
+                    { id: 'COMMUNITY_LEADER' as const, label: 'Organisateur de groupe', price: '10 $/mois CAD', icon: Shield, desc: 'Proposez des restaurants et gérez un groupe.' },
+                    { id: 'ORGANIZATION' as const, label: 'Organisation / Resto', price: '20 $/mois CAD', icon: Building2, desc: 'Accueillez des groupes et partenaire officiel.' }
                   ].map((type) => (
                     <button
                       key={type.id}
@@ -182,45 +182,45 @@ export function Register() {
                       className={cn(
                         "flex flex-col text-left p-4 sm:p-6 rounded-2xl border-2 transition-all bg-white shadow-sm relative overflow-hidden",
                         role === type.id
-                          ? "border-[#2D2159] bg-[#F2F0FA]"
-                          : "border-transparent hover:border-gray-200 text-gray-600"
+                          ? "border-[#E86225] bg-[#FDF0E9]"
+                          : "border-transparent hover:border-[#EFE6DD] text-[#52433B]"
                       )}
                     >
                       <div className="flex justify-between items-start mb-4">
-                        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", role === type.id ? "bg-[#2D2159] text-white" : "bg-gray-100 text-gray-500")}>
+                        <div className={cn("w-10 h-10 rounded-full flex items-center justify-center", role === type.id ? "bg-[#E86225] text-white" : "bg-[#FAF5EF] text-[#52433B]")}>
                           <type.icon size={20} />
                         </div>
                         <span className={cn(
                           "text-xs font-extrabold px-2.5 py-1 rounded-full",
-                          type.id === 'MEMBER' ? "bg-emerald-100 text-emerald-800" : "bg-indigo-100 text-indigo-900"
+                          type.id === 'MEMBER' ? "bg-[#E8F3EB] text-[#1E4D2B]" : "bg-[#FDF0E9] text-[#E86225]"
                         )}>
                           {type.price}
                         </span>
                       </div>
-                      <span className={cn("font-bold mb-1 text-base", role === type.id ? "text-[#2D2159]" : "text-gray-900")}>{type.label}</span>
-                      <span className="text-xs text-gray-500 leading-relaxed">{type.desc}</span>
+                      <span className={cn("font-bold mb-1 text-sm", role === type.id ? "text-[#E86225]" : "text-[#2C1810]")}>{type.label}</span>
+                      <span className="text-xs text-[#52433B] leading-relaxed">{type.desc}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
               {/* Terms Checkbox */}
-              <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-start gap-4">
+              <div className="bg-white p-6 rounded-2xl shadow-sm border border-[#EFE6DD] flex items-start gap-4">
                 <input
                   type="checkbox"
-                  className="mt-1 w-5 h-5 rounded border-gray-300 text-primary focus:ring-primary disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="mt-1 w-5 h-5 rounded border-slate-300 text-[#E86225] focus:ring-[#E86225] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   checked={termsAccepted}
                   onChange={(e) => setTermsAccepted(e.target.checked)}
                   disabled={!canAccept}
                 />
                 <div className="flex-1">
-                  <div className="text-sm font-semibold text-[#2D2159] mb-3">
-                    I agree to the <a href="#" onClick={openTerms} className="underline hover:text-primary transition-colors">Terms of Use and Privacy Policy</a>
-                    {terms && <span className="text-gray-400 font-normal"> (v{terms.version})</span>}.
+                  <div className="text-xs font-bold text-[#2C1810] mb-2">
+                    J'accepte les <a href="#" onClick={openTerms} className="underline text-[#E86225] hover:text-[#D0521B]">Conditions d'utilisation et la Politique de confidentialité</a>
+                    {terms && <span className="text-slate-400 font-normal"> (v{terms.version})</span>}.
                   </div>
-                  <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                    {termsOpened ? <CheckCircle2 size={14} className="text-green-500" /> : <Circle size={14} className="text-gray-300" />}
-                    {termsLoading ? 'Loading terms…' : 'Terms opened'}
+                  <div className="flex items-center gap-1.5 text-xs text-[#52433B]">
+                    {termsOpened ? <CheckCircle2 size={14} className="text-[#1E4D2B]" /> : <Circle size={14} className="text-slate-300" />}
+                    {termsLoading ? 'Chargement des conditions…' : 'Conditions consultées'}
                   </div>
                 </div>
               </div>
@@ -231,16 +231,16 @@ export function Register() {
                   type="submit"
                   size="lg"
                   className={cn(
-                    "w-full py-6 rounded-xl font-bold text-lg transition-all flex items-center justify-center gap-2",
-                    termsAccepted ? "bg-[#2D2159] hover:bg-[#3F2A78] text-white" : "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    "w-full py-6 rounded-xl font-bold text-base transition-all flex items-center justify-center gap-2",
+                    termsAccepted ? "bg-[#E86225] hover:bg-[#D0521B] text-white shadow-md" : "bg-slate-200 text-slate-400 cursor-not-allowed"
                   )}
                   disabled={!termsAccepted || registerMutation.isPending}
                 >
                   {registerMutation.isPending && <Loader2 size={18} className="animate-spin" />}
-                  {role === 'MEMBER' ? 'Create Free Account' : `Proceed to Payment (${role === 'COMMUNITY_LEADER' ? '$10' : '$20'} CAD)`}
+                  {role === 'MEMBER' ? 'Créer mon compte gratuit' : `Procéder au paiement (${role === 'COMMUNITY_LEADER' ? '10 $' : '20 $'} CAD)`}
                 </Button>
-                <p className="text-center text-sm text-gray-500">
-                  Already a member? <Link to="/login" className="text-[#2D2159] font-bold hover:underline">Log in</Link>
+                <p className="text-center text-xs text-[#52433B]">
+                  Déjà membre ? <Link to="/login" className="text-[#E86225] font-bold hover:underline">Se connecter</Link>
                 </p>
               </div>
 
@@ -254,12 +254,12 @@ export function Register() {
         <PaymentModal
           plan={{
             id: role.toLowerCase(),
-            label: role === 'COMMUNITY_LEADER' ? 'Community Leader' : 'Organization',
-            price: role === 'COMMUNITY_LEADER' ? '$10' : '$20',
-            period: '/month',
+            label: role === 'COMMUNITY_LEADER' ? 'Organisateur de groupe' : 'Organisation / Resto',
+            price: role === 'COMMUNITY_LEADER' ? '10 $' : '20 $',
+            period: '/mois',
             features: role === 'COMMUNITY_LEADER' 
-              ? ['Create & manage a community', 'Publish announcements & events', 'Analytics']
-              : ['Verified Org page', 'Contact communities directly', 'Team seats']
+              ? ['Créer et gérer un groupe d\'arrondissement', 'Proposer de nouvelles sorties au restaurant', 'Badges exclusifs']
+              : ['Page d\'organisation vérifiée', 'Partenaire officiel de sorties', 'Accès prioritaire']
           }}
           onBack={() => setShowPaymentModal(false)}
           onSuccess={() => {
@@ -269,14 +269,16 @@ export function Register() {
       </Modal>
 
       {/* Legal Modal */}
-      <Modal isOpen={termsModalOpen} onClose={() => setTermsModalOpen(false)} title={`Terms of Use & Privacy Policy${terms ? ` (v${terms.version})` : ''}`} className="max-w-2xl">
-        <div className="prose prose-sm prose-purple whitespace-pre-wrap">
-          {terms?.body ?? 'Loading…'}
+      <Modal isOpen={termsModalOpen} onClose={() => setTermsModalOpen(false)} title={`Conditions d'utilisation & Politique de confidentialité${terms ? ` (v${terms.version})` : ''}`} className="max-w-2xl">
+        <div className="prose prose-sm prose-amber whitespace-pre-wrap text-xs text-[#52433B]">
+          {terms?.body ?? 'Chargement…'}
         </div>
         <div className="mt-8 flex justify-end">
-          <Button onClick={() => setTermsModalOpen(false)}>I understand</Button>
+          <Button onClick={() => setTermsModalOpen(false)} className="bg-[#E86225] text-white">J'ai compris</Button>
         </div>
       </Modal>
     </PageTransition>
   );
 }
+
+export default Register;

@@ -23,7 +23,7 @@ export function OrganizationPage() {
   const isLoading = isMine ? myOrgQuery.isLoading : otherOrgQuery.isLoading;
 
   if (isLoading) {
-    return <div className="flex justify-center py-24"><Loader2 className="animate-spin text-primary" size={32} /></div>;
+    return <div className="flex justify-center py-24"><Loader2 className="animate-spin text-[#E86225]" size={32} /></div>;
   }
 
   if (isMine && !org) {
@@ -31,7 +31,7 @@ export function OrganizationPage() {
   }
 
   if (!org) {
-    return <div className="text-center py-24 text-gray-500">This organization page could not be found.</div>;
+    return <div className="text-center py-24 text-[#52433B]">Cette page d'organisation est introuvable.</div>;
   }
 
   const canEdit = org.ownerUserId === currentUser?.id;
@@ -51,43 +51,43 @@ function CreateOrganizationForm() {
     setFormError(null);
     createOrg.mutate(
       { name, description, contactEmail, services },
-      { onError: (err) => setFormError(err instanceof ApiError ? err.message : 'Could not create your organization page.') }
+      { onError: (err) => setFormError(err instanceof ApiError ? err.message : 'Impossible de créer la page d\'organisation.') }
     );
   };
 
   return (
-    <div className="max-w-xl mx-auto px-6 py-12">
+    <div className="max-w-xl mx-auto px-6 py-12 font-body">
       <div className="text-center mb-8">
-        <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto mb-4">
+        <div className="w-16 h-16 bg-[#FDF0E9] rounded-2xl flex items-center justify-center text-[#E86225] mx-auto mb-4">
           <Building2 size={32} />
         </div>
-        <h1 className="text-2xl font-heading font-bold text-gray-900">Create your organization page</h1>
-        <p className="text-gray-500 text-sm mt-1">Introduce your organization to the New Villages community.</p>
+        <h1 className="text-2xl font-heading font-extrabold text-[#2C1810]">Créez votre page d'organisation</h1>
+        <p className="text-[#52433B] text-xs mt-1">Présentez votre restaurant ou organisation au club Bouffe &amp; Amitié.</p>
       </div>
-      <Card>
+      <Card className="border-[#EFE6DD] shadow-sm rounded-3xl overflow-hidden bg-white">
         <CardContent className="p-6">
           <form onSubmit={handleSubmit} className="space-y-4">
             {formError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm font-medium px-4 py-3 rounded-xl">{formError}</div>
+              <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-medium px-4 py-3 rounded-xl">{formError}</div>
             )}
             <div>
-              <label className="block text-sm font-medium mb-1">Organization Name *</label>
-              <Input required value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Tech Startups Canada" />
+              <label className="block text-xs font-bold text-[#2C1810] mb-1">Nom de l'organisation / restaurant *</label>
+              <Input required value={name} onChange={e => setName(e.target.value)} placeholder="ex. Bistrot du Plateau" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Contact Email</label>
-              <Input type="email" value={contactEmail} onChange={e => setContactEmail(e.target.value)} placeholder="info@yourorg.ca" />
+              <label className="block text-xs font-bold text-[#2C1810] mb-1">Courriel de contact</label>
+              <Input type="email" value={contactEmail} onChange={e => setContactEmail(e.target.value)} placeholder="contact@bistrot.ca" />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">About</label>
-              <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full border border-gray-300 rounded-md p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary" rows={3} placeholder="What does your organization do?" />
+              <label className="block text-xs font-bold text-[#2C1810] mb-1">À propos</label>
+              <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full border border-[#EFE6DD] rounded-xl p-3 text-xs resize-none focus:outline-none focus:ring-2 focus:ring-[#E86225]" rows={3} placeholder="Présentez votre établissement ou vos activités..." />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Services & Programs</label>
-              <textarea value={services} onChange={e => setServices(e.target.value)} className="w-full border border-gray-300 rounded-md p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary" rows={3} placeholder="List the programs or services you offer..." />
+              <label className="block text-xs font-bold text-[#2C1810] mb-1">Services &amp; Offres spéciales</label>
+              <textarea value={services} onChange={e => setServices(e.target.value)} className="w-full border border-[#EFE6DD] rounded-xl p-3 text-xs resize-none focus:outline-none focus:ring-2 focus:ring-[#E86225]" rows={3} placeholder="Menu spécial pour groupes, réductions..." />
             </div>
-            <Button type="submit" className="w-full" disabled={createOrg.isPending}>
-              {createOrg.isPending ? 'Creating…' : 'Create Organization Page'}
+            <Button type="submit" className="w-full bg-[#E86225] hover:bg-[#D0521B] text-white font-bold py-3 rounded-xl text-xs" disabled={createOrg.isPending}>
+              {createOrg.isPending ? 'Création…' : 'Créer la page d\'organisation'}
             </Button>
           </form>
         </CardContent>
@@ -116,9 +116,9 @@ function OrganizationView({ org, canEdit }: { org: Organization; canEdit: boolea
     updateOrg.mutate(form, {
       onSuccess: () => {
         setEditing(false);
-        toast.success('Organization page updated.');
+        toast.success('Page d\'organisation mise à jour.');
       },
-      onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Could not save changes.'),
+      onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Impossible d\'enregistrer les modifications.'),
     });
   };
 
@@ -129,22 +129,22 @@ function OrganizationView({ org, canEdit }: { org: Organization; canEdit: boolea
       { type: 'LEADER', communityId: proposalCommunityId, initialMessage: proposalText },
       {
         onSuccess: () => setContactSuccess(true),
-        onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Could not send this proposal.'),
+        onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Impossible d\'envoyer la proposition.'),
       }
     );
   };
 
   return (
-    <div className="px-6 md:px-12 py-8 max-w-[1600px] mx-auto space-y-6 w-full">
+    <div className="px-6 md:px-12 py-8 max-w-[1600px] mx-auto space-y-6 w-full font-body">
       <div className="flex justify-between items-center">
-        <h1 className="text-3xl font-heading font-bold text-gray-900">Organization Profile</h1>
+        <h1 className="text-3xl font-heading font-extrabold text-[#2C1810]">Profil de l'organisation</h1>
         {canEdit && (
           !editing ? (
-            <Button variant="outline" onClick={() => setEditing(true)}>Edit Details</Button>
+            <Button variant="outline" className="border-[#E86225] text-[#E86225] font-bold text-xs" onClick={() => setEditing(true)}>Modifier les détails</Button>
           ) : (
             <div className="flex gap-2">
-              <Button variant="ghost" onClick={() => setEditing(false)}>Cancel</Button>
-              <Button onClick={handleSave} disabled={updateOrg.isPending}>{updateOrg.isPending ? 'Saving…' : 'Save Org Page'}</Button>
+              <Button variant="ghost" className="text-xs font-bold" onClick={() => setEditing(false)}>Annuler</Button>
+              <Button className="bg-[#E86225] text-white font-bold text-xs" onClick={handleSave} disabled={updateOrg.isPending}>{updateOrg.isPending ? 'Enregistrement…' : 'Enregistrer'}</Button>
             </div>
           )
         )}
@@ -153,21 +153,21 @@ function OrganizationView({ org, canEdit }: { org: Organization; canEdit: boolea
       <div className="grid md:grid-cols-3 gap-6">
         {/* Left column info */}
         <div className="space-y-6">
-          <Card>
+          <Card className="border-[#EFE6DD] shadow-sm rounded-3xl overflow-hidden bg-white">
             <CardContent className="p-6 text-center space-y-4">
-              <div className="w-20 h-20 bg-primary/10 rounded-2xl flex items-center justify-center text-primary mx-auto overflow-hidden">
+              <div className="w-20 h-20 bg-[#FDF0E9] rounded-2xl flex items-center justify-center text-[#E86225] mx-auto overflow-hidden">
                 {org.logoUrl ? <img src={org.logoUrl} alt="" className="w-full h-full object-cover" /> : <Building2 size={40} />}
               </div>
               <div>
                 {editing
-                  ? <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className="text-center font-bold" />
-                  : <h2 className="font-heading font-bold text-xl">{org.name}</h2>}
-                <span className="text-xs font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full mt-1 inline-block">Organization</span>
+                  ? <Input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} className="text-center font-bold text-xs" />
+                  : <h2 className="font-heading font-extrabold text-xl text-[#2C1810]">{org.name}</h2>}
+                <span className="text-xs font-bold bg-[#E8F3EB] text-[#1E4D2B] px-3 py-1 rounded-full mt-2 inline-block">Organisation Partenaire</span>
               </div>
-              <div className="text-sm text-gray-500 space-y-2 pt-2 border-t border-gray-100 text-left">
+              <div className="text-xs text-[#52433B] space-y-2 pt-2 border-t border-[#EFE6DD] text-left">
                 {editing
                   ? <Input value={form.contactEmail} onChange={e => setForm(p => ({ ...p, contactEmail: e.target.value }))} icon={<Mail size={16} />} />
-                  : <p className="flex items-center gap-2"><Mail size={16}/>{org.contactEmail || 'No contact email set'}</p>}
+                  : <p className="flex items-center gap-2"><Mail size={16} className="text-[#E86225]"/>{org.contactEmail || 'Aucun courriel renseigné'}</p>}
               </div>
             </CardContent>
           </Card>
@@ -175,62 +175,62 @@ function OrganizationView({ org, canEdit }: { org: Organization; canEdit: boolea
 
         {/* Right column content */}
         <div className="md:col-span-2 space-y-6">
-          <Card>
+          <Card className="border-[#EFE6DD] shadow-sm rounded-3xl overflow-hidden bg-white">
             <CardContent className="p-6 space-y-4">
-              <h3 className="font-bold text-lg">About Us</h3>
+              <h3 className="font-extrabold text-lg text-[#2C1810]">À propos</h3>
               {editing ? (
                 <textarea
                   value={form.description}
                   onChange={e => setForm(prev => ({ ...prev, description: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-md p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full border border-[#EFE6DD] rounded-xl p-3 text-xs resize-none focus:outline-none focus:ring-2 focus:ring-[#E86225]"
                   rows={4}
                 />
               ) : (
-                <p className="text-gray-600 text-sm leading-relaxed">{org.description || 'No description yet.'}</p>
+                <p className="text-[#52433B] text-xs leading-relaxed">{org.description || 'Aucune description pour le moment.'}</p>
               )}
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-[#EFE6DD] shadow-sm rounded-3xl overflow-hidden bg-white">
             <CardContent className="p-6 space-y-4">
-              <h3 className="font-bold text-lg">Services & Programs Offered</h3>
+              <h3 className="font-extrabold text-lg text-[#2C1810]">Services &amp; Offres proposées</h3>
               {editing ? (
                 <textarea
                   value={form.services}
                   onChange={e => setForm(prev => ({ ...prev, services: e.target.value }))}
-                  className="w-full border border-gray-300 rounded-md p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full border border-[#EFE6DD] rounded-xl p-3 text-xs resize-none focus:outline-none focus:ring-2 focus:ring-[#E86225]"
                   rows={4}
                 />
               ) : (
-                <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-wrap">{org.services || 'No services listed yet.'}</p>
+                <p className="text-[#52433B] text-xs leading-relaxed whitespace-pre-wrap">{org.services || 'Aucun service affiché pour le moment.'}</p>
               )}
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="border-[#EFE6DD] shadow-sm rounded-3xl overflow-hidden bg-white">
             <CardContent className="p-6 space-y-4">
-              <h3 className="font-bold text-lg">Contact Communities</h3>
-              <p className="text-xs text-gray-500">Send an inquiry proposal to a community's leadership.</p>
+              <h3 className="font-extrabold text-lg text-[#2C1810]">Contacter les responsables de groupe</h3>
+              <p className="text-xs text-[#52433B]">Envoyez une offre de partenariat ou de réservation de groupe.</p>
 
               {contactSuccess ? (
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-sm text-green-700">
-                  Proposal inquiry sent successfully!
+                <div className="bg-[#E8F3EB] border border-[#1E4D2B]/30 rounded-xl p-4 text-xs text-[#1E4D2B] font-bold">
+                  Proposition envoyée avec succès !
                 </div>
               ) : (
                 <form onSubmit={handleContactSubmit} className="space-y-3">
                   <div>
-                    <label className="block text-xs font-semibold mb-1 text-gray-600">Select Community Portal</label>
-                    <select value={proposalCommunityId} onChange={e => setProposalCommunityId(e.target.value)} required className="w-full border border-gray-300 rounded-md p-2 text-xs focus:ring-primary focus:outline-none">
-                      <option value="" disabled>Select a community</option>
+                    <label className="block text-xs font-bold mb-1 text-[#2C1810]">Sélectionner un groupe d'arrondissement</label>
+                    <select value={proposalCommunityId} onChange={e => setProposalCommunityId(e.target.value)} required className="w-full border border-[#EFE6DD] rounded-xl p-3 text-xs focus:ring-[#E86225] focus:outline-none bg-[#FAF5EF]">
+                      <option value="" disabled>Sélectionner un groupe</option>
                       {(communitiesPage?.content ?? []).map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-semibold mb-1 text-gray-600">Message proposal details</label>
-                    <textarea value={proposalText} onChange={e => setProposalText(e.target.value)} className="w-full border border-gray-300 rounded-md p-2 text-xs resize-none focus:outline-none focus:ring-2 focus:ring-primary" rows={3} placeholder="Describe potential collaboration opportunities..." required />
+                    <label className="block text-xs font-bold mb-1 text-[#2C1810]">Détails de la proposition</label>
+                    <textarea value={proposalText} onChange={e => setProposalText(e.target.value)} className="w-full border border-[#EFE6DD] rounded-xl p-3 text-xs resize-none focus:outline-none focus:ring-2 focus:ring-[#E86225]" rows={3} placeholder="Proposez une réservation de table ou un menu groupe..." required />
                   </div>
-                  <Button type="submit" size="sm" disabled={startConversation.isPending}>
-                    {startConversation.isPending ? 'Sending…' : 'Send Collaboration proposal'}
+                  <Button type="submit" size="sm" className="bg-[#E86225] hover:bg-[#D0521B] text-white font-bold py-2.5 px-4 rounded-xl text-xs" disabled={startConversation.isPending}>
+                    {startConversation.isPending ? 'Envoi…' : 'Envoyer la proposition'}
                   </Button>
                 </form>
               )}
@@ -241,3 +241,5 @@ function OrganizationView({ org, canEdit }: { org: Organization; canEdit: boolea
     </div>
   );
 }
+
+export default OrganizationPage;

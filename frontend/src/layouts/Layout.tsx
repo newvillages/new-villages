@@ -80,50 +80,50 @@ export function Layout() {
 
   const mainNavItems = [
     isAuthenticated
-      ? { label: 'Dashboard', icon: Home, href: '/dashboard' }
-      : { label: 'Home', icon: Home, href: '/' },
-    { label: 'Communities', icon: Users, href: '/communities' },
-    { label: 'Events', icon: Calendar, href: '/events' },
-    ...(!isLeaderOrOrgOrAdmin ? [{ label: 'Pricing', icon: Sparkles, href: '/pricing' }] : []),
+      ? { label: 'Tableau de bord', icon: Home, href: '/dashboard' }
+      : { label: 'Accueil', icon: Home, href: '/' },
+    { label: 'Groupes', icon: Users, href: '/communities' },
+    { label: 'Prochaines sorties', icon: Calendar, href: '/events' },
+    ...(!isLeaderOrOrgOrAdmin ? [{ label: 'Abonnements', icon: Sparkles, href: '/pricing' }] : []),
     ...(!isAuthenticated ? [{ label: 'Contact', icon: Mail, href: '/contact' }] : []),
-    ...(isAuthenticated ? [{ label: 'Messages', icon: MessageSquare, href: '/messages' }] : []),
+    ...(isAuthenticated ? [{ label: 'Messagerie', icon: MessageSquare, href: '/messages' }] : []),
   ];
 
   if (role === 'COMMUNITY_LEADER') {
-    mainNavItems.push({ label: 'Leader Portal', icon: Shield, href: '/leader-dashboard' });
+    mainNavItems.push({ label: 'Organisateur', icon: Shield, href: '/leader-dashboard' });
   } else if (role === 'ORGANIZATION') {
-    mainNavItems.push({ label: 'Org Page', icon: Users, href: '/org/me' });
+    mainNavItems.push({ label: 'Page Org', icon: Users, href: '/org/me' });
   } else if (role === 'ADMIN') {
-    mainNavItems.push({ label: 'Admin Panel', icon: Shield, href: '/admin' });
+    mainNavItems.push({ label: 'Admin', icon: Shield, href: '/admin' });
   }
 
   let mobileRoleItem: { label: string; icon: typeof Shield; href: string } | null = null;
   if (role === 'COMMUNITY_LEADER') {
-    mobileRoleItem = { label: 'Leader', icon: Shield, href: '/leader-dashboard' };
+    mobileRoleItem = { label: 'Organisateur', icon: Shield, href: '/leader-dashboard' };
   } else if (role === 'ORGANIZATION') {
-    mobileRoleItem = { label: 'Org Page', icon: Users, href: '/org/me' };
+    mobileRoleItem = { label: 'Page Org', icon: Users, href: '/org/me' };
   } else if (role === 'ADMIN') {
     mobileRoleItem = { label: 'Admin', icon: Shield, href: '/admin' };
   }
 
   const mobileNavItems = [
     isAuthenticated
-      ? { label: 'Dashboard', icon: Home, href: '/dashboard', isAction: false }
-      : { label: 'Home', icon: Home, href: '/', isAction: false },
-    { label: 'Communities', icon: Users, href: '/communities', isAction: false },
-    { label: 'Events', icon: Calendar, href: '/events', isAction: false },
-    ...(!isLeaderOrOrgOrAdmin ? [{ label: 'Pricing', icon: Sparkles, href: '/pricing', isAction: false }] : []),
+      ? { label: 'Accueil', icon: Home, href: '/dashboard', isAction: false }
+      : { label: 'Accueil', icon: Home, href: '/', isAction: false },
+    { label: 'Groupes', icon: Users, href: '/communities', isAction: false },
+    { label: 'Sorties', icon: Calendar, href: '/events', isAction: false },
+    ...(!isLeaderOrOrgOrAdmin ? [{ label: 'Forfaits', icon: Sparkles, href: '/pricing', isAction: false }] : []),
     ...(canCreateEvent
-      ? [{ label: 'Create', icon: PlusCircle, href: '/create-event', isAction: true }]
+      ? [{ label: 'Créer', icon: PlusCircle, href: '/create-event', isAction: true }]
       : []),
     ...(isAuthenticated ? [{ label: 'Messages', icon: MessageSquare, href: '/messages', isAction: false }] : []),
     ...(mobileRoleItem ? [{ ...mobileRoleItem, isAction: false }] : []),
-    { label: 'Profile', icon: UserCircle, href: '/profile', isAction: false },
+    { label: 'Profil', icon: UserCircle, href: '/profile', isAction: false },
   ];
 
   const Logo = () => (
     <Link to="/" className="flex items-center shrink-0">
-      <img src="/logo-new-villages.webp" alt="NewVillages" className="h-9 sm:h-11 lg:h-14 w-auto object-contain" />
+      <img src="/logo-bouffe-amitie.png" alt="Bouffe &amp; Amitié" className="h-10 sm:h-12 lg:h-14 w-auto object-contain" />
     </Link>
   );
 
@@ -142,14 +142,14 @@ export function Layout() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col text-[#102A43] w-full overflow-x-hidden">
+    <div className="min-h-screen bg-[#FDFBF7] flex flex-col text-[#2C1810] w-full overflow-x-hidden font-body">
       {/* Desktop Top Navigation Bar */}
-      <header className="hidden md:flex h-16 bg-white border-b border-[#E2E8F0] items-center justify-between px-4 lg:px-8 sticky top-0 z-40 shadow-sm w-full">
-        <div className="flex items-center gap-8">
+      <header className="hidden md:flex h-20 bg-white/95 backdrop-blur-md border-b border-[#EFE6DD] items-center justify-between px-4 lg:px-8 sticky top-0 z-40 shadow-xs w-full">
+        <div className="flex items-center gap-3 lg:gap-5 min-w-0 flex-1">
           <Logo />
 
           {/* Main Navigation Links */}
-          <nav className="flex items-center gap-1">
+          <nav className="flex items-center gap-1 sm:gap-1.5 lg:gap-2 shrink-0">
             {mainNavItems.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
               return (
@@ -157,8 +157,8 @@ export function Layout() {
                   key={item.href}
                   to={item.href}
                   className={cn(
-                    'px-4 py-2 rounded-full font-bold transition-all duration-200 text-sm',
-                    isActive ? 'bg-[#0A2540] text-white shadow-sm' : 'text-[#486581] hover:bg-slate-100 hover:text-[#102A43]'
+                    'px-3.5 py-2 rounded-full font-bold transition-all duration-200 text-xs xl:text-sm whitespace-nowrap shrink-0',
+                    isActive ? 'bg-[#1E4D2B] text-white shadow-sm' : 'text-[#52433B] hover:bg-[#E8F3EB] hover:text-[#1E4D2B]'
                   )}
                 >
                   {item.label}
@@ -168,26 +168,26 @@ export function Layout() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-3 lg:gap-4">
+        <div className="flex items-center gap-2 lg:gap-3 shrink-0 ml-2">
           {/* Global Search */}
-          <div className="flex items-center bg-slate-100 rounded-full px-4 py-2 w-44 lg:w-56 transition-all focus-within:w-60 lg:focus-within:w-72 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#1D4ED8]/20 focus-within:shadow-sm border border-transparent focus-within:border-[#1D4ED8]">
-            <Search size={16} className="text-slate-400 mr-2 shrink-0" />
+          <div className="flex items-center bg-[#FAF5EF] rounded-full px-3.5 py-2 w-32 sm:w-40 lg:w-48 xl:w-56 transition-all focus-within:w-48 lg:focus-within:w-60 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#E86225]/20 focus-within:shadow-sm border border-[#EFE6DD] focus-within:border-[#E86225] shrink-0">
+            <Search size={15} className="text-slate-400 mr-2 shrink-0" />
             <input
               type="text"
-              placeholder="Search..."
-              className="bg-transparent border-none focus:outline-none text-sm w-full text-[#102A43] placeholder-slate-400 font-medium"
+              placeholder="Rechercher..."
+              className="bg-transparent border-none focus:outline-none text-xs lg:text-sm w-full text-[#2C1810] placeholder-slate-400 font-medium"
             />
           </div>
 
           {/* "+ Create" Dropdown Menu */}
           {(canCreateEvent || canCreateCommunity) && (
-            <div className="relative" ref={createMenuRef}>
+            <div className="relative shrink-0" ref={createMenuRef}>
               <button
                 onClick={() => setIsCreateMenuOpen(!isCreateMenuOpen)}
-                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#1D4ED8] text-white hover:bg-[#1E40AF] transition-colors font-bold text-xs shadow-sm"
+                className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#E86225] text-white hover:bg-[#D0521B] transition-colors font-bold text-xs shadow-sm whitespace-nowrap"
               >
                 <PlusCircle size={15} />
-                <span>Create</span>
+                <span>Créer</span>
                 <ChevronDown size={14} className={cn('transition-transform duration-200', isCreateMenuOpen && 'rotate-180')} />
               </button>
 
@@ -201,21 +201,21 @@ export function Layout() {
                     className="absolute right-0 mt-2 w-64 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 origin-top-right p-2 space-y-1"
                   >
                     <div className="px-3 py-2 border-b border-slate-100 flex items-center gap-1.5 text-xs font-bold text-slate-400 uppercase tracking-wider">
-                      <Sparkles size={13} className="text-[#38BDF8]" />
-                      <span>Creation Portal</span>
+                      <Sparkles size={13} className="text-[#E86225]" />
+                      <span>Espace de création</span>
                     </div>
 
                     {canCreateEvent && (
                       <Link
                         to="/create-event"
-                        className="flex items-start gap-3 p-2.5 hover:bg-slate-50 rounded-xl transition-colors group"
+                        className="flex items-start gap-3 p-2.5 hover:bg-[#FDF0E9] rounded-xl transition-colors group"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#1D4ED8] flex items-center justify-center shrink-0 group-hover:bg-[#1D4ED8] group-hover:text-white transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-[#FDF0E9] text-[#E86225] flex items-center justify-center shrink-0 group-hover:bg-[#E86225] group-hover:text-white transition-colors">
                           <Calendar size={16} />
                         </div>
                         <div>
-                          <p className="font-bold text-xs text-[#102A43] group-hover:text-[#1D4ED8]">Create Event</p>
-                          <p className="text-[11px] text-[#486581]">Host a meetup, workshop, or webinar</p>
+                          <p className="font-bold text-xs text-[#2C1810] group-hover:text-[#E86225]">Organiser une sortie</p>
+                          <p className="text-[11px] text-[#52433B]">Proposer une rencontre au restaurant</p>
                         </div>
                       </Link>
                     )}
@@ -223,14 +223,14 @@ export function Layout() {
                     {canCreateCommunity && (
                       <Link
                         to="/create-community"
-                        className="flex items-start gap-3 p-2.5 hover:bg-slate-50 rounded-xl transition-colors group"
+                        className="flex items-start gap-3 p-2.5 hover:bg-[#E8F3EB] rounded-xl transition-colors group"
                       >
-                        <div className="w-8 h-8 rounded-lg bg-blue-50 text-[#1D4ED8] flex items-center justify-center shrink-0 group-hover:bg-[#1D4ED8] group-hover:text-white transition-colors">
+                        <div className="w-8 h-8 rounded-lg bg-[#E8F3EB] text-[#1E4D2B] flex items-center justify-center shrink-0 group-hover:bg-[#1E4D2B] group-hover:text-white transition-colors">
                           <PlusCircle size={16} />
                         </div>
                         <div>
-                          <p className="font-bold text-xs text-[#102A43] group-hover:text-[#1D4ED8]">Create Community</p>
-                          <p className="text-[11px] text-[#486581]">Launch a new circle or group</p>
+                          <p className="font-bold text-xs text-[#2C1810] group-hover:text-[#1E4D2B]">Créer un groupe</p>
+                          <p className="text-[11px] text-[#52433B]">Lancer un groupe dans votre quartier</p>
                         </div>
                       </Link>
                     )}
@@ -240,21 +240,21 @@ export function Layout() {
             </div>
           )}
 
-          <div className="h-6 w-px bg-slate-200 mx-1 hidden lg:block" />
+          <div className="h-6 w-px bg-slate-200 mx-0.5 hidden xl:block" />
 
           {isAuthenticated ? (
             <>
               {/* Notifications */}
               <button
                 onClick={() => setIsNotificationsOpen(true)}
-                className="relative p-2 text-slate-500 hover:bg-slate-100 hover:text-[#0A2540] rounded-full transition-colors"
+                className="relative p-2 text-slate-500 hover:bg-[#FAF5EF] hover:text-[#E86225] rounded-full transition-colors shrink-0"
               >
                 <Bell size={20} />
                 {hasUnread && <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>}
               </button>
 
               {/* User Profile Dropdown */}
-              <div className="relative" ref={profileMenuRef}>
+              <div className="relative shrink-0" ref={profileMenuRef}>
                 <button
                   onClick={() => setIsProfileMenuOpen(!isProfileMenuOpen)}
                   className="flex items-center gap-2 hover:bg-slate-50 rounded-full pl-1 pr-2 py-1 transition-colors border border-transparent hover:border-slate-200"
@@ -279,40 +279,40 @@ export function Layout() {
                       transition={{ duration: 0.15, ease: "easeOut" }}
                       className="absolute right-0 mt-2 w-60 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 origin-top-right"
                     >
-                      <div className="p-4 border-b border-slate-50 bg-slate-50/50">
-                        <p className="font-bold text-[#102A43] truncate">{currentUser?.fullName || 'Guest User'}</p>
-                        <p className="text-xs text-[#1D4ED8] font-semibold capitalize mt-0.5">{role.toLowerCase().replace('_', ' ')}</p>
+                      <div className="p-4 border-b border-slate-50 bg-[#FAF5EF]">
+                        <p className="font-bold text-[#2C1810] truncate">{currentUser?.fullName || 'Membre'}</p>
+                        <p className="text-xs text-[#E86225] font-semibold capitalize mt-0.5">{role.toLowerCase().replace('_', ' ')}</p>
                       </div>
                       <div className="p-2 space-y-1">
-                        <Link to="/profile" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#486581] hover:bg-slate-50 hover:text-[#1D4ED8] rounded-xl transition-colors">
-                          <UserCircle size={16} /> My Profile
+                        <Link to="/profile" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#52433B] hover:bg-[#FDF0E9] hover:text-[#E86225] rounded-xl transition-colors">
+                          <UserCircle size={16} /> Mon Profil
                         </Link>
 
                         {canCreateEvent && (
-                          <Link to="/create-event" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#486581] hover:bg-slate-50 hover:text-[#1D4ED8] rounded-xl transition-colors">
-                            <Calendar size={16} className="text-[#1D4ED8]" /> Create Event
+                          <Link to="/create-event" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#52433B] hover:bg-[#FDF0E9] hover:text-[#E86225] rounded-xl transition-colors">
+                            <Calendar size={16} className="text-[#E86225]" /> Organiser une sortie
                           </Link>
                         )}
 
                         {canCreateCommunity && (
-                          <Link to="/create-community" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#486581] hover:bg-slate-50 hover:text-[#1D4ED8] rounded-xl transition-colors">
-                            <PlusCircle size={16} className="text-[#1D4ED8]" /> Create Community
+                          <Link to="/create-community" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#52433B] hover:bg-[#E8F3EB] hover:text-[#1E4D2B] rounded-xl transition-colors">
+                            <PlusCircle size={16} className="text-[#1E4D2B]" /> Créer un groupe
                           </Link>
                         )}
 
-                        <Link to="/settings" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#486581] hover:bg-slate-50 hover:text-[#1D4ED8] rounded-xl transition-colors">
-                          <Settings size={16} /> Settings
+                        <Link to="/settings" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#52433B] hover:bg-slate-50 hover:text-[#2C1810] rounded-xl transition-colors">
+                          <Settings size={16} /> Paramètres
                         </Link>
 
                         {!isLeaderOrOrgOrAdmin && (
-                          <Link to="/pricing" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#1D4ED8] hover:bg-blue-50 rounded-xl transition-colors font-bold">
-                            <Sparkles size={16} className="text-[#38BDF8]" /> Upgrade Plan
+                          <Link to="/pricing" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#E86225] hover:bg-[#FDF0E9] rounded-xl transition-colors font-bold">
+                            <Sparkles size={16} className="text-[#E86225]" /> Modifier mon forfait
                           </Link>
                         )}
                       </div>
                       <div className="p-2 border-t border-slate-50">
                         <button onClick={handleLogout} className="w-full flex items-center gap-3 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors text-left">
-                          <LogOut size={16} /> Log Out
+                          <LogOut size={16} /> Se déconnecter
                         </button>
                       </div>
                     </motion.div>
@@ -321,12 +321,12 @@ export function Layout() {
               </div>
             </>
           ) : (
-            <div className="flex items-center gap-2">
-              <Link to="/login" className="px-4 py-2 rounded-full text-sm font-semibold text-[#486581] hover:bg-slate-100 hover:text-[#102A43] transition-colors">
-                Log in
+            <div className="flex items-center gap-2 shrink-0">
+              <Link to="/login" className="px-4 py-2 rounded-full text-xs lg:text-sm font-bold border border-[#E86225] text-[#E86225] hover:bg-[#FDF0E9] transition-colors whitespace-nowrap">
+                Se connecter
               </Link>
-              <Link to="/register" className="px-4 py-2 rounded-full text-sm font-bold bg-[#1D4ED8] text-white hover:bg-[#1E40AF] transition-colors shadow-sm">
-                Sign up
+              <Link to="/register" className="px-5 py-2 rounded-full text-xs lg:text-sm font-bold bg-[#E86225] text-white hover:bg-[#D0521B] transition-colors shadow-sm whitespace-nowrap">
+                S'inscrire
               </Link>
             </div>
           )}
@@ -373,38 +373,38 @@ export function Layout() {
                       transition={{ duration: 0.15, ease: "easeOut" }}
                       className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden z-50 origin-top-right"
                     >
-                      <div className="p-3 border-b border-slate-50 bg-slate-50/50">
-                        <p className="font-bold text-xs text-[#102A43] truncate">{currentUser?.fullName || 'Guest User'}</p>
-                        <p className="text-[11px] text-[#1D4ED8] font-semibold capitalize mt-0.5">{role.toLowerCase().replace('_', ' ')}</p>
+                      <div className="p-3 border-b border-slate-50 bg-[#FAF5EF]">
+                        <p className="font-bold text-xs text-[#2C1810] truncate">{currentUser?.fullName || 'Membre'}</p>
+                        <p className="text-[11px] text-[#E86225] font-semibold capitalize mt-0.5">{role.toLowerCase().replace('_', ' ')}</p>
                       </div>
                       <div className="p-1.5 space-y-0.5">
-                        <Link to="/profile" className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#486581] hover:bg-slate-50 hover:text-[#1D4ED8] rounded-xl transition-colors">
-                          <UserCircle size={15} /> My Profile
+                        <Link to="/profile" className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#52433B] hover:bg-[#FDF0E9] rounded-xl transition-colors">
+                          <UserCircle size={15} /> Mon Profil
                         </Link>
-                        <Link to="/settings" className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#486581] hover:bg-slate-50 hover:text-[#1D4ED8] rounded-xl transition-colors">
-                          <Settings size={15} className="text-[#1D4ED8]" /> Settings
+                        <Link to="/settings" className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#52433B] hover:bg-slate-50 rounded-xl transition-colors">
+                          <Settings size={15} className="text-[#E86225]" /> Paramètres
                         </Link>
                         {!isLeaderOrOrgOrAdmin && (
-                          <Link to="/pricing" className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-[#1D4ED8] hover:bg-blue-50 rounded-xl transition-colors">
-                            <Sparkles size={15} className="text-[#38BDF8]" /> Upgrade Plan
+                          <Link to="/pricing" className="flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-[#E86225] hover:bg-[#FDF0E9] rounded-xl transition-colors">
+                            <Sparkles size={15} className="text-[#E86225]" /> Choisir un forfait
                           </Link>
                         )}
 
                         {canCreateEvent && (
-                          <Link to="/create-event" className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#486581] hover:bg-slate-50 hover:text-[#1D4ED8] rounded-xl transition-colors">
-                            <Calendar size={15} className="text-[#1D4ED8]" /> Create Event
+                          <Link to="/create-event" className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#52433B] hover:bg-[#FDF0E9] rounded-xl transition-colors">
+                            <Calendar size={15} className="text-[#E86225]" /> Organiser une sortie
                           </Link>
                         )}
 
                         {canCreateCommunity && (
-                          <Link to="/create-community" className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#486581] hover:bg-slate-50 hover:text-[#1D4ED8] rounded-xl transition-colors">
-                            <PlusCircle size={15} className="text-[#1D4ED8]" /> Create Community
+                          <Link to="/create-community" className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#52433B] hover:bg-[#E8F3EB] rounded-xl transition-colors">
+                            <PlusCircle size={15} className="text-[#1E4D2B]" /> Créer un groupe
                           </Link>
                         )}
                       </div>
                       <div className="p-1.5 border-t border-slate-50">
                         <button onClick={handleLogout} className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-bold text-red-600 hover:bg-red-50 rounded-xl transition-colors text-left">
-                          <LogOut size={15} /> Log Out
+                          <LogOut size={15} /> Se déconnecter
                         </button>
                       </div>
                     </motion.div>
@@ -414,11 +414,11 @@ export function Layout() {
             </>
           ) : (
             <div className="flex items-center gap-1.5 sm:gap-2">
-              <Link to="/login" className="px-3 py-1.5 rounded-full text-xs font-semibold text-[#486581] hover:bg-slate-100 transition-colors">
-                Log in
+              <Link to="/login" className="px-3 py-1.5 rounded-full text-xs font-bold border border-[#E86225] text-[#E86225] hover:bg-[#FDF0E9] transition-colors">
+                Se connecter
               </Link>
-              <Link to="/register" className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#1D4ED8] text-white hover:bg-[#1E40AF] transition-colors shadow-sm whitespace-nowrap">
-                Sign up
+              <Link to="/register" className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-[#E86225] text-white hover:bg-[#D0521B] transition-colors shadow-sm whitespace-nowrap">
+                S'inscrire
               </Link>
             </div>
           )}
@@ -442,7 +442,7 @@ export function Layout() {
           if (item.isAction) {
             return (
               <div key={item.href} className="relative -top-5 shrink-0">
-                <Link to={item.href} className="w-12 h-12 bg-[#1D4ED8] rounded-full flex items-center justify-center text-white shadow-lg hover:bg-[#1E40AF] transition-colors">
+                <Link to={item.href} className="w-12 h-12 bg-[#E86225] rounded-full flex items-center justify-center text-white shadow-lg hover:bg-[#D0521B] transition-colors">
                   <Icon size={24} />
                 </Link>
               </div>
@@ -455,7 +455,7 @@ export function Layout() {
               to={item.href}
               className={cn(
                 'flex flex-col items-center justify-center flex-1 min-w-0 h-full gap-0.5 transition-colors px-1',
-                isActive ? 'text-[#1D4ED8] font-bold' : 'text-slate-400'
+                isActive ? 'text-[#E86225] font-bold' : 'text-slate-400'
               )}
             >
               <Icon size={19} />

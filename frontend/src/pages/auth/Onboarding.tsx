@@ -2,32 +2,32 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '../../components/ui/Button';
-import { Users, Calendar, MessageSquare, UserCircle } from 'lucide-react';
+import { Users, Utensils, CalendarCheck, UserCircle } from 'lucide-react';
 
 const steps = [
   {
-    title: 'Find Your Community',
-    desc: 'Discover groups that share your interests, profession, or culture.',
+    title: 'Trouvez votre groupe',
+    desc: 'Rejoignez le groupe de sorties au restaurant de votre arrondissement.',
     icon: Users,
-    color: 'bg-blue-500'
+    color: 'bg-[#1E4D2B]'
   },
   {
-    title: 'Attend Events',
-    desc: 'Join online meetups or local in-person gatherings to connect.',
-    icon: Calendar,
-    color: 'bg-green-500'
+    title: 'Sorties mensuelles',
+    desc: 'Participez à 1 sortie conviviale par mois dans de superbes restaurants.',
+    icon: Utensils,
+    color: 'bg-[#E86225]'
   },
   {
-    title: 'Meaningful Conversations',
-    desc: 'Message leaders and members safely within the platform.',
-    icon: MessageSquare,
-    color: 'bg-purple-500'
+    title: 'Réservez votre place',
+    desc: 'Confirmez votre présence et rencontrez les autres membres.',
+    icon: CalendarCheck,
+    color: 'bg-amber-700'
   },
   {
-    title: 'Set Up Your Profile',
-    desc: 'Let others know a bit about you to foster better connections.',
+    title: 'Complétez votre profil',
+    desc: 'Présentez-vous en quelques mots pour faciliter les échanges.',
     icon: UserCircle,
-    color: 'bg-orange-500'
+    color: 'bg-[#1E4D2B]'
   }
 ];
 
@@ -44,7 +44,7 @@ export function Onboarding() {
   };
 
   return (
-    <div className="min-h-screen bg-white flex flex-col">
+    <div className="min-h-screen bg-[#FDFBF7] flex flex-col font-body">
       <div className="flex-1 flex flex-col items-center justify-center p-6 max-w-lg mx-auto w-full text-center">
         
         <div className="w-full relative h-64 mb-8 flex items-center justify-center">
@@ -57,11 +57,11 @@ export function Onboarding() {
               transition={{ duration: 0.3 }}
               className="absolute inset-0 flex flex-col items-center justify-center"
             >
-              <div className={`w-32 h-32 ${steps[currentStep].color} text-white rounded-full flex items-center justify-center mb-8 shadow-xl`}>
-                {React.createElement(steps[currentStep].icon, { size: 64 })}
+              <div className={`w-28 h-28 ${steps[currentStep].color} text-white rounded-full flex items-center justify-center mb-6 shadow-xl`}>
+                {React.createElement(steps[currentStep].icon, { size: 52 })}
               </div>
-              <h2 className="text-3xl font-heading font-bold mb-4">{steps[currentStep].title}</h2>
-              <p className="text-gray-600 text-lg">{steps[currentStep].desc}</p>
+              <h2 className="text-2xl font-heading font-extrabold text-[#2C1810] mb-2">{steps[currentStep].title}</h2>
+              <p className="text-[#52433B] text-sm max-w-xs">{steps[currentStep].desc}</p>
             </motion.div>
           </AnimatePresence>
         </div>
@@ -73,7 +73,7 @@ export function Onboarding() {
           {steps.map((_, i) => (
             <div 
               key={i} 
-              className={`h-2 rounded-full transition-all duration-300 ${i === currentStep ? 'w-8 bg-primary' : 'w-2 bg-gray-200'}`}
+              className={`h-2 rounded-full transition-all duration-300 ${i === currentStep ? 'w-8 bg-[#E86225]' : 'w-2 bg-slate-200'}`}
             />
           ))}
         </div>
@@ -81,19 +81,21 @@ export function Onboarding() {
         <div className="flex gap-4">
           <Button 
             variant="ghost" 
-            className="flex-1" 
+            className="flex-1 text-[#52433B] font-bold text-xs" 
             onClick={() => navigate('/dashboard')}
           >
-            Skip
+            Passer
           </Button>
           <Button 
-            className="flex-1" 
+            className="flex-1 bg-[#E86225] hover:bg-[#D0521B] text-white font-bold py-3 rounded-xl text-xs" 
             onClick={handleNext}
           >
-            {currentStep === steps.length - 1 ? 'Get Started' : 'Next'}
+            {currentStep === steps.length - 1 ? 'Commencer' : 'Suivant'}
           </Button>
         </div>
       </div>
     </div>
   );
 }
+
+export default Onboarding;

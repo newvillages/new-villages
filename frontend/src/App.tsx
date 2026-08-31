@@ -48,14 +48,20 @@ export function App() {
           {/* Public / Marketing */}
           <Route index element={<Landing />} />
           <Route path="terms" element={<Terms />} />
+          <Route path="conditions" element={<Terms />} />
           <Route path="privacy" element={<Privacy />} />
+          <Route path="confidentialite" element={<Privacy />} />
           <Route path="contact" element={<Contact />} />
           {/* Anyone can browse the directory; viewing a community or joining still requires a session */}
           <Route path="communities" element={<CommunityDirectory />} />
+          <Route path="groupes" element={<CommunityDirectory />} />
+          <Route path="arrondissements" element={<CommunityDirectory />} />
 
           {/* Auth */}
           <Route path="register" element={<Register />} />
+          <Route path="inscription" element={<Register />} />
           <Route path="login" element={<Login />} />
+          <Route path="connexion" element={<Login />} />
           <Route path="verify-email" element={<VerifyEmail />} />
           <Route path="forgot-password" element={<ForgotPassword />} />
           <Route path="reset-password" element={<ResetPassword />} />
@@ -64,13 +70,18 @@ export function App() {
           {/* Core App (requires an authenticated session) */}
           <Route path="dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
           <Route path="communities/:id" element={<RequireAuth><CommunityDetail /></RequireAuth>} />
+          <Route path="groupes/:id" element={<RequireAuth><CommunityDetail /></RequireAuth>} />
           <Route path="create-community" element={<RequireAuth><CreateCommunity /></RequireAuth>} />
           <Route path="events" element={<RequireAuth><Events /></RequireAuth>} />
+          <Route path="prochaines-sorties" element={<RequireAuth><Events /></RequireAuth>} />
+          <Route path="sorties" element={<RequireAuth><Events /></RequireAuth>} />
           <Route path="events/:id" element={<RequireAuth><EventDetail /></RequireAuth>} />
           <Route path="messages" element={<RequireAuth><Messaging /></RequireAuth>} />
           <Route path="profile" element={<RequireAuth><Profile /></RequireAuth>} />
           <Route path="settings" element={<RequireAuth><Settings /></RequireAuth>} />
           <Route path="pricing" element={<Subscription />} />
+          <Route path="abonnements" element={<Subscription />} />
+          <Route path="tarifs" element={<Subscription />} />
           <Route path="re-consent" element={<RequireAuth><ReConsent /></RequireAuth>} />
           <Route path="org/:id" element={<RequireAuth><OrganizationPage /></RequireAuth>} />
           <Route

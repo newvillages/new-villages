@@ -17,17 +17,17 @@ export function ForgotPassword() {
 
   if (forgotPassword.isSuccess) {
     return (
-      <div className="min-h-screen bg-background-light py-12 px-4 flex items-center justify-center">
-        <Card className="w-full max-w-md text-center">
+      <div className="min-h-screen bg-[#FDFBF7] py-12 px-4 flex items-center justify-center font-body">
+        <Card className="w-full max-w-md text-center border-[#EFE6DD] shadow-sm rounded-3xl overflow-hidden bg-white">
           <CardContent className="p-8">
-            <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-16 h-16 bg-[#FDF0E9] text-[#E86225] rounded-full flex items-center justify-center mx-auto mb-6">
               <Mail size={32} />
             </div>
-            <h1 className="text-2xl font-heading font-bold mb-4">Check your email</h1>
-            <p className="text-gray-600 mb-8">
-              If an account exists for <strong>{email}</strong>, we've sent a link to reset your password.
+            <h1 className="text-2xl font-heading font-extrabold text-[#2C1810] mb-3">Consultez vos courriels</h1>
+            <p className="text-xs text-[#52433B] mb-8 leading-relaxed">
+              Si un compte existe pour <strong>{email}</strong>, nous vous avons envoyé un lien pour réinitialiser votre mot de passe.
             </p>
-            <Link to="/login" className="text-primary hover:underline font-medium text-sm">Back to log in</Link>
+            <Link to="/login" className="text-[#E86225] hover:underline font-bold text-xs">Retour à la connexion</Link>
           </CardContent>
         </Card>
       </div>
@@ -35,29 +35,29 @@ export function ForgotPassword() {
   }
 
   return (
-    <div className="min-h-screen bg-background-light py-12 px-4 flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-[#FDFBF7] py-12 px-4 flex flex-col items-center justify-center font-body">
       <div className="w-full max-w-md mb-4 text-left">
-        <Link to="/" className="inline-flex items-center text-sm font-semibold text-primary hover:underline">
-          <ArrowLeft size={16} className="mr-2" /> Back to Home
+        <Link to="/" className="inline-flex items-center text-xs font-bold text-[#E86225] hover:underline">
+          <ArrowLeft size={16} className="mr-2" /> Retour à l'accueil
         </Link>
       </div>
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md border-[#EFE6DD] shadow-sm rounded-3xl overflow-hidden bg-white">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-heading font-bold mb-2">Forgot password?</h1>
-            <p className="text-gray-600">Enter your email and we'll send you a reset link.</p>
+            <h1 className="text-2xl font-heading font-extrabold text-[#2C1810] mb-2">Mot de passe oublié ?</h1>
+            <p className="text-xs text-[#52433B]">Entrez votre adresse courriel pour recevoir un lien de réinitialisation.</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Email</label>
-              <Input required type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <label className="block text-xs font-bold text-[#2C1810] mb-1">Adresse courriel</label>
+              <Input required type="email" placeholder="votre.courriel@exemple.ca" value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
-            <Button type="submit" size="lg" className="w-full mt-2 flex items-center justify-center gap-2" disabled={forgotPassword.isPending}>
+            <Button type="submit" size="lg" className="w-full mt-2 bg-[#E86225] hover:bg-[#D0521B] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2" disabled={forgotPassword.isPending}>
               {forgotPassword.isPending && <Loader2 size={18} className="animate-spin" />}
-              Send reset link
+              Envoyer le lien de réinitialisation
             </Button>
-            <p className="text-center text-sm text-gray-600 mt-6">
-              <Link to="/login" className="text-primary hover:underline font-medium">Back to log in</Link>
+            <p className="text-center text-xs text-[#52433B] mt-6">
+              <Link to="/login" className="text-[#E86225] hover:underline font-bold">Retour à la connexion</Link>
             </p>
           </form>
         </CardContent>
@@ -65,3 +65,5 @@ export function ForgotPassword() {
     </div>
   );
 }
+
+export default ForgotPassword;

@@ -8,28 +8,37 @@ export default {
     extend: {
       colors: {
         primary: {
-          DEFAULT: '#1D4ED8', // Royal Blue
-          hover: '#1E40AF',   // Deep Royal
-          dark: '#0A2540',    // Midnight Blue
+          DEFAULT: '#E86225', // Warm Orange
+          hover: '#D0521B',   // Deep Orange
+          dark: '#1E4D2B',    // Forest Green
+          light: '#FDF0E9',   // Soft Orange Tint
+        },
+        brandOrange: {
+          DEFAULT: '#E86225',
+          hover: '#D0521B',
+          light: '#FDF0E9',
+        },
+        brandGreen: {
+          DEFAULT: '#1E4D2B',
+          hover: '#163E22',
+          light: '#E8F3EB',
+          dark: '#133820',
+        },
+        brandBrown: {
+          DEFAULT: '#4A2C11',
+          hover: '#3A1F0D',
+          light: '#FAF5EF',
         },
         midnight: {
-          DEFAULT: '#0A2540',
-          dark: '#07192C',
+          DEFAULT: '#133820', // Dark Forest Green for dark sections/footer
+          dark: '#0E2917',
         },
-        royal: {
-          DEFAULT: '#1D4ED8',
-          hover: '#1E40AF',
-        },
-        sky: {
-          DEFAULT: '#38BDF8',
-          light: '#E0F2FE',
-        },
-        heading: '#102A43',
-        bodytext: '#486581',
-        bordercolor: '#E2E8F0',
+        heading: '#2C1810',
+        bodytext: '#52433B',
+        bordercolor: '#EFE6DD',
         background: {
-          light: '#F8FAFC',
-          dark: '#0A2540',
+          light: '#FDFBF7', // Warm Cream
+          dark: '#133820',
         }
       },
       fontFamily: {

@@ -46,7 +46,7 @@ public class EmailService {
         } else if (fromAddress != null && !fromAddress.isBlank() && !fromAddress.contains("carmani")) {
             this.fromAddress = fromAddress.trim();
         } else {
-            this.fromAddress = "contact@newvillages.ca";
+            this.fromAddress = "contact@bouffeamitie.ca";
         }
 
         log.info("[EMAIL SERVICE INIT] Configured From Address: {} | Host: {} | Auth Username: {}", this.fromAddress, this.mailHost, this.mailUsername);
@@ -59,7 +59,7 @@ public class EmailService {
             log.warn("  MAIL_PORT     = 587");
             log.warn("  MAIL_USERNAME = your-smtp-username");
             log.warn("  MAIL_PASSWORD = your-smtp-password-or-app-password");
-            log.warn("  MAIL_FROM     = contact@newvillages.ca");
+            log.warn("  MAIL_FROM     = contact@bouffeamitie.ca");
             log.warn("=================================================================================");
         }
     }
@@ -74,7 +74,7 @@ public class EmailService {
 
     public String sendTestEmail(String toEmail) {
         if (toEmail == null || toEmail.isBlank()) {
-            throw com.onevillage.backend.common.ApiException.badRequest("Recipient email address is required");
+            throw com.onevillage.backend.common.ApiException.badRequest("L'adresse courriel du destinataire est requise");
         }
         String cleanTo = toEmail.trim().toLowerCase();
         log.info("[EMAIL TEST] Attempting dispatch to [{}] via Host: {} | From: {}", cleanTo, mailHost, fromAddress);
@@ -82,39 +82,39 @@ public class EmailService {
         // Try Brevo HTTPS REST API (Port 443) first if key is present
         String restResult = "";
         if (!mailPassword.isBlank()) {
-            restResult = sendViaBrevoApiResult(cleanTo, "New Villages - Test Email (HTTPS Port 443)", "This is a test email sent via Brevo HTTPS REST API.",
-                    "<div style=\"font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;\">"
-                    + "<h2 style=\"color: #0F172A;\">HTTPS REST API Test Successful!</h2>"
-                    + "<p style=\"color: #334155;\">Email delivered via Brevo HTTPS REST API (Port 443).</p>"
-                    + "<pre style=\"background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 12px;\">" + getEmailDiagnosticInfo() + "</pre>"
+            restResult = sendViaBrevoApiResult(cleanTo, "Bouffe & Amitié - Courriel de test", "Ceci est un courriel de test envoyé via l'API REST de Brevo.",
+                    "<div style=\"font-family: Arial, sans-serif; padding: 20px; border: 1px solid #efe6dd; border-radius: 12px;\">"
+                    + "<h2 style=\"color: #2C1810;\">Test API REST réussi !</h2>"
+                    + "<p style=\"color: #52433B;\">Courriel livré avec succès via Brevo (Port 443).</p>"
+                    + "<pre style=\"background: #faf5ef; padding: 12px; border-radius: 8px; font-size: 12px;\">" + getEmailDiagnosticInfo() + "</pre>"
                     + "</div>");
             if (restResult.startsWith("SUCCESS")) {
-                return "SUCCESS (Brevo HTTPS API Port 443): Test email delivered to " + cleanTo + "!";
+                return "SUCCESS (Brevo HTTPS API Port 443): Courriel de test livré à " + cleanTo + " !";
             }
         }
 
         // Fallback to standard SMTP
         try {
-            jakarta.mail.internet.InternetAddress from = new jakarta.mail.internet.InternetAddress(fromAddress, "New Villages Test");
+            jakarta.mail.internet.InternetAddress from = new jakarta.mail.internet.InternetAddress(fromAddress, "Bouffe & Amitié");
             MimeMessage mimeMessage = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
             helper.setFrom(from);
             helper.setReplyTo(from);
             helper.setTo(cleanTo);
-            helper.setSubject("New Villages - SMTP Test Email");
-            helper.setText("Hi,\n\nThis is a test email sent from New Villages backend.\n\n"
+            helper.setSubject("Bouffe & Amitié - Test SMTP");
+            helper.setText("Bonjour,\n\nCeci est un courriel de test du backend de Bouffe & Amitié.\n\n"
                     + getEmailDiagnosticInfo(),
-                    "<div style=\"font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;\">"
-                    + "<h2 style=\"color: #0F172A;\">SMTP Test Successful!</h2>"
-                    + "<p style=\"color: #334155;\">Your email delivery pipeline on Render is working properly.</p>"
-                    + "<pre style=\"background: #f8fafc; padding: 12px; border-radius: 8px; font-size: 12px;\">" + getEmailDiagnosticInfo() + "</pre>"
+                    "<div style=\"font-family: Arial, sans-serif; padding: 20px; border: 1px solid #efe6dd; border-radius: 12px;\">"
+                    + "<h2 style=\"color: #2C1810;\">Test SMTP Réussi !</h2>"
+                    + "<p style=\"color: #52433B;\">Le service d'envoi de courriels fonctionne correctement.</p>"
+                    + "<pre style=\"background: #faf5ef; padding: 12px; border-radius: 8px; font-size: 12px;\">" + getEmailDiagnosticInfo() + "</pre>"
                     + "</div>");
             mailSender.send(mimeMessage);
             log.info("[SMTP TEST SUCCESS] Email delivered to [{}]", cleanTo);
-            return "SUCCESS (SMTP): Test email sent to " + cleanTo + " using " + fromAddress + " via host " + (mailHost.isBlank() ? "smtp.gmail.com" : mailHost);
+            return "SUCCESS (SMTP): Courriel de test envoyé à " + cleanTo + " via " + fromAddress;
         } catch (Exception e) {
             String apiFailInfo = !restResult.isBlank() ? " | API Error: " + restResult : "";
-            throw com.onevillage.backend.common.ApiException.badRequest("Email Dispatch Failed. SMTP: " + e.getMessage() + apiFailInfo);
+            throw com.onevillage.backend.common.ApiException.badRequest("Échec de l'envoi. SMTP: " + e.getMessage() + apiFailInfo);
         }
     }
 
@@ -133,7 +133,7 @@ public class EmailService {
         try {
             String finalHtml = htmlContent != null && !htmlContent.isBlank() ? htmlContent : plainText;
             String jsonPayload = String.format(
-                    "{\"sender\":{\"name\":\"New Villages\",\"email\":\"%s\"},\"to\":[{\"email\":\"%s\"}],\"subject\":\"%s\",\"htmlContent\":\"%s\"}",
+                    "{\"sender\":{\"name\":\"Bouffe & Amitié\",\"email\":\"%s\"},\"to\":[{\"email\":\"%s\"}],\"subject\":\"%s\",\"htmlContent\":\"%s\"}",
                     escapeJson(fromAddress),
                     escapeJson(cleanTo),
                     escapeJson(subject),
@@ -175,19 +175,18 @@ public class EmailService {
     @Async
     public void sendVerificationEmail(User user, String token) {
         String link = frontendBaseUrl + "/verify-email?token=" + token;
-        String directApiLink = backendBaseUrl + "/api/auth/verify-email?token=" + token;
-        log.info("Verification email for {} — direct API link: {}", user.getEmail(), directApiLink);
-        sendHtml(user.getEmail(), "Verify your New Villages email",
-                "Hi " + user.getFullName() + ",\n\n"
-                        + "Welcome to New Villages! Please verify your email address by opening this link:\n"
+        log.info("Verification email for {} — link: {}", user.getEmail(), link);
+        sendHtml(user.getEmail(), "Activez votre compte Bouffe & Amitié",
+                "Bonjour " + user.getFullName() + ",\n\n"
+                        + "Bienvenue sur Bouffe & Amitié ! Veuillez confirmer votre adresse courriel en ouvrant ce lien :\n"
                         + link + "\n\n"
-                        + "This link expires in 24 hours.",
-                "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;\">"
-                        + "<h2 style=\"color: #0F172A;\">Welcome to New Villages!</h2>"
-                        + "<p style=\"color: #475569;\">Hi <strong>" + user.getFullName() + "</strong>,</p>"
-                        + "<p style=\"color: #475569;\">Please verify your email address by clicking the button below:</p>"
-                        + "<p style=\"text-align: center; margin: 24px 0;\"><a href=\"" + link + "\" style=\"background-color: #2563EB; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;\">Verify Email Address</a></p>"
-                        + "<p style=\"font-size: 12px; color: #94A3B8;\">Or copy and paste this link in your browser: <br><a href=\"" + link + "\">" + link + "</a></p>"
+                        + "Ce lien expire dans 24 heures.",
+                "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #efe6dd; border-radius: 16px; background-color: #ffffff;\">"
+                        + "<h2 style=\"color: #2C1810;\">Bienvenue sur Bouffe &amp; Amitié !</h2>"
+                        + "<p style=\"color: #52433B;\">Bonjour <strong>" + user.getFullName() + "</strong>,</p>"
+                        + "<p style=\"color: #52433B;\">Veuillez activer votre compte en cliquant sur le bouton ci-dessous :</p>"
+                        + "<p style=\"text-align: center; margin: 24px 0;\"><a href=\"" + link + "\" style=\"background-color: #E86225; color: #ffffff; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: bold;\">Activer mon compte</a></p>"
+                        + "<p style=\"font-size: 12px; color: #94A3B8;\">Ou copiez ce lien dans votre navigateur : <br><a href=\"" + link + "\" style=\"color: #E86225;\">" + link + "</a></p>"
                         + "</div>"
         );
     }
@@ -196,16 +195,16 @@ public class EmailService {
     public void sendPasswordResetEmail(User user, String token) {
         String link = frontendBaseUrl + "/reset-password?token=" + token;
         log.info("Password reset requested for {} — token: {}", user.getEmail(), token);
-        sendHtml(user.getEmail(), "Reset your New Villages password",
-                "Hi " + user.getFullName() + ",\n\n"
-                        + "We received a request to reset your password. Open this link to choose a new one:\n"
+        sendHtml(user.getEmail(), "Réinitialisation de votre mot de passe - Bouffe & Amitié",
+                "Bonjour " + user.getFullName() + ",\n\n"
+                        + "Nous avons reçu une demande de réinitialisation de mot de passe. Ouvrez ce lien pour choisir un nouveau mot de passe :\n"
                         + link + "\n\n"
-                        + "If you didn't request this, you can safely ignore this email. This link expires in 1 hour.",
-                "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 12px;\">"
-                        + "<h2 style=\"color: #0F172A;\">Password Reset Request</h2>"
-                        + "<p style=\"color: #475569;\">Hi <strong>" + user.getFullName() + "</strong>,</p>"
-                        + "<p style=\"color: #475569;\">We received a request to reset your password. Click below to set a new password:</p>"
-                        + "<p style=\"text-align: center; margin: 24px 0;\"><a href=\"" + link + "\" style=\"background-color: #2563EB; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold;\">Reset Password</a></p>"
+                        + "Si vous n'avez pas fait cette demande, vous pouvez ignorer ce courriel. Ce lien expire dans 1 heure.",
+                "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #efe6dd; border-radius: 16px; background-color: #ffffff;\">"
+                        + "<h2 style=\"color: #2C1810;\">Réinitialisation de mot de passe</h2>"
+                        + "<p style=\"color: #52433B;\">Bonjour <strong>" + user.getFullName() + "</strong>,</p>"
+                        + "<p style=\"color: #52433B;\">Cliquez sur le bouton ci-dessous pour choisir un nouveau mot de passe :</p>"
+                        + "<p style=\"text-align: center; margin: 24px 0;\"><a href=\"" + link + "\" style=\"background-color: #E86225; color: #ffffff; padding: 12px 24px; border-radius: 10px; text-decoration: none; font-weight: bold;\">Changer mon mot de passe</a></p>"
                         + "</div>"
         );
     }
@@ -216,18 +215,18 @@ public class EmailService {
         String dashboardLink = frontendBaseUrl + "/dashboard";
 
         log.info("Sending payment receipt email to {} for plan {} ({})", toEmail, planLabel, amount);
-        send(toEmail, "NewVillages Payment Confirmation - " + planLabel + " Plan",
-                "Hi " + (name != null && !name.isBlank() ? name : "Leader") + ",\n\n"
-                        + "Thank you for subscribing to the NewVillages " + planLabel + " plan (" + amount + ")!\n\n"
-                        + "We have received your payment details (Reference Code: " + memoCode + ").\n"
-                        + "Our admin team is reviewing your payment and will enable your full leader/org account features shortly.\n\n"
-                        + "🔑 Log back into your account anytime to enjoy your dashboard and features:\n"
+        send(toEmail, "Confirmation de paiement Bouffe & Amitié - " + planLabel,
+                "Bonjour " + (name != null && !name.isBlank() ? name : "Membre") + ",\n\n"
+                        + "Merci pour votre inscription à la formule Bouffe & Amitié " + planLabel + " (" + amount + ") !\n\n"
+                        + "Nous avons bien reçu vos informations de paiement (Code de référence : " + memoCode + ").\n"
+                        + "Notre équipe validera votre demande sous peu pour activer tous vos accès.\n\n"
+                        + "🔑 Connectez-vous à votre compte à tout moment :\n"
                         + loginLink + "\n\n"
-                        + "🚀 Access your dashboard directly:\n"
+                        + "🚀 Accédez à votre tableau de bord :\n"
                         + dashboardLink + "\n\n"
-                        + "If you have any questions, reply directly to this email or contact contact@newvillages.ca.\n\n"
-                        + "Warm regards,\n"
-                        + "The NewVillages Canada Team\n"
+                        + "Si vous avez des questions, vous pouvez répondre à ce courriel ou écrire à contact@bouffeamitie.ca.\n\n"
+                        + "Cordialement,\n"
+                        + "L'équipe Bouffe & Amitié\n"
                         + "https://newvillages.ca");
     }
 
@@ -235,43 +234,43 @@ public class EmailService {
     public void sendContactSubmissionEmail(String senderName, String senderEmail, String subject, String message) {
         log.info("[CONTACT FORM] Submission from {} ({}) | Subject: {}", senderName, senderEmail, subject);
 
-        // 1. Notify platform admin at contact@newvillages.ca
-        String adminSubject = "[New Villages Contact] " + subject;
-        String adminPlainText = "New message received via New Villages Contact Form:\n\n"
-                + "Name: " + senderName + "\n"
-                + "Email: " + senderEmail + "\n"
-                + "Subject: " + subject + "\n\n"
+        // 1. Notify platform admin at contact@bouffeamitie.ca
+        String adminSubject = "[Contact Bouffe & Amitié] " + subject;
+        String adminPlainText = "Nouveau message reçu via le formulaire de contact Bouffe & Amitié :\n\n"
+                + "Nom: " + senderName + "\n"
+                + "Courriel: " + senderEmail + "\n"
+                + "Sujet: " + subject + "\n\n"
                 + "Message:\n" + message;
 
-        String adminHtml = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;\">"
-                + "<h2 style=\"color: #0F172A; margin: 0 0 16px 0;\">New Contact Form Submission</h2>"
-                + "<p style=\"font-size: 14px; color: #334155;\"><strong>Sender Name:</strong> " + escapeJson(senderName) + "</p>"
-                + "<p style=\"font-size: 14px; color: #334155;\"><strong>Sender Email:</strong> <a href=\"mailto:" + escapeJson(senderEmail) + "\">" + escapeJson(senderEmail) + "</a></p>"
-                + "<p style=\"font-size: 14px; color: #334155;\"><strong>Subject:</strong> " + escapeJson(subject) + "</p>"
-                + "<hr style=\"border: 0; border-top: 1px solid #e2e8f0; margin: 16px 0;\" />"
-                + "<p style=\"font-size: 14px; color: #1E293B; white-space: pre-wrap;\">" + escapeJson(message) + "</p>"
+        String adminHtml = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #efe6dd; border-radius: 16px; background-color: #ffffff;\">"
+                + "<h2 style=\"color: #2C1810; margin: 0 0 16px 0;\">Nouveau message de contact</h2>"
+                + "<p style=\"font-size: 14px; color: #52433B;\"><strong>Nom :</strong> " + escapeJson(senderName) + "</p>"
+                + "<p style=\"font-size: 14px; color: #52433B;\"><strong>Courriel :</strong> <a href=\"mailto:" + escapeJson(senderEmail) + "\">" + escapeJson(senderEmail) + "</a></p>"
+                + "<p style=\"font-size: 14px; color: #52433B;\"><strong>Sujet :</strong> " + escapeJson(subject) + "</p>"
+                + "<hr style=\"border: 0; border-top: 1px solid #efe6dd; margin: 16px 0;\" />"
+                + "<p style=\"font-size: 14px; color: #2C1810; white-space: pre-wrap;\">" + escapeJson(message) + "</p>"
                 + "</div>";
 
-        sendHtml("contact@newvillages.ca", adminSubject, adminPlainText, adminHtml);
+        sendHtml("contact@bouffeamitie.ca", adminSubject, adminPlainText, adminHtml);
 
         // 2. Send auto-reply to submitter
-        String userSubject = "We received your message - New Villages Support";
-        String userPlainText = "Hi " + senderName + ",\n\n"
-                + "Thank you for contacting New Villages! We have received your message regarding \"" + subject + "\".\n"
-                + "Our support team will review your inquiry and get back to you shortly.\n\n"
-                + "Best regards,\n"
-                + "The New Villages Team\n"
-                + "contact@newvillages.ca";
+        String userSubject = "Nous avons bien reçu votre message - Bouffe & Amitié";
+        String userPlainText = "Bonjour " + senderName + ",\n\n"
+                + "Merci d'avoir contacté Bouffe & Amitié ! Nous avons bien reçu votre message concernant « " + subject + " ».\n"
+                + "Notre équipe examinera votre demande et vous répondra très rapidement.\n\n"
+                + "Cordialement,\n"
+                + "L'équipe Bouffe & Amitié\n"
+                + "contact@bouffeamitie.ca";
 
-        String userHtml = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;\">"
-                + "<h2 style=\"color: #0F172A; margin: 0 0 8px 0;\">Thank You for Reaching Out!</h2>"
-                + "<p style=\"font-size: 14px; color: #475569;\">Hi <strong>" + escapeJson(senderName) + "</strong>,</p>"
-                + "<p style=\"font-size: 14px; color: #475569;\">We have received your message and our team will get back to you within 24 hours.</p>"
-                + "<div style=\"background-color: #F8FAFC; border-radius: 12px; padding: 16px; margin: 20px 0; border: 1px solid #F1F5F9;\">"
-                + "<p style=\"font-size: 13px; color: #64748B; margin: 0 0 4px 0;\"><strong>Your Message:</strong></p>"
-                + "<p style=\"font-size: 13px; color: #334155; margin: 0;\">" + escapeJson(message) + "</p>"
+        String userHtml = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #efe6dd; border-radius: 16px; background-color: #ffffff;\">"
+                + "<h2 style=\"color: #2C1810; margin: 0 0 8px 0;\">Merci de nous avoir contactés !</h2>"
+                + "<p style=\"font-size: 14px; color: #52433B;\">Bonjour <strong>" + escapeJson(senderName) + "</strong>,</p>"
+                + "<p style=\"font-size: 14px; color: #52433B;\">Nous avons bien reçu votre message et notre équipe vous répondra sous 24 heures.</p>"
+                + "<div style=\"background-color: #FAF5EF; border-radius: 12px; padding: 16px; margin: 20px 0; border: 1px solid #EFE6DD;\">"
+                + "<p style=\"font-size: 13px; color: #1E4D2B; margin: 0 0 4px 0;\"><strong>Votre message :</strong></p>"
+                + "<p style=\"font-size: 13px; color: #2C1810; margin: 0;\">" + escapeJson(message) + "</p>"
                 + "</div>"
-                + "<p style=\"font-size: 12px; color: #94A3B8;\">The New Villages Team &bull; contact@newvillages.ca</p>"
+                + "<p style=\"font-size: 12px; color: #94A3B8;\">L'équipe Bouffe &amp; Amitié &bull; contact@bouffeamitie.ca</p>"
                 + "</div>";
 
         sendHtml(senderEmail, userSubject, userPlainText, userHtml);
@@ -281,32 +280,32 @@ public class EmailService {
     public void sendCommunityInvitationEmail(String toEmail, String inviterName, String communityName, String communityId) {
         String cleanEmail = toEmail != null ? toEmail.trim().toLowerCase() : "";
         String inviteLink = frontendBaseUrl + "/communities/" + communityId;
-        String senderLabel = (inviterName != null && !inviterName.isBlank()) ? inviterName : "A Community Leader";
+        String senderLabel = (inviterName != null && !inviterName.isBlank()) ? inviterName : "Un organisateur de groupe";
         
         log.info("[INVITATION DISPATCH] Email: {} | Inviter: {} | Community: {} | Link: {}", cleanEmail, senderLabel, communityName, inviteLink);
         
-        String subject = "Invitation to join " + communityName + " on New Villages";
-        String plainText = "Hi,\n\n"
-                + senderLabel + " has invited you to join the community circle \"" + communityName + "\" on New Villages!\n\n"
-                + "Please open this link to view the community and accept the invitation:\n"
+        String subject = "Invitation à rejoindre le groupe " + communityName + " - Bouffe & Amitié";
+        String plainText = "Bonjour,\n\n"
+                + senderLabel + " vous a invité(e) à rejoindre le groupe de sorties au restaurant « " + communityName + " » sur Bouffe & Amitié !\n\n"
+                + "Ouvrez ce lien pour découvrir le groupe et accepter l'invitation :\n"
                 + inviteLink + "\n\n"
-                + "Welcome to New Villages!\n"
-                + "The New Villages Team";
+                + "Bienvenue sur Bouffe & Amitié !\n"
+                + "L'équipe Bouffe & Amitié";
 
-        String htmlContent = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #e2e8f0; border-radius: 16px; background-color: #ffffff;\">"
+        String htmlContent = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #efe6dd; border-radius: 16px; background-color: #ffffff;\">"
                 + "<div style=\"text-align: center; margin-bottom: 24px;\">"
-                + "<h2 style=\"color: #0F172A; margin: 0 0 4px 0;\">You're Invited!</h2>"
-                + "<p style=\"color: #64748B; font-size: 14px; margin: 0;\">New Villages Community Circle</p>"
+                + "<h2 style=\"color: #2C1810; margin: 0 0 4px 0;\">Vous êtes invité(e) !</h2>"
+                + "<p style=\"color: #1E4D2B; font-size: 14px; margin: 0;\">Bouffe &amp; Amitié - Club de sorties au restaurant</p>"
                 + "</div>"
-                + "<div style=\"background-color: #F8FAFC; border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1px solid #F1F5F9;\">"
-                + "<p style=\"font-size: 15px; color: #334155; line-height: 1.6; margin: 0 0 12px 0;\">Hi,</p>"
-                + "<p style=\"font-size: 15px; color: #334155; line-height: 1.6; margin: 0 0 16px 0;\"><strong>" + senderLabel + "</strong> has invited you to join the community circle <strong>\"" + communityName + "\"</strong> on New Villages!</p>"
+                + "<div style=\"background-color: #FAF5EF; border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1px solid #EFE6DD;\">"
+                + "<p style=\"font-size: 15px; color: #2C1810; line-height: 1.6; margin: 0 0 12px 0;\">Bonjour,</p>"
+                + "<p style=\"font-size: 15px; color: #2C1810; line-height: 1.6; margin: 0 0 16px 0;\"><strong>" + senderLabel + "</strong> vous invite à rejoindre le groupe <strong>« " + communityName + " »</strong> sur Bouffe &amp; Amitié !</p>"
                 + "<div style=\"text-align: center; margin: 24px 0;\">"
-                + "<a href=\"" + inviteLink + "\" style=\"background-color: #2563EB; color: #ffffff; padding: 12px 28px; border-radius: 10px; text-decoration: none; font-weight: bold; display: inline-block;\">View Community & Join Circle</a>"
+                + "<a href=\"" + inviteLink + "\" style=\"background-color: #E86225; color: #ffffff; padding: 12px 28px; border-radius: 10px; text-decoration: none; font-weight: bold; display: inline-block;\">Voir le groupe &amp; Rejoindre</a>"
                 + "</div>"
-                + "<p style=\"font-size: 12px; color: #64748B; text-align: center; margin: 0;\">Or copy and paste this link into your browser:<br><a href=\"" + inviteLink + "\" style=\"color: #2563EB;\">" + inviteLink + "</a></p>"
+                + "<p style=\"font-size: 12px; color: #52433B; text-align: center; margin: 0;\">Ou copiez ce lien dans votre navigateur :<br><a href=\"" + inviteLink + "\" style=\"color: #E86225;\">" + inviteLink + "</a></p>"
                 + "</div>"
-                + "<p style=\"font-size: 12px; color: #94A3B8; text-align: center; margin: 0;\">The New Villages Team &bull; Connecting Communities</p>"
+                + "<p style=\"font-size: 12px; color: #94A3B8; text-align: center; margin: 0;\">L'équipe Bouffe &amp; Amitié &bull; Mangez. Rencontrez. Créez des amitiés.</p>"
                 + "</div>";
 
         sendHtml(cleanEmail, subject, plainText, htmlContent);
@@ -335,7 +334,7 @@ public class EmailService {
 
         // Fallback to standard SMTP
         try {
-            jakarta.mail.internet.InternetAddress from = new jakarta.mail.internet.InternetAddress(fromAddress, "New Villages");
+            jakarta.mail.internet.InternetAddress from = new jakarta.mail.internet.InternetAddress(fromAddress, "Bouffe & Amitié");
             if (htmlText != null && !htmlText.isBlank()) {
                 MimeMessage mimeMessage = mailSender.createMimeMessage();
                 MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
@@ -350,14 +349,12 @@ public class EmailService {
                 message.setFrom(fromAddress);
                 message.setTo(cleanTo);
                 message.setSubject(subject);
-                message.setText(plainText);
+                message.setText(plainText != null ? plainText : "");
                 mailSender.send(message);
             }
-            log.info("Email successfully sent to [{}] via SMTP {}", cleanTo, fromAddress);
+            log.info("Email sent to [{}] via standard SMTP", cleanTo);
         } catch (Exception e) {
-            log.error("Failed to send email to [{}]: {} (Cause: {})", cleanTo, e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : "none", e);
+            log.error("Failed to send email to [{}]: {}", cleanTo, e.getMessage(), e);
         }
     }
 }
-
-

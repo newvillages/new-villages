@@ -4,21 +4,21 @@
 
 @layer base {
   :root {
-    --bg-page: #F8FAFC;
+    --bg-page: #FDFBF7;
     --bg-card: #ffffff;
     --bg-sidebar: #ffffff;
-    --text-primary: #102A43;
-    --text-secondary: #486581;
-    --border-color: #E2E8F0;
+    --text-primary: #2C1810;
+    --text-secondary: #52433B;
+    --border-color: #EFE6DD;
   }
 
   .dark {
-    --bg-page: #0A2540;
-    --bg-card: #0F3054;
-    --bg-sidebar: #091E34;
-    --text-primary: #F8FAFC;
-    --text-secondary: #94A3B8;
-    --border-color: #1E3A5F;
+    --bg-page: #133820;
+    --bg-card: #164025;
+    --bg-sidebar: #0E2917;
+    --text-primary: #FDFBF7;
+    --text-secondary: #C8D6CB;
+    --border-color: #215933;
   }
 
   body {
@@ -29,7 +29,7 @@
   }
 
   .dark body {
-    @apply bg-[#0A2540] text-gray-100;
+    @apply bg-[#133820] text-gray-100;
   }
 
   h1, h2, h3, h4, h5, h6 {

@@ -35,129 +35,129 @@ interface TermItem {
 const TERMS_DATA: TermItem[] = [
   {
     id: 1,
-    title: 'User Conduct & Responsibility',
+    title: 'Conduite et responsabilité de l\'utilisateur',
     category: 'conduct',
-    categoryLabel: 'User Conduct',
+    categoryLabel: 'Conduite des membres',
     icon: UserCheck,
-    text: 'Users are responsible for their own posts, messages, and behavior.',
-    summary: 'You are accountable for all activities, messages, and content posted under your account.'
+    text: 'Les utilisateurs sont responsables de leurs propres publications, messages et comportements sur la plateforme.',
+    summary: 'Vous êtes responsable de toutes les activités, messages et contenus publiés sous votre compte.'
   },
   {
     id: 2,
-    title: 'Platform Intermediary Role',
+    title: 'Rôle d\'intermédiaire de la plateforme',
     category: 'intermediary',
-    categoryLabel: 'Platform Role',
+    categoryLabel: 'Rôle de la plateforme',
     icon: Scale,
-    text: 'The platform acts only as an intermediary and is not responsible for agreements made between users.',
-    summary: 'NewVillages facilitates connections; agreements made between members are strictly private between those parties.'
+    text: 'La plateforme agit uniquement en tant qu\'intermédiaire et n\'est pas responsable des ententes conclues entre les membres.',
+    summary: 'Bouffe & Amitié facilite la mise en relation ; les échanges et arrangements entre membres relèvent exclusivement de leur responsabilité.'
   },
   {
     id: 3,
-    title: 'Accurate Account Registration',
+    title: 'Inscription et exactitude du compte',
     category: 'conduct',
-    categoryLabel: 'User Conduct',
+    categoryLabel: 'Conduite des membres',
     icon: ShieldCheck,
-    text: 'Users must provide accurate information when creating an account.',
-    summary: 'Full name, email address, and location details provided during signup must be truthful and accurate.'
+    text: 'Les utilisateurs doivent fournir des informations exactes et véridiques lors de la création de leur compte.',
+    summary: 'Le nom complet, l\'adresse courriel et l\'arrondissement indiqués lors de l\'inscription doivent être exacts.'
   },
   {
     id: 4,
-    title: 'Prohibited Content & Behavior',
+    title: 'Contenus et comportements interdits',
     category: 'conduct',
-    categoryLabel: 'User Conduct',
+    categoryLabel: 'Conduite des membres',
     icon: AlertTriangle,
-    text: 'Illegal, hateful, violent, fraudulent, or rights-infringing content is prohibited.',
-    summary: 'Zero tolerance for hate speech, harassment, violence, fraud, spam, or intellectual property violations.'
+    text: 'Les contenus illégaux, haineux, violents, frauduleux ou portant atteinte aux droits d\'autrui sont strictement interdits.',
+    summary: 'Tolérance zéro pour les discours haineux, le harcèlement, la violence, la fraude, le spam ou la violation de la propriété intellectuelle.'
   },
   {
     id: 5,
-    title: 'Compliance with Applicable Laws',
+    title: 'Conformité avec les lois applicables',
     category: 'conduct',
-    categoryLabel: 'User Conduct',
+    categoryLabel: 'Conduite des membres',
     icon: FileText,
-    text: 'Users must comply with all applicable laws in their country or region.',
-    summary: 'All interactions and activities must abide by local, regional, national, and international laws.'
+    text: 'Les utilisateurs doivent se conformer à toutes les lois et réglementations applicables au Canada.',
+    summary: 'Toutes les interactions et sorties organisées doivent respecter les lois locales, provinciales et fédérales.'
   },
   {
     id: 6,
-    title: 'Subscriptions & Participation Fees',
+    title: 'Abonnements et frais de participation',
     category: 'financial',
-    categoryLabel: 'Fees & Expenses',
+    categoryLabel: 'Frais & abonnements',
     icon: CreditCard,
-    text: 'Subscriptions and participation fees, when applicable, must be paid according to the displayed terms and may be non-refundable unless required by law.',
-    summary: 'All paid membership, leader, or event fees follow published pricing rules and are non-refundable where allowed by law.'
+    text: 'Les abonnements et frais de participation doivent être réglés selon les conditions affichées et sont non remboursables sauf disposition légale contraire.',
+    summary: 'Les paiements d\'abonnement ou d\'inscription respectent les tarifs publiés et sont non remboursables dans les limites de la loi.'
   },
   {
     id: 7,
-    title: 'Personal Expense Responsibility',
+    title: 'Responsabilité des dépenses personnelles',
     category: 'financial',
-    categoryLabel: 'Fees & Expenses',
+    categoryLabel: 'Frais & abonnements',
     icon: DollarSign,
-    text: 'Each user is responsible for their own personal expenses, including transportation, food, purchases, and other costs.',
-    summary: 'Costs incurred to attend community gatherings, events, or travel are solely your personal responsibility.'
+    text: 'Chaque utilisateur est responsable de ses propres dépenses personnelles lors des sorties (repas, boissons, transport, etc.).',
+    summary: 'Les frais encourus au restaurant ou lors du déplacement pour participer à une sortie restent à la charge exclusive de chaque membre.'
   },
   {
     id: 8,
-    title: 'Account Suspension & Removal',
+    title: 'Suspension et résiliation de compte',
     category: 'legal',
-    categoryLabel: 'Account & Legal',
+    categoryLabel: 'Compte & Aspects légaux',
     icon: UserX,
-    text: 'The platform may suspend or permanently remove accounts that violate these Terms.',
-    summary: 'Violations of community safety or terms may lead to immediate temporary suspension or permanent deletion.'
+    text: 'La plateforme se réserve le droit de suspendre ou de supprimer définitivement tout compte en cas de non-respect des présentes Conditions.',
+    summary: 'Tout manquement aux règles de respect ou aux conditions d\'utilisation peut entraîner la suspension immédiate du compte.'
   },
   {
     id: 9,
-    title: 'Modifications to Features & Terms',
+    title: 'Modifications des fonctionnalités et des conditions',
     category: 'legal',
-    categoryLabel: 'Account & Legal',
+    categoryLabel: 'Compte & Aspects légaux',
     icon: RefreshCw,
-    text: 'The platform may modify its features, pricing, or these Terms and Conditions at any time. Changes become effective once published on the platform unless applicable law requires otherwise. Continued use of the platform after changes means you accept the updated Terms.',
-    summary: 'We may update services, terms, or fees. Continued use after publication signifies your acceptance of updated terms.'
+    text: 'La plateforme peut modifier ses fonctionnalités, ses tarifs ou les présentes Conditions à tout moment. Les modifications prennent effet dès leur publication.',
+    summary: 'L\'utilisation continue du service après la publication des modifications vaut acceptation des Conditions mises à jour.'
   },
   {
     id: 10,
-    title: 'No Guarantee of Event or Activity Outcomes',
+    title: 'Absence de garantie sur le déroulement des sorties',
     category: 'intermediary',
-    categoryLabel: 'Platform Role',
+    categoryLabel: 'Rôle de la plateforme',
     icon: Award,
-    text: 'The platform does not guarantee the success, quality, or outcome of any event, activity, or interaction between users.',
-    summary: 'Events and activities organized on NewVillages are run independently by members/leaders without outcome guarantees.'
+    text: 'La plateforme ne garantit pas le déroulement ou la qualité des rencontres individuelles entre membres.',
+    summary: 'Les sorties sont des moments d\'échange entre adultes consentants organisés de manière bienveillante.'
   },
   {
     id: 11,
-    title: 'Limitation of Liability',
+    title: 'Limitation de responsabilité',
     category: 'intermediary',
-    categoryLabel: 'Platform Role',
+    categoryLabel: 'Rôle de la plateforme',
     icon: ShieldAlert,
-    text: 'To the maximum extent permitted by law, the platform is not liable for damages, losses, or disputes arising from interactions between users.',
-    summary: 'NewVillages is not liable for personal disputes, financial claims, or losses stemming from member interactions.'
+    text: 'Dans toute la mesure permise par la loi, la plateforme ne peut être tenue responsable des dommages directes ou indirects survenant lors d\'une sortie.',
+    summary: 'Bouffe & Amitié n\'assume pas de responsabilité civile pour les différends personnels ou pertes survenus entre membres.'
   },
   {
     id: 12,
-    title: 'Privacy Policy & Data Use',
+    title: 'Protection de la vie privée et des données',
     category: 'legal',
-    categoryLabel: 'Account & Legal',
+    categoryLabel: 'Compte & Aspects légaux',
     icon: Lock,
-    text: "Users agree to the platform's Privacy Policy regarding the collection and use of personal information.",
-    summary: 'Personal data processing and protection follow our dedicated Privacy Policy guidelines.'
+    text: 'Les utilisateurs acceptent la Politique de confidentialité concernant la collecte et le traitement de leurs renseignements personnels.',
+    summary: 'Le traitement des données personnelles respecte scrupuleusement notre Politique de confidentialité.'
   },
   {
     id: 13,
-    title: 'Fraud Prevention & Security Integrity',
+    title: 'Prévention de la fraude et sécurité',
     category: 'legal',
-    categoryLabel: 'Account & Legal',
+    categoryLabel: 'Compte & Aspects légaux',
     icon: Lock,
-    text: 'Any fraudulent activity or attempt to bypass the platform\'s security measures may result in account termination.',
-    summary: 'Bypassing technical security measures, unauthorized API access, or fraud leads to immediate termination and legal action.'
+    text: 'Toute tentative d\'accès non autorisé ou de contournement des mesures de sécurité entraînera la fermeture du compte.',
+    summary: 'Toute tentative de piratage, d\'accès non autorisé ou de fraude entraînera des poursuites légales.'
   },
   {
     id: 14,
-    title: 'Binding Agreement & Acknowledgment',
+    title: 'Accord contraignant et acceptation',
     category: 'legal',
-    categoryLabel: 'Account & Legal',
+    categoryLabel: 'Compte & Aspects légaux',
     icon: CheckCircle2,
-    text: 'By accessing or using the platform, users acknowledge that they have read, understood, and agree to these Terms and Conditions.',
-    summary: 'Accessing or registering on NewVillages constitutes your explicit agreement to all terms in full.'
+    text: 'En accédant à la plateforme ou en créant un compte, l\'utilisateur confirme avoir lu, compris et accepté les présentes Conditions d\'utilisation.',
+    summary: 'L\'utilisation de Bouffe & Amitié constitue une acceptation sans réserve des présentes conditions.'
   }
 ];
 
@@ -181,53 +181,53 @@ export function Terms() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-[#F8FAFC] text-[#102A43] flex flex-col">
+      <div className="min-h-screen bg-[#FDFBF7] text-[#2C1810] flex flex-col font-body">
         {/* Header Hero */}
-        <section className="bg-gradient-to-b from-[#07192C] to-[#0A2540] text-white py-16 md:py-20 relative overflow-hidden">
+        <section className="bg-[#133820] text-white py-16 md:py-20 relative overflow-hidden">
           <div className="max-w-5xl mx-auto px-6 relative z-10">
             <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
               <Link
                 to="/"
-                className="inline-flex items-center text-slate-300 hover:text-white font-semibold transition-colors bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl text-sm border border-white/10"
+                className="inline-flex items-center text-[#E8F3EB] hover:text-white font-bold transition-colors bg-white/10 backdrop-blur-md px-4 py-2 rounded-xl text-sm border border-white/10"
               >
-                <ArrowLeft size={16} className="mr-2" /> Back to Home
+                <ArrowLeft size={16} className="mr-2" /> Retour à l'accueil
               </Link>
-              <div className="flex items-center gap-3 text-xs font-semibold text-slate-300">
-                <span className="bg-[#1D4ED8] text-white px-3 py-1 rounded-full uppercase tracking-wider text-[11px]">Official Document</span>
+              <div className="flex items-center gap-3 text-xs font-semibold text-emerald-100">
+                <span className="bg-[#E86225] text-white px-3 py-1 rounded-full uppercase tracking-wider text-[11px]">Document Officiel</span>
                 <span>Version 1.0.0</span>
                 <span>&bull;</span>
-                <span>Last Updated: July 2026</span>
+                <span>Dernière mise à jour : Août 2026</span>
               </div>
             </div>
 
             <div className="max-w-3xl">
-              <h1 className="text-4xl md:text-5xl lg:text-6xl font-heading font-extrabold text-white tracking-tight mb-4">
-                Terms and Conditions
+              <h1 className="text-3xl md:text-5xl lg:text-6xl font-heading font-extrabold text-white tracking-tight mb-4">
+                Conditions d'utilisation
               </h1>
-              <p className="text-lg md:text-xl text-slate-300 leading-relaxed font-light">
-                Please read these Terms and Conditions carefully. They govern your access to and use of the NewVillages platform, services, and community network.
+              <p className="text-base md:text-lg text-emerald-100/90 leading-relaxed font-light">
+                Veuillez lire attentivement ces conditions d'utilisation. Elles régissent l'accès et l'utilisation de la plateforme **Bouffe &amp; Amitié**, de ses services et de son réseau de sorties au restaurant.
               </p>
             </div>
 
             {/* Actions & Quick Stats */}
-            <div className="mt-10 pt-8 border-t border-slate-700/50 flex flex-wrap items-center justify-between gap-4">
-              <div className="flex items-center gap-6 text-sm text-slate-300">
+            <div className="mt-10 pt-8 border-t border-emerald-900/60 flex flex-wrap items-center justify-between gap-4">
+              <div className="flex items-center gap-6 text-xs sm:text-sm text-emerald-100">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 size={18} className="text-[#38BDF8]" />
-                  <span>14 Binding Clauses</span>
+                  <CheckCircle2 size={18} className="text-[#E86225]" />
+                  <span>14 clauses d'utilisation</span>
                 </div>
                 <div className="flex items-center gap-2">
-                  <ShieldCheck size={18} className="text-[#38BDF8]" />
-                  <span>Community Standards</span>
+                  <ShieldCheck size={18} className="text-[#E86225]" />
+                  <span>Charte de bienveillance</span>
                 </div>
               </div>
 
               <button
                 onClick={handlePrint}
-                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-semibold px-4 py-2.5 rounded-xl transition-all border border-white/20 text-sm"
+                className="inline-flex items-center gap-2 bg-white/10 hover:bg-white/20 text-white font-bold px-4 py-2 rounded-xl transition-all border border-white/20 text-xs"
               >
                 <Printer size={16} />
-                <span>Print / Save PDF</span>
+                <span>Imprimer / Sauvegarder PDF</span>
               </button>
             </div>
           </div>
@@ -237,16 +237,16 @@ export function Terms() {
         <main className="max-w-5xl mx-auto px-6 py-12 flex-1 w-full space-y-10">
 
           {/* Search & Filter Control Bar */}
-          <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-[#E2E8F0] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+          <div className="bg-white p-4 md:p-6 rounded-2xl shadow-sm border border-[#EFE6DD] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
             {/* Search Input */}
             <div className="relative flex-1">
               <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search terms by keyword or clause number..."
+                placeholder="Rechercher une clause par mot-clé..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:bg-white transition-all text-[#102A43]"
+                className="w-full pl-11 pr-4 py-3 bg-[#FAF5EF] border border-[#EFE6DD] rounded-xl text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#E86225] focus:bg-white transition-all text-[#2C1810]"
               />
               {searchQuery && (
                 <button
@@ -261,19 +261,19 @@ export function Terms() {
             {/* Category Filter Tabs */}
             <div className="flex items-center gap-1.5 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
               {[
-                { id: 'all', label: 'All Terms' },
-                { id: 'conduct', label: 'User Conduct' },
-                { id: 'intermediary', label: 'Platform Role' },
-                { id: 'financial', label: 'Fees' },
-                { id: 'legal', label: 'Account & Legal' }
+                { id: 'all', label: 'Toutes les clauses' },
+                { id: 'conduct', label: 'Conduite' },
+                { id: 'intermediary', label: 'Rôle du club' },
+                { id: 'financial', label: 'Frais' },
+                { id: 'legal', label: 'Aspects légaux' }
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id as typeof activeTab)}
-                  className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
+                  className={`px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
                     activeTab === tab.id
-                      ? 'bg-[#1D4ED8] text-white shadow-sm'
-                      : 'bg-slate-100 text-[#486581] hover:bg-slate-200'
+                      ? 'bg-[#E86225] text-white shadow-sm'
+                      : 'bg-[#FAF5EF] text-[#52433B] hover:bg-[#E8F3EB]'
                   }`}
                 >
                   {tab.label}
@@ -283,28 +283,28 @@ export function Terms() {
           </div>
 
           {/* Key Principles Summary Box */}
-          <div className="bg-[#0A2540] text-white rounded-2xl p-6 md:p-8 shadow-md">
+          <div className="bg-[#133820] text-white rounded-2xl p-6 md:p-8 shadow-md">
             <h2 className="text-xl font-bold text-white mb-3 flex items-center gap-2">
-              <ShieldCheck className="text-[#38BDF8]" size={22} />
-              Key Platform Principles
+              <ShieldCheck className="text-[#E86225]" size={22} />
+              Principes fondamentaux du club
             </h2>
             <div className="grid md:grid-cols-3 gap-6 mt-4">
-              <div className="bg-[#0F3054] p-4 rounded-xl border border-[#1E3A5F]">
-                <h4 className="font-bold text-sm text-white mb-1">1. User Ownership</h4>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  You retain responsibility for all messages, posts, and commitments you make on NewVillages.
+              <div className="bg-[#164025] p-4 rounded-xl border border-[#215933]">
+                <h4 className="font-bold text-sm text-white mb-1">1. Respect &amp; Bienveillance</h4>
+                <p className="text-xs text-emerald-100/90 leading-relaxed">
+                  Chaque membre s'engage à faire preuve d'ouverture et de courtoisie lors des rencontres.
                 </p>
               </div>
-              <div className="bg-[#0F3054] p-4 rounded-xl border border-[#1E3A5F]">
-                <h4 className="font-bold text-sm text-white mb-1">2. Platform Intermediary</h4>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  NewVillages connects people but is not party to private agreements or personal arrangements between users.
+              <div className="bg-[#164025] p-4 rounded-xl border border-[#215933]">
+                <h4 className="font-bold text-sm text-[#E86225] mb-1">2. Rôle d'intermédiaire</h4>
+                <p className="text-xs text-emerald-100/90 leading-relaxed">
+                  Bouffe &amp; Amitié facilite les sorties au restaurant mais n'intervient pas dans la vie privée des membres.
                 </p>
               </div>
-              <div className="bg-[#0F3054] p-4 rounded-xl border border-[#1E3A5F]">
-                <h4 className="font-bold text-sm text-white mb-1">3. Active Consent</h4>
-                <p className="text-xs text-slate-300 leading-relaxed">
-                  Every account creation requires explicit acknowledgement and acceptance of these binding terms.
+              <div className="bg-[#164025] p-4 rounded-xl border border-[#215933]">
+                <h4 className="font-bold text-sm text-white mb-1">3. Consentement éclairé</h4>
+                <p className="text-xs text-emerald-100/90 leading-relaxed">
+                  La création d'un compte requiert l'acceptation expresse des présentes conditions d'utilisation.
                 </p>
               </div>
             </div>
@@ -312,20 +312,20 @@ export function Terms() {
 
           {/* Terms List Grid / Cards */}
           {filteredTerms.length === 0 ? (
-            <div className="bg-white rounded-2xl p-12 text-center border border-[#E2E8F0]">
+            <div className="bg-white rounded-2xl p-12 text-center border border-[#EFE6DD]">
               <AlertTriangle size={36} className="mx-auto text-slate-400 mb-3" />
-              <h3 className="text-lg font-bold text-[#102A43] mb-1">No terms found</h3>
-              <p className="text-sm text-[#486581] max-w-md mx-auto mb-4">
-                No Terms and Conditions clauses match your query "{searchQuery}".
+              <h3 className="text-lg font-bold text-[#2C1810] mb-1">Aucune clause trouvée</h3>
+              <p className="text-xs text-[#52433B] max-w-md mx-auto mb-4">
+                Aucune clause ne correspond à votre recherche "{searchQuery}".
               </p>
               <button
                 onClick={() => {
                   setSearchQuery('');
                   setActiveTab('all');
                 }}
-                className="text-xs font-bold text-[#1D4ED8] hover:underline"
+                className="text-xs font-bold text-[#E86225] hover:underline"
               >
-                Reset Search & Filters
+                Réinitialiser la recherche
               </button>
             </div>
           ) : (
@@ -336,15 +336,15 @@ export function Terms() {
                   <article
                     key={term.id}
                     id={`term-${term.id}`}
-                    className="bg-white rounded-2xl border border-[#E2E8F0] p-6 md:p-8 shadow-sm hover:shadow-md transition-all relative overflow-hidden group"
+                    className="bg-white rounded-2xl border border-[#EFE6DD] p-6 md:p-8 shadow-sm hover:shadow-md transition-all relative overflow-hidden group"
                   >
                     <div className="flex flex-col md:flex-row items-start gap-5">
                       {/* Number Badge & Icon */}
                       <div className="flex items-center gap-3 shrink-0">
-                        <div className="w-12 h-12 rounded-2xl bg-[#0A2540] text-white font-black text-lg flex items-center justify-center border border-[#1E3A5F]">
+                        <div className="w-12 h-12 rounded-2xl bg-[#133820] text-white font-black text-lg flex items-center justify-center border border-[#1E4D2B]">
                           {term.id}
                         </div>
-                        <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#1D4ED8] flex items-center justify-center md:hidden">
+                        <div className="w-10 h-10 rounded-xl bg-[#FDF0E9] text-[#E86225] flex items-center justify-center md:hidden">
                           <IconComponent size={20} />
                         </div>
                       </div>
@@ -352,30 +352,30 @@ export function Terms() {
                       {/* Content */}
                       <div className="flex-1 space-y-3">
                         <div className="flex flex-wrap items-center justify-between gap-2">
-                          <h3 className="text-xl font-bold text-[#102A43] group-hover:text-[#1D4ED8] transition-colors">
+                          <h3 className="text-xl font-bold text-[#2C1810] group-hover:text-[#E86225] transition-colors">
                             {term.id}. {term.title}
                           </h3>
-                          <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 bg-slate-100 text-[#486581] rounded-full">
+                          <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 bg-[#FAF5EF] text-[#52433B] rounded-full">
                             {term.categoryLabel}
                           </span>
                         </div>
 
-                        {/* Full Clause Text from PDF */}
-                        <div className="bg-[#F8FAFC] p-4 rounded-xl border border-[#E2E8F0]">
-                          <p className="text-base text-[#102A43] font-medium leading-relaxed">
-                            "{term.text}"
+                        {/* Clause Text */}
+                        <div className="bg-[#FAF5EF] p-4 rounded-xl border border-[#EFE6DD]">
+                          <p className="text-sm text-[#2C1810] font-medium leading-relaxed">
+                            « {term.text} »
                           </p>
                         </div>
 
                         {/* Summary */}
-                        <p className="text-xs text-[#486581] leading-relaxed flex items-start gap-1.5">
-                          <span className="font-semibold text-[#102A43] shrink-0">Summary:</span>
+                        <p className="text-xs text-[#52433B] leading-relaxed flex items-start gap-1.5">
+                          <span className="font-bold text-[#2C1810] shrink-0">En résumé :</span>
                           <span>{term.summary}</span>
                         </p>
                       </div>
 
                       {/* Icon Desktop */}
-                      <div className="hidden md:flex w-12 h-12 rounded-2xl bg-blue-50 text-[#1D4ED8] items-center justify-center shrink-0">
+                      <div className="hidden md:flex w-12 h-12 rounded-2xl bg-[#FDF0E9] text-[#E86225] items-center justify-center shrink-0">
                         <IconComponent size={24} />
                       </div>
                     </div>
@@ -385,54 +385,28 @@ export function Terms() {
             </div>
           )}
 
-          {/* Mandatory Terms Acceptance & Re-Consent Policy Section */}
-          <section className="bg-gradient-to-r from-[#07192C] to-[#0A2540] text-white rounded-3xl p-8 md:p-10 shadow-lg relative overflow-hidden">
-            <div className="max-w-3xl space-y-4 relative z-10">
-              <span className="text-xs font-bold uppercase tracking-widest bg-white/10 px-3 py-1 rounded-full text-[#38BDF8]">
-                Terms Acceptance Requirement
-              </span>
-              <h2 className="text-2xl md:text-3xl font-extrabold font-heading text-white">
-                How Terms Acceptance Works on NewVillages
-              </h2>
-              <p className="text-sm md:text-base text-slate-300 leading-relaxed font-light">
-                Before creating an account, every user is required to actively read and accept the Terms of Use and Privacy Policy via an unchecked checkbox on registration. The date, time, and version accepted are securely logged.
-              </p>
-              <ul className="space-y-2 text-xs md:text-sm text-slate-300 font-medium">
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-[#38BDF8]" /> Explicit opt-in checkbox required prior to account creation.
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-[#38BDF8]" /> Server-side version and timestamp audit tracking.
-                </li>
-                <li className="flex items-center gap-2">
-                  <CheckCircle2 size={16} className="text-[#38BDF8]" /> Automatic re-consent prompt whenever Terms & Conditions are updated.
-                </li>
-              </ul>
-            </div>
-          </section>
-
           {/* Additional Links & Support */}
-          <div className="bg-white rounded-2xl p-6 md:p-8 border border-[#E2E8F0] flex flex-col md:flex-row items-center justify-between gap-6">
+          <div className="bg-white rounded-2xl p-6 md:p-8 border border-[#EFE6DD] flex flex-col md:flex-row items-center justify-between gap-6">
             <div>
-              <h4 className="font-bold text-lg text-[#102A43] mb-1">Questions about our Terms?</h4>
-              <p className="text-xs text-[#486581]">
-                If you have questions regarding legal compliance or data privacy, reach out to our team.
+              <h4 className="font-bold text-lg text-[#2C1810] mb-1">Des questions sur nos conditions ?</h4>
+              <p className="text-xs text-[#52433B]">
+                Si vous souhaitez obtenir des précisions sur le fonctionnement du club, n'hésitez pas à nous contacter.
               </p>
             </div>
             <div className="flex items-center gap-4 shrink-0">
               <Link
                 to="/privacy"
-                className="inline-flex items-center gap-2 text-xs font-bold text-[#102A43] hover:underline px-4 py-2.5 rounded-xl border border-[#E2E8F0]"
+                className="inline-flex items-center gap-2 text-xs font-bold text-[#2C1810] hover:underline px-4 py-2.5 rounded-xl border border-[#EFE6DD]"
               >
-                <span>Privacy Policy</span>
+                <span>Politique de confidentialité</span>
                 <ExternalLink size={14} />
               </Link>
               <Link
                 to="/contact"
-                className="inline-flex items-center gap-2 text-xs font-bold text-white bg-[#1D4ED8] hover:bg-[#1E40AF] px-5 py-2.5 rounded-xl transition-all shadow-sm"
+                className="inline-flex items-center gap-2 text-xs font-bold text-white bg-[#E86225] hover:bg-[#D0521B] px-5 py-2.5 rounded-xl transition-all shadow-sm"
               >
                 <Mail size={14} />
-                <span>Contact Support</span>
+                <span>Nous contacter</span>
               </Link>
             </div>
           </div>

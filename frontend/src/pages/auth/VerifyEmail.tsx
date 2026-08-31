@@ -20,39 +20,39 @@ export function VerifyEmail() {
   if (token) {
     if (verifyEmailQuery.isLoading) {
       return (
-        <div className="min-h-screen bg-background-light flex items-center justify-center">
-          <Loader2 size={32} className="animate-spin text-primary" />
+        <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center">
+          <Loader2 size={32} className="animate-spin text-[#E86225]" />
         </div>
       );
     }
     if (verifyEmailQuery.isSuccess) {
       return (
-        <div className="min-h-screen bg-background-light py-12 px-4 flex items-center justify-center">
-          <Card className="w-full max-w-md text-center">
+        <div className="min-h-screen bg-[#FDFBF7] py-12 px-4 flex items-center justify-center font-body">
+          <Card className="w-full max-w-md text-center border-[#EFE6DD] shadow-sm rounded-3xl overflow-hidden bg-white">
             <CardContent className="p-8">
-              <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6">
+              <div className="w-16 h-16 bg-[#E8F3EB] text-[#1E4D2B] rounded-full flex items-center justify-center mx-auto mb-6">
                 <CheckCircle2 size={32} />
               </div>
-              <h1 className="text-2xl font-heading font-bold mb-4">Email verified!</h1>
-              <p className="text-gray-600 mb-8">Your account is ready. You can log in now.</p>
-              <Button className="w-full" onClick={() => navigate('/login')}>Go to log in</Button>
+              <h1 className="text-2xl font-heading font-extrabold text-[#2C1810] mb-3">Courriel vérifié !</h1>
+              <p className="text-xs text-[#52433B] mb-8">Votre compte est activé. Vous pouvez maintenant vous connecter.</p>
+              <Button className="w-full bg-[#E86225] hover:bg-[#D0521B] text-white font-bold py-3.5 rounded-xl" onClick={() => navigate('/login')}>Se connecter</Button>
             </CardContent>
           </Card>
         </div>
       );
     }
     return (
-      <div className="min-h-screen bg-background-light py-12 px-4 flex items-center justify-center">
-        <Card className="w-full max-w-md text-center">
+      <div className="min-h-screen bg-[#FDFBF7] py-12 px-4 flex items-center justify-center font-body">
+        <Card className="w-full max-w-md text-center border-[#EFE6DD] shadow-sm rounded-3xl overflow-hidden bg-white">
           <CardContent className="p-8">
             <div className="w-16 h-16 bg-red-100 text-red-600 rounded-full flex items-center justify-center mx-auto mb-6">
               <XCircle size={32} />
             </div>
-            <h1 className="text-2xl font-heading font-bold mb-4">Link expired or invalid</h1>
-            <p className="text-gray-600 mb-8">
-              {verifyEmailQuery.error instanceof ApiError ? verifyEmailQuery.error.message : 'This verification link is no longer valid.'}
+            <h1 className="text-2xl font-heading font-extrabold text-[#2C1810] mb-3">Lien expiré ou invalide</h1>
+            <p className="text-xs text-[#52433B] mb-8">
+              {verifyEmailQuery.error instanceof ApiError ? verifyEmailQuery.error.message : 'Ce lien de vérification n\'est plus valide.'}
             </p>
-            <Button variant="outline" className="w-full" onClick={() => navigate('/login')}>Back to log in</Button>
+            <Button variant="outline" className="w-full border-[#E86225] text-[#E86225] font-bold" onClick={() => navigate('/login')}>Retour à la connexion</Button>
           </CardContent>
         </Card>
       </div>
@@ -60,38 +60,38 @@ export function VerifyEmail() {
   }
 
   return (
-    <div className="min-h-screen bg-background-light py-12 px-4 flex items-center justify-center">
-      <Card className="w-full max-w-md text-center">
+    <div className="min-h-screen bg-[#FDFBF7] py-12 px-4 flex items-center justify-center font-body">
+      <Card className="w-full max-w-md text-center border-[#EFE6DD] shadow-sm rounded-3xl overflow-hidden bg-white">
         <CardContent className="p-8">
-          <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
+          <div className="w-16 h-16 bg-[#FDF0E9] text-[#E86225] rounded-full flex items-center justify-center mx-auto mb-6">
             <Mail size={32} />
           </div>
-          <h1 className="text-2xl font-heading font-bold mb-4">Check your email</h1>
-          <p className="text-gray-600 mb-6">
-            We've sent a verification link to {emailFromState ? <strong>{emailFromState}</strong> : 'your email address'}. Please click the link to activate your account.
+          <h1 className="text-2xl font-heading font-extrabold text-[#2C1810] mb-3">Vérifiez vos courriels</h1>
+          <p className="text-xs text-[#52433B] mb-6">
+            Nous avons envoyé un lien d'activation à {emailFromState ? <strong>{emailFromState}</strong> : 'votre adresse courriel'}. Veuillez cliquer sur le lien pour activer votre compte.
           </p>
-          <div className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-xl p-3 mb-8 text-center font-medium">
-            💡 Can't find the email? Please check your <strong>Spam</strong> or <strong>Junk</strong> folder.
+          <div className="text-xs text-amber-800 bg-amber-50 border border-amber-200 rounded-xl p-3 mb-8 text-center font-medium">
+            💡 Vous ne trouvez pas le courriel ? Pensez à vérifier votre dossier <strong>Indésirables / Spam</strong>.
           </div>
 
           <div className="space-y-4">
             {!emailFromState && (
               <input
                 type="email"
-                placeholder="you@newvillages.ca"
+                placeholder="votre.courriel@exemple.ca"
                 value={resendEmail}
                 onChange={(e) => setResendEmail(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                className="w-full border border-[#EFE6DD] rounded-xl p-3 text-xs focus:outline-none focus:ring-2 focus:ring-[#E86225]"
               />
             )}
             <Button
               variant="outline"
-              className="w-full flex items-center justify-center gap-2"
+              className="w-full flex items-center justify-center gap-2 border-[#E86225] text-[#E86225] font-bold py-3.5 rounded-xl"
               disabled={!resendEmail || resend.isPending}
               onClick={() => resend.mutate(resendEmail)}
             >
               {resend.isPending && <Loader2 size={16} className="animate-spin" />}
-              {resend.isSuccess ? 'Email sent!' : 'Resend Email'}
+              {resend.isSuccess ? 'Courriel envoyé !' : 'Renvoyer le courriel'}
             </Button>
           </div>
         </CardContent>
@@ -99,3 +99,5 @@ export function VerifyEmail() {
     </div>
   );
 }
+
+export default VerifyEmail;

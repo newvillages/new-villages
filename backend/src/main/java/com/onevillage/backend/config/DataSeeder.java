@@ -102,7 +102,7 @@ public class DataSeeder implements ApplicationRunner {
                         .orElseGet(() -> userRepository.findFirstByRole(UserRole.ADMIN)
                                 .orElseGet(User::new)));
 
-        admin.setFullName("New Villages Admin");
+        admin.setFullName("Bouffe & Amitié Admin");
         admin.setEmail(adminEmail);
         admin.setPasswordHash(passwordEncoder.encode(adminPassword));
         admin.setRole(UserRole.ADMIN);

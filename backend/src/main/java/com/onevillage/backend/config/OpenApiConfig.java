@@ -17,8 +17,8 @@ public class OpenApiConfig {
     public OpenAPI oneVillageOpenAPI() {
         return new OpenAPI()
                 .info(new Info()
-                        .title("New Villages API")
-                        .description("Backend API for the New Villages community platform")
+                        .title("Bouffe & Amitié API")
+                        .description("Backend API for the Bouffe & Amitié community platform")
                         .version("v1"))
                 .addSecurityItem(new SecurityRequirement().addList(BEARER_SCHEME))
                 .components(new Components()

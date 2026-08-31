@@ -22,11 +22,11 @@ export function ResetPassword() {
     setFormError(null);
 
     if (newPassword !== confirmPassword) {
-      setFormError('Passwords do not match.');
+      setFormError('Les mots de passe ne correspondent pas.');
       return;
     }
     if (!token) {
-      setFormError('This reset link is missing its token. Please request a new one.');
+      setFormError('Le jeton de réinitialisation est manquant. Veuillez faire une nouvelle demande.');
       return;
     }
 
@@ -34,44 +34,44 @@ export function ResetPassword() {
       { token, newPassword },
       {
         onSuccess: () => navigate('/login'),
-        onError: (err) => setFormError(err instanceof ApiError ? err.message : 'Something went wrong.'),
+        onError: (err) => setFormError(err instanceof ApiError ? err.message : 'Une erreur est survenue.'),
       }
     );
   };
 
   return (
-    <div className="min-h-screen bg-background-light py-12 px-4 flex flex-col items-center justify-center">
+    <div className="min-h-screen bg-[#FDFBF7] py-12 px-4 flex flex-col items-center justify-center font-body">
       <div className="w-full max-w-md mb-4 text-left">
-        <Link to="/" className="inline-flex items-center text-sm font-semibold text-primary hover:underline">
-          <ArrowLeft size={16} className="mr-2" /> Back to Home
+        <Link to="/" className="inline-flex items-center text-xs font-bold text-[#E86225] hover:underline">
+          <ArrowLeft size={16} className="mr-2" /> Retour à l'accueil
         </Link>
       </div>
-      <Card className="w-full max-w-md">
+      <Card className="w-full max-w-md border-[#EFE6DD] shadow-sm rounded-3xl overflow-hidden bg-white">
         <CardContent className="p-8">
           <div className="text-center mb-8">
-            <h1 className="text-3xl font-heading font-bold mb-2">Choose a new password</h1>
-            <p className="text-gray-600">Make it something you haven't used before.</p>
+            <h1 className="text-2xl font-heading font-extrabold text-[#2C1810] mb-2">Choisir un nouveau mot de passe</h1>
+            <p className="text-xs text-[#52433B]">Choisissez un mot de passe sécurisé à 8 caractères minimum.</p>
           </div>
           <form onSubmit={handleSubmit} className="space-y-4">
             {formError && (
-              <div className="bg-red-50 border border-red-200 text-red-700 text-sm font-medium px-4 py-3 rounded-xl">
+              <div className="bg-red-50 border border-red-200 text-red-700 text-xs font-medium px-4 py-3 rounded-xl">
                 {formError}
               </div>
             )}
             <div>
-              <label className="block text-sm font-medium mb-1">New password</label>
-              <Input required type="password" minLength={8} value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+              <label className="block text-xs font-bold text-[#2C1810] mb-1">Nouveau mot de passe</label>
+              <Input required type="password" minLength={8} placeholder="••••••••" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Confirm new password</label>
-              <Input required type="password" minLength={8} value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+              <label className="block text-xs font-bold text-[#2C1810] mb-1">Confirmer le nouveau mot de passe</label>
+              <Input required type="password" minLength={8} placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
             </div>
-            <Button type="submit" size="lg" className="w-full mt-2 flex items-center justify-center gap-2" disabled={resetPassword.isPending}>
+            <Button type="submit" size="lg" className="w-full mt-2 bg-[#E86225] hover:bg-[#D0521B] text-white font-bold py-3.5 rounded-xl flex items-center justify-center gap-2" disabled={resetPassword.isPending}>
               {resetPassword.isPending && <Loader2 size={18} className="animate-spin" />}
-              Reset password
+              Réinitialiser le mot de passe
             </Button>
-            <p className="text-center text-sm text-gray-600 mt-6">
-              <Link to="/login" className="text-primary hover:underline font-medium">Back to log in</Link>
+            <p className="text-center text-xs text-[#52433B] mt-6">
+              <Link to="/login" className="text-[#E86225] hover:underline font-bold">Retour à la connexion</Link>
             </p>
           </form>
         </CardContent>
@@ -79,3 +79,5 @@ export function ResetPassword() {
     </div>
   );
 }
+
+export default ResetPassword;
