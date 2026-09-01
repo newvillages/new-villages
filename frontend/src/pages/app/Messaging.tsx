@@ -66,11 +66,27 @@ export function Messaging() {
 
   const messages = messagesPage?.content?.slice().reverse() ?? [];
 
+  const formatRoleName = (role?: string | null) => {
+    if (!role) return 'Membre';
+    switch (role.toUpperCase()) {
+      case 'COMMUNITY_LEADER':
+        return 'Organisateur de groupe';
+      case 'ORGANIZATION':
+        return 'Organisation partenaire';
+      case 'ADMIN':
+        return 'Administrateur';
+      case 'PREMIUM_MEMBER':
+        return 'Membre Privilège';
+      default:
+        return 'Membre';
+    }
+  };
+
   const sendCurrentMessage = () => {
     if (!draft.trim() || !selected) return;
     sendMessage.mutate(draft, {
       onSuccess: () => setDraft(''),
-      onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Could not send message.'),
+      onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Impossible d\'envoyer le message.'),
     });
   };
 
@@ -93,7 +109,7 @@ export function Messaging() {
           setComposeText('');
           setComposeOpen(false);
         },
-        onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Could not start this conversation.'),
+        onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Impossible de démarrer la conversation.'),
       }
     );
   };
@@ -102,7 +118,7 @@ export function Messaging() {
     if (!selected) return;
     blockUser.mutate(selected.otherUserId, {
       onSuccess: () => {
-        toast.info(`${selected.otherUserName ?? 'This user'} has been blocked.`);
+        toast.info(`${selected.otherUserName ?? 'Cet utilisateur'} a été bloqué.`);
         setBlockOpen(false);
       },
     });
@@ -114,7 +130,7 @@ export function Messaging() {
       { targetType: 'USER', targetId: selected.otherUserId, reason: reportReason },
       {
         onSuccess: () => {
-          toast.success('Report submitted. Our moderation team will review it.');
+          toast.success('Signalement transmis à l\'équipe de modération.');
           setReportOpen(false);
           setReportReason('');
         },
@@ -123,33 +139,33 @@ export function Messaging() {
   };
 
   return (
-    <div className="h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] flex overflow-hidden">
+    <div className="h-[calc(100vh-4rem)] md:h-[calc(100vh-4rem)] flex overflow-hidden font-body text-[#2C1810] bg-[#FDFBF7]">
       {/* Conversation List */}
       <div
         className={cn(
-          'w-full md:w-80 border-r border-gray-200 bg-white flex flex-col shrink-0',
+          'w-full md:w-80 border-r border-[#EFE6DD] bg-white flex flex-col shrink-0',
           showMobileThread ? 'hidden md:flex' : 'flex'
         )}
       >
-        <div className="p-4 border-b border-gray-100 flex items-center justify-between gap-2">
-          <h2 className="text-xl font-heading font-bold">Messages</h2>
+        <div className="p-4 border-b border-[#EFE6DD] flex items-center justify-between gap-2">
+          <h2 className="text-xl font-heading font-extrabold text-[#2C1810]">Messagerie</h2>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setComposeOpen(true)}
-            className="p-1 hover:bg-gray-50 rounded-full"
-            title="New Message"
+            className="p-1 hover:bg-[#FAF5EF] rounded-full text-[#E86225]"
+            title="Nouveau message"
           >
-            <PlusCircle size={22} className="text-primary" />
+            <PlusCircle size={22} className="text-[#E86225]" />
           </Button>
         </div>
-        <div className="p-3 border-b border-gray-50">
-          <Input placeholder="Search messages..." className="bg-gray-50 text-xs" />
+        <div className="p-3 border-b border-[#EFE6DD]">
+          <Input placeholder="Rechercher dans les messages..." className="bg-[#FAF5EF] border-[#EFE6DD] text-xs text-[#2C1810]" />
         </div>
         <div className="overflow-y-auto flex-1">
           {(conversations ?? []).length === 0 && (
-            <div className="text-center text-gray-400 text-sm p-8">
-              No conversations yet. Start one with the + button above.
+            <div className="text-center text-[#52433B]/60 text-xs p-8">
+              Aucune conversation pour l'instant. Démarrer avec le bouton + ci-dessus.
             </div>
           )}
           {(conversations ?? []).map((conv) => (
@@ -160,18 +176,18 @@ export function Messaging() {
                 setShowMobileThread(true);
               }}
               className={cn(
-                'w-full flex items-start gap-3 p-4 hover:bg-gray-50 transition-colors border-b border-gray-50 text-left',
-                selected?.id === conv.id && 'bg-primary/5 border-l-2 border-l-primary'
+                'w-full flex items-start gap-3 p-4 hover:bg-[#FAF5EF] transition-colors border-b border-[#EFE6DD] text-left cursor-pointer',
+                selected?.id === conv.id && 'bg-[#FDF0E9] border-l-4 border-l-[#E86225]'
               )}
             >
               <div className="relative shrink-0">
                 <img
                   src={conv.otherUserAvatar || `https://i.pravatar.cc/150?u=${conv.otherUserId}`}
                   alt=""
-                  className="w-12 h-12 rounded-full"
+                  className="w-12 h-12 rounded-full border border-[#EFE6DD] object-cover"
                 />
                 {conv.unreadCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#E86225] text-white text-[10px] font-bold rounded-full flex items-center justify-center">
                     {conv.unreadCount}
                   </span>
                 )}
@@ -179,18 +195,18 @@ export function Messaging() {
               <div className="flex-1 min-w-0">
                 <div className="flex justify-between items-start">
                   <div>
-                    <p className="font-semibold text-gray-900 text-sm">{conv.otherUserName ?? 'Unknown'}</p>
-                    <p className="text-xs text-primary font-medium capitalize">
-                      {(conv.otherUserRole ?? '').toLowerCase().replace('_', ' ')}
+                    <p className="font-bold text-[#2C1810] text-sm">{conv.otherUserName ?? 'Membre'}</p>
+                    <p className="text-xs text-[#E86225] font-semibold">
+                      {formatRoleName(conv.otherUserRole)}
                     </p>
                   </div>
                   {conv.lastMessageAt && (
-                    <p className="text-xs text-gray-400 shrink-0">
+                    <p className="text-[10px] text-[#52433B]/60 shrink-0">
                       {new Date(conv.lastMessageAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                     </p>
                   )}
                 </div>
-                <p className="text-xs text-gray-500 truncate mt-1">{conv.lastMessage}</p>
+                <p className="text-xs text-[#52433B] truncate mt-1">{conv.lastMessage}</p>
               </div>
             </button>
           ))}
@@ -199,54 +215,54 @@ export function Messaging() {
 
       {/* Chat Thread */}
       {selected ? (
-        <div className={cn('flex-1 flex flex-col bg-gray-50 min-w-0', !showMobileThread ? 'hidden md:flex' : 'flex')}>
-          <div className="flex items-center justify-between px-4 md:px-6 py-4 bg-white border-b border-gray-200">
+        <div className={cn('flex-1 flex flex-col bg-[#FAF5EF] min-w-0', !showMobileThread ? 'hidden md:flex' : 'flex')}>
+          <div className="flex items-center justify-between px-4 md:px-6 py-4 bg-white border-b border-[#EFE6DD]">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setShowMobileThread(false)}
-                className="md:hidden p-1.5 -ml-1 text-gray-600 hover:bg-gray-100 rounded-full transition-colors"
-                title="Back to conversation list"
+                className="md:hidden p-1.5 -ml-1 text-[#52433B] hover:bg-[#FAF5EF] rounded-full transition-colors"
+                title="Retour aux messages"
               >
                 <ArrowLeft size={20} />
               </button>
               <img
                 src={selected.otherUserAvatar || `https://i.pravatar.cc/150?u=${selected.otherUserId}`}
                 alt=""
-                className="w-10 h-10 rounded-full"
+                className="w-10 h-10 rounded-full border border-[#EFE6DD] object-cover"
               />
               <div>
-                <p className="font-semibold text-gray-900">{selected.otherUserName ?? 'Unknown'}</p>
-                <p className="text-xs text-primary font-medium capitalize">
-                  {(selected.otherUserRole ?? '').toLowerCase().replace('_', ' ')}
+                <p className="font-bold text-[#2C1810]">{selected.otherUserName ?? 'Membre'}</p>
+                <p className="text-xs text-[#E86225] font-semibold">
+                  {formatRoleName(selected.otherUserRole)}
                 </p>
               </div>
             </div>
             <div className="relative">
               <button
                 onClick={() => setShowOptions(!showOptions)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                className="p-2 hover:bg-[#FAF5EF] rounded-full transition-colors cursor-pointer"
               >
-                <MoreVertical size={20} className="text-gray-500" />
+                <MoreVertical size={20} className="text-[#52433B]" />
               </button>
               {showOptions && (
-                <div className="absolute right-0 top-10 bg-white border border-gray-200 rounded-lg shadow-lg py-1 w-40 z-10">
+                <div className="absolute right-0 top-10 bg-white border border-[#EFE6DD] rounded-xl shadow-lg py-1.5 w-48 z-10">
                   <button
                     onClick={() => {
                       setReportOpen(true);
                       setShowOptions(false);
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                    className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-red-600 hover:bg-red-50 transition-colors cursor-pointer"
                   >
-                    <Flag size={14} /> Report User
+                    <Flag size={14} /> Signaler cet utilisateur
                   </button>
                   <button
                     onClick={() => {
                       setBlockOpen(true);
                       setShowOptions(false);
                     }}
-                    className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                    className="w-full flex items-center gap-2 px-4 py-2 text-xs font-bold text-[#52433B] hover:bg-[#FAF5EF] transition-colors cursor-pointer"
                   >
-                    <Ban size={14} /> Block User
+                    <Ban size={14} /> Bloquer cet utilisateur
                   </button>
                 </div>
               )}
@@ -258,14 +274,14 @@ export function Messaging() {
               <div key={msg.id} className={cn('flex', msg.mine ? 'justify-end' : 'justify-start')}>
                 <div
                   className={cn(
-                    'max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl text-sm',
+                    'max-w-xs md:max-w-md lg:max-w-lg px-4 py-3 rounded-2xl text-sm leading-relaxed',
                     msg.mine
-                      ? 'bg-primary text-white rounded-tr-sm'
-                      : 'bg-white text-gray-900 border border-gray-200 rounded-tl-sm shadow-sm'
+                      ? 'bg-[#E86225] text-white rounded-tr-sm shadow-sm'
+                      : 'bg-white text-[#2C1810] border border-[#EFE6DD] rounded-tl-sm shadow-sm'
                   )}
                 >
                   <p>{msg.body}</p>
-                  <p className={cn('text-[10px] mt-1', msg.mine ? 'text-white/70 text-right' : 'text-gray-400')}>
+                  <p className={cn('text-[10px] mt-1', msg.mine ? 'text-white/80 text-right' : 'text-[#52433B]/60')}>
                     {new Date(msg.sentAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                   </p>
                 </div>
@@ -273,39 +289,39 @@ export function Messaging() {
             ))}
           </div>
 
-          <div className="p-4 bg-white border-t border-gray-200 mb-16 md:mb-0">
-            <div className="flex gap-3 items-end">
+          <div className="p-4 bg-white border-t border-[#EFE6DD] mb-16 md:mb-0">
+            <div className="flex gap-3 items-center">
               <div className="flex-1">
                 <Input
                   value={draft}
                   onChange={(e) => setDraft(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && sendCurrentMessage()}
-                  placeholder="Type a message..."
-                  className="rounded-full"
+                  placeholder="Écrivez votre message..."
+                  className="rounded-full bg-[#FAF5EF] border-[#EFE6DD] text-sm text-[#2C1810]"
                 />
               </div>
-              <Button onClick={sendCurrentMessage} disabled={sendMessage.isPending} className="rounded-full w-10 h-10 p-0 shrink-0">
+              <Button onClick={sendCurrentMessage} disabled={sendMessage.isPending} className="bg-[#E86225] hover:bg-[#D0521B] text-white rounded-full w-10 h-10 p-0 shrink-0 flex items-center justify-center cursor-pointer">
                 {sendMessage.isPending ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
               </Button>
             </div>
           </div>
         </div>
       ) : (
-        <div className={cn('flex-1 flex items-center justify-center text-gray-400 text-sm', !showMobileThread ? 'hidden md:flex' : 'flex')}>
-          Select a conversation, or start a new one.
+        <div className={cn('flex-1 flex items-center justify-center text-[#52433B]/60 text-sm bg-[#FAF5EF]', !showMobileThread ? 'hidden md:flex' : 'flex')}>
+          Sélectionnez une conversation ou démarrez-en une nouvelle.
         </div>
       )}
 
       {/* Compose Message Modal */}
-      <Modal isOpen={composeOpen} onClose={() => setComposeOpen(false)} title="Start New Direct Conversation">
+      <Modal isOpen={composeOpen} onClose={() => setComposeOpen(false)} title="Démarrer une nouvelle conversation">
         <form onSubmit={handleComposeSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium mb-1">Recipient Type</label>
+            <label className="block text-xs font-bold text-[#2C1810] uppercase tracking-wider mb-1.5">Destinataire</label>
             <div className="grid grid-cols-4 gap-2">
               {[
-                { id: 'LEADER' as const, label: 'Leader' },
-                { id: 'USER' as const, label: 'Member' },
-                { id: 'ORG' as const, label: 'Org' },
+                { id: 'LEADER' as const, label: 'Organisateur' },
+                { id: 'USER' as const, label: 'Membre' },
+                { id: 'ORG' as const, label: 'Partenaire' },
                 { id: 'ADMIN' as const, label: 'Admin' },
               ].map((opt) => (
                 <button
@@ -313,8 +329,8 @@ export function Messaging() {
                   type="button"
                   onClick={() => setComposeTo(opt.id)}
                   className={cn(
-                    'py-2 text-xs border rounded-lg font-semibold',
-                    composeTo === opt.id ? 'border-primary bg-primary/5 text-primary' : 'border-gray-200 text-gray-600'
+                    'py-2 text-xs border rounded-xl font-bold cursor-pointer transition-colors',
+                    composeTo === opt.id ? 'border-[#E86225] bg-[#FDF0E9] text-[#E86225]' : 'border-[#EFE6DD] text-[#52433B] hover:bg-[#FAF5EF]'
                   )}
                 >
                   {opt.label}
@@ -325,15 +341,15 @@ export function Messaging() {
 
           {composeTo === 'LEADER' && (
             <div>
-              <label className="block text-sm font-medium mb-1">Community Circle</label>
+              <label className="block text-xs font-bold text-[#2C1810] uppercase tracking-wider mb-1.5">Groupe d'arrondissement</label>
               <select
                 value={composeCommunityId}
                 onChange={(e) => setComposeCommunityId(e.target.value)}
                 required
-                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary focus:outline-none"
+                className="w-full border border-[#EFE6DD] rounded-xl p-2.5 text-sm bg-[#FAF5EF] focus:ring-[#E86225] focus:outline-none font-medium text-[#2C1810]"
               >
                 <option value="" disabled>
-                  Select a community
+                  Sélectionnez un groupe
                 </option>
                 {(myCommunities ?? []).map((c) => (
                   <option key={c.id} value={c.id}>
@@ -347,20 +363,20 @@ export function Messaging() {
           {composeTo === 'USER' && (
             <div className="space-y-3">
               {stateLocation?.targetUserId && composeTargetUserId === stateLocation.targetUserId ? (
-                <div className="bg-primary/5 border border-primary/20 rounded-xl p-3 flex items-center justify-between text-xs text-primary font-semibold">
-                  <span>Messaging Member: {stateLocation.targetUserName || 'Selected Member'}</span>
+                <div className="bg-[#FDF0E9] border border-[#E86225]/30 rounded-xl p-3 flex items-center justify-between text-xs text-[#E86225] font-bold">
+                  <span>Membre sélectionné : {stateLocation.targetUserName || 'Membre du groupe'}</span>
                   <button
                     type="button"
                     onClick={() => setComposeTargetUserId('')}
-                    className="underline text-gray-500 hover:text-gray-700"
+                    className="underline text-[#52433B] hover:text-[#2C1810]"
                   >
-                    Select Different Member
+                    Changer de membre
                   </button>
                 </div>
               ) : (
                 <>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Select Community Circle</label>
+                    <label className="block text-xs font-bold text-[#2C1810] uppercase tracking-wider mb-1.5">Groupe d'arrondissement</label>
                     <select
                       value={composeCommunityId}
                       onChange={(e) => {
@@ -368,10 +384,10 @@ export function Messaging() {
                         setComposeTargetUserId('');
                       }}
                       required={!composeTargetUserId}
-                      className="w-full border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-primary focus:outline-none"
+                      className="w-full border border-[#EFE6DD] rounded-xl p-2.5 text-sm bg-[#FAF5EF] focus:ring-[#E86225] focus:outline-none text-[#2C1810]"
                     >
                       <option value="" disabled>
-                        Choose a community to view member roster...
+                        Choisissez un groupe pour voir la liste des membres...
                       </option>
                       {(myCommunities ?? []).map((c) => (
                         <option key={c.id} value={c.id}>
@@ -383,27 +399,26 @@ export function Messaging() {
 
                   {composeCommunityId && (
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">Choose Member from Roster</label>
+                      <label className="block text-xs font-bold text-[#2C1810] uppercase tracking-wider mb-1.5">Membre de la communauté</label>
                       {rosterLoading ? (
-                        <p className="text-xs text-gray-400 py-2">Loading member roster...</p>
+                        <p className="text-xs text-gray-400 py-2">Chargement des membres...</p>
                       ) : (
                         <select
                           value={composeTargetUserId}
                           onChange={(e) => setComposeTargetUserId(e.target.value)}
                           required
-                          className="w-full border border-gray-300 rounded-xl p-2.5 text-sm focus:ring-primary focus:outline-none"
+                          className="w-full border border-[#EFE6DD] rounded-xl p-2.5 text-sm bg-[#FAF5EF] focus:ring-[#E86225] focus:outline-none text-[#2C1810]"
                         >
                           <option value="" disabled>
-                            Select a member to start conversation...
+                            Sélectionnez un membre...
                           </option>
                           {(rosterMembers ?? [])
                             .filter((m) => m.userId !== currentUser?.id)
                             .map((m) => (
                               <option key={m.userId} value={m.userId}>
-                                {m.fullName || 'Member'}
+                                {m.fullName || 'Membre'}
                                 {m.city ? ` — ${m.city}` : ''}
                                 {m.email ? ` (${m.email})` : ''}
-                                {` [${m.roleInCommunity.toLowerCase()}]`}
                               </option>
                             ))}
                         </select>
@@ -417,15 +432,15 @@ export function Messaging() {
 
           {composeTo === 'ORG' && (
             <div>
-              <label className="block text-sm font-medium mb-1">Organization</label>
+              <label className="block text-xs font-bold text-[#2C1810] uppercase tracking-wider mb-1.5">Organisation partenaire</label>
               <select
                 value={composeOrgId}
                 onChange={(e) => setComposeOrgId(e.target.value)}
                 required
-                className="w-full border border-gray-300 rounded-md p-2 text-sm focus:ring-primary focus:outline-none"
+                className="w-full border border-[#EFE6DD] rounded-xl p-2.5 text-sm bg-[#FAF5EF] focus:ring-[#E86225] focus:outline-none text-[#2C1810]"
               >
                 <option value="" disabled>
-                  Select an organization
+                  Sélectionnez une organisation
                 </option>
                 {(organizations ?? []).map((o) => (
                   <option key={o.id} value={o.id}>
@@ -437,59 +452,58 @@ export function Messaging() {
           )}
 
           <div>
-            <label className="block text-sm font-medium mb-1">Initial Message</label>
+            <label className="block text-xs font-bold text-[#2C1810] uppercase tracking-wider mb-1.5">Premier message</label>
             <textarea
               value={composeText}
               onChange={(e) => setComposeText(e.target.value)}
-              className="w-full border border-gray-300 rounded-md p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary"
+              className="w-full border border-[#EFE6DD] rounded-xl p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#E86225] bg-[#FAF5EF] text-[#2C1810]"
               rows={4}
-              placeholder="Write your initial private message..."
+              placeholder="Rédigez votre message privé..."
               required
             />
           </div>
 
-          <div className="flex gap-2">
-            <Button type="button" variant="ghost" className="flex-1" onClick={() => setComposeOpen(false)}>
-              Cancel
+          <div className="flex gap-2 pt-2">
+            <Button type="button" variant="ghost" className="flex-1 rounded-xl" onClick={() => setComposeOpen(false)}>
+              Annuler
             </Button>
-            <Button type="submit" className="flex-1" disabled={startConversation.isPending}>
-              {startConversation.isPending ? 'Sending…' : 'Send Message'}
+            <Button type="submit" className="flex-1 bg-[#E86225] hover:bg-[#D0521B] text-white font-bold rounded-xl" disabled={startConversation.isPending}>
+              {startConversation.isPending ? 'Envoi…' : 'Envoyer le message'}
             </Button>
           </div>
         </form>
       </Modal>
 
       {/* Report Modal */}
-      <Modal isOpen={reportOpen} onClose={() => setReportOpen(false)} title="Report User">
+      <Modal isOpen={reportOpen} onClose={() => setReportOpen(false)} title="Signaler un utilisateur">
         <div className="space-y-4">
-          <p className="text-gray-600 text-sm">Please select a reason and provide details. Our moderation team will review your report.</p>
+          <p className="text-[#52433B] text-sm">Veuillez sélectionner un motif. Notre équipe de modération examinera votre signalement.</p>
           <div className="space-y-2">
-            {['Harassment or bullying', 'Spam or misleading content', 'Hate speech', 'Inappropriate content', 'Other policy violation'].map((r) => (
-              <label key={r} className="flex items-center gap-3 p-3 border rounded-lg cursor-pointer hover:bg-gray-50">
-                <input type="radio" name="reason" value={r} onChange={(e) => setReportReason(e.target.value)} className="text-primary" />
-                <span className="text-sm">{r}</span>
+            {['Harcèlement ou comportement irrespectueux', 'Spam ou contenu indésirable', 'Propos haineux', 'Contenu inapproprié', 'Autre infraction aux règles'].map((r) => (
+              <label key={r} className="flex items-center gap-3 p-3 border border-[#EFE6DD] rounded-xl cursor-pointer hover:bg-[#FAF5EF]">
+                <input type="radio" name="reason" value={r} onChange={(e) => setReportReason(e.target.value)} className="text-[#E86225] focus:ring-[#E86225]" />
+                <span className="text-xs font-medium text-[#2C1810]">{r}</span>
               </label>
             ))}
           </div>
-          <Button className="w-full" variant="danger" onClick={handleReport} disabled={!reportReason || submitReport.isPending}>
-            {submitReport.isPending ? 'Submitting…' : 'Submit Report'}
+          <Button className="w-full bg-red-600 hover:bg-red-700 text-white font-bold rounded-xl" onClick={handleReport} disabled={!reportReason || submitReport.isPending}>
+            {submitReport.isPending ? 'Transmission…' : 'Soumettre le signalement'}
           </Button>
         </div>
       </Modal>
 
       {/* Block Modal */}
-      <Modal isOpen={blockOpen} onClose={() => setBlockOpen(false)} title="Block User">
+      <Modal isOpen={blockOpen} onClose={() => setBlockOpen(false)} title="Bloquer un utilisateur">
         <div className="space-y-4">
-          <p className="text-gray-600">
-            Are you sure you want to block <strong>{selected?.otherUserName}</strong>? They will no longer be able to message you or see your
-            profile.
+          <p className="text-[#52433B] text-sm">
+            Êtes-vous sûr de vouloir bloquer <strong>{selected?.otherUserName}</strong> ? Cette personne ne pourra plus vous envoyer de messages.
           </p>
           <div className="flex gap-3">
-            <Button variant="outline" className="flex-1" onClick={() => setBlockOpen(false)}>
-              Cancel
+            <Button variant="outline" className="flex-1 rounded-xl" onClick={() => setBlockOpen(false)}>
+              Annuler
             </Button>
-            <Button variant="danger" className="flex-1" onClick={handleBlock} disabled={blockUser.isPending}>
-              Block
+            <Button variant="danger" className="flex-1 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold" onClick={handleBlock} disabled={blockUser.isPending}>
+              Bloquer
             </Button>
           </div>
         </div>
