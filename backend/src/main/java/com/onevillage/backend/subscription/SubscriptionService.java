@@ -26,7 +26,7 @@ public class SubscriptionService {
     private static final List<PlanResponse> PLANS = List.of(
             new PlanResponse("FREE", "Member", "Free", "", "Join and connect",
                     List.of("Unlimited communities", "RSVP to events", "Direct messages", "Notifications")),
-            new PlanResponse("COMMUNITY_LEADER", "Community Leader", "$10", "/month", "Most popular",
+            new PlanResponse("COMMUNITY_LEADER", "Community Leader", "$20", "/month", "Most popular",
                     List.of("All Member features", "Create & manage a community", "Publish announcements & events", "Basic analytics")),
             new PlanResponse("ORGANIZATION", "Organization", "$20", "/month", "For businesses & nonprofits",
                     List.of("All Leader features", "Verified org page", "Contact communities directly", "Team seats"))
@@ -53,8 +53,7 @@ public class SubscriptionService {
 
     public BigDecimal getRequiredPlanAmountCAD(SubscriptionPlan plan) {
         return switch (plan) {
-            case COMMUNITY_LEADER -> new BigDecimal("10.00");
-            case ORGANIZATION -> new BigDecimal("20.00");
+            case COMMUNITY_LEADER, ORGANIZATION -> new BigDecimal("20.00");
             default -> BigDecimal.ZERO;
         };
     }

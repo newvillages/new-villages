@@ -419,7 +419,7 @@ export function Landing() {
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#E86225]">Sorties mensuelles</span>
                 <h3 className="text-2xl font-bold text-[#2C1810] mt-1 mb-2">Membre Privilège</h3>
                 <div className="flex items-end gap-1 mb-6">
-                  <span className="text-4xl font-extrabold text-[#2C1810]">10 $</span>
+                  <span className="text-4xl font-extrabold text-[#2C1810]">20 $</span>
                   <span className="text-xs text-[#52433B] mb-1">/mois</span>
                 </div>
                 <ul className="space-y-3 mb-8 text-xs text-[#52433B]">

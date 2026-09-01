@@ -29,7 +29,8 @@ export function Subscription() {
     {
       id: 'leader',
       label: 'Membre Privilège',
-      price: '10 $',
+      price: '20 $',
+      priceRaw: 20,
       period: '/mois',
       tag: 'Recommandé',
       features: ['Tous les avantages Membre', 'Accès à 1 sortie au restaurant par mois', 'Réservation prioritaire des places', 'Messagerie du groupe'],
