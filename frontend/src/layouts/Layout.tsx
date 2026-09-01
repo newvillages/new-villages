@@ -83,7 +83,7 @@ export function Layout() {
       ? { label: 'Tableau de bord', icon: Home, href: '/dashboard' }
       : { label: 'Accueil', icon: Home, href: '/' },
     { label: 'Groupes', icon: Users, href: '/communities' },
-    { label: 'Prochaines sorties', icon: Calendar, href: '/events' },
+    { label: 'Sorties', icon: Calendar, href: '/events' },
     ...(!isLeaderOrOrgOrAdmin ? [{ label: 'Abonnements', icon: Sparkles, href: '/pricing' }] : []),
     ...(!isAuthenticated ? [{ label: 'Contact', icon: Mail, href: '/contact' }] : []),
     ...(isAuthenticated ? [{ label: 'Messagerie', icon: MessageSquare, href: '/messages' }] : []),
@@ -123,7 +123,7 @@ export function Layout() {
 
   const Logo = () => (
     <Link to="/" className="flex items-center shrink-0">
-      <img src="/logo-bouffe-amitie.png" alt="Bouffe &amp; Amitié" className="h-10 sm:h-12 lg:h-14 w-auto object-contain" />
+      <img src="/logo-bouffe-amitie.png" alt="Bouffe &amp; Amitié" className="h-8 sm:h-10 lg:h-12 w-auto object-contain" />
     </Link>
   );
 
@@ -144,12 +144,12 @@ export function Layout() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex flex-col text-[#2C1810] w-full overflow-x-hidden font-body">
       {/* Desktop Top Navigation Bar */}
-      <header className="hidden md:flex h-20 bg-white/95 backdrop-blur-md border-b border-[#EFE6DD] items-center justify-between px-3 lg:px-6 xl:px-8 sticky top-0 z-40 shadow-xs w-full">
-        <div className="flex items-center gap-2 lg:gap-4 xl:gap-5 min-w-0 flex-1">
+      <header className="hidden md:flex h-16 lg:h-20 bg-white/95 backdrop-blur-md border-b border-[#EFE6DD] items-center justify-between px-2.5 lg:px-5 xl:px-8 sticky top-0 z-40 shadow-xs w-full">
+        <div className="flex items-center gap-1.5 md:gap-2 lg:gap-3 xl:gap-5 min-w-0">
           <Logo />
 
           {/* Main Navigation Links */}
-          <nav className="flex items-center gap-1 xl:gap-2 overflow-x-auto scrollbar-none py-1">
+          <nav className="flex items-center gap-0.5 md:gap-1 lg:gap-1.5 shrink-0">
             {mainNavItems.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
               return (
@@ -157,7 +157,7 @@ export function Layout() {
                   key={item.href}
                   to={item.href}
                   className={cn(
-                    'px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-full font-extrabold transition-all duration-200 text-xs xl:text-sm whitespace-nowrap shrink-0',
+                    'px-2 lg:px-3 py-1.5 rounded-full font-bold transition-all duration-200 text-xs xl:text-sm whitespace-nowrap shrink-0',
                     isActive ? 'bg-[#1E4D2B] text-white shadow-sm' : 'text-[#52433B] hover:bg-[#E8F3EB] hover:text-[#1E4D2B]'
                   )}
                 >
@@ -168,14 +168,14 @@ export function Layout() {
           </nav>
         </div>
 
-        <div className="flex items-center gap-2 lg:gap-3 shrink-0 ml-2">
+        <div className="flex items-center gap-1.5 lg:gap-2.5 shrink-0 ml-1">
           {/* Global Search */}
-          <div className="flex items-center bg-[#FAF5EF] rounded-full px-3 py-1.5 lg:px-3.5 lg:py-2 w-28 lg:w-36 xl:w-48 transition-all focus-within:w-40 lg:focus-within:w-52 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#E86225]/20 focus-within:shadow-sm border border-[#EFE6DD] focus-within:border-[#E86225] shrink-0">
-            <Search size={15} className="text-slate-400 mr-1.5 shrink-0" />
+          <div className="flex items-center bg-[#FAF5EF] rounded-full px-2.5 py-1.5 lg:px-3.5 lg:py-2 w-24 md:w-28 lg:w-36 xl:w-44 transition-all focus-within:w-36 lg:focus-within:w-48 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#E86225]/20 focus-within:shadow-sm border border-[#EFE6DD] focus-within:border-[#E86225] shrink-0">
+            <Search size={14} className="text-slate-400 mr-1 shrink-0" />
             <input
               type="text"
               placeholder="Rechercher..."
-              className="bg-transparent border-none focus:outline-none text-xs lg:text-sm w-full text-[#2C1810] placeholder-slate-400 font-medium"
+              className="bg-transparent border-none focus:outline-none text-xs w-full text-[#2C1810] placeholder-slate-400 font-medium"
             />
           </div>
 
