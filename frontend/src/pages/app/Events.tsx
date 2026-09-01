@@ -67,29 +67,29 @@ export function Events() {
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-[#F8FAFC] pb-24 text-[#102A43]">
+      <div className="min-h-screen bg-[#FDFBF7] pb-24 text-[#2C1810] font-body">
         {/* Hero Section */}
-        <section className="bg-gradient-to-b from-[#07192C] via-[#0A2540] to-[#0F3054] text-white py-10 md:py-20 px-4 sm:px-6 md:px-12 mb-8 relative overflow-hidden">
+        <section className="bg-gradient-to-r from-[#133820] via-[#164025] to-[#1E4D2B] text-white py-10 md:py-20 px-4 sm:px-6 md:px-12 mb-8 relative overflow-hidden">
           <div className="max-w-[1600px] mx-auto flex flex-col md:flex-row items-start md:items-center justify-between gap-8 relative z-10">
             <div className="max-w-2xl space-y-3">
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold text-slate-300 border border-white/10">
-                <Sparkles size={14} className="text-[#38BDF8]" />
-                <span>Community Events Hub</span>
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-md px-3.5 py-1.5 rounded-full text-xs font-semibold text-emerald-100 border border-white/15">
+                <Sparkles size={14} className="text-[#E86225]" />
+                <span>Espace sorties &amp; rencontres</span>
               </div>
               <h1 className="text-3xl md:text-5xl font-heading font-extrabold text-white tracking-tight">
-                Discover & Join Events
+                Découvrez &amp; rejoignez des sorties
               </h1>
-              <p className="text-slate-300 text-base md:text-lg font-light leading-relaxed">
-                Connect locally, learn new skills, and participate in gatherings hosted by communities on NewVillages.
+              <p className="text-emerald-100/90 text-base md:text-lg font-light leading-relaxed">
+                Rencontrez des personnes près de chez vous et participez aux sorties au restaurant organisées par nos groupes.
               </p>
             </div>
 
             {canCreateEvent && (
               <div className="shrink-0">
                 <Link to="/create-event">
-                  <Button className="bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-bold px-6 py-6 rounded-xl shadow-lg flex items-center gap-2">
+                  <Button className="bg-[#E86225] hover:bg-[#D0521B] text-white font-bold px-6 py-6 rounded-xl shadow-lg flex items-center gap-2">
                     <Plus size={20} />
-                    <span>Create New Event</span>
+                    <span>Proposer une sortie</span>
                   </Button>
                 </Link>
               </div>
@@ -100,21 +100,21 @@ export function Events() {
         {/* Content Container */}
         <div className="max-w-[1600px] mx-auto px-4 sm:px-6 md:px-12 space-y-8">
           {/* Main Navigation Tabs */}
-          <div className="flex items-center justify-between border-b border-[#E2E8F0]">
+          <div className="flex items-center justify-between border-b border-[#EFE6DD]">
             <div className="flex space-x-2">
               {[
-                { id: 'all', label: 'All Events' },
-                { id: 'upcoming', label: 'Upcoming' },
-                ...(canCreateEvent ? [{ id: 'my', label: 'My Created Events' }] : []),
+                { id: 'all', label: 'Toutes les sorties' },
+                { id: 'upcoming', label: 'À venir' },
+                ...(canCreateEvent ? [{ id: 'my', label: 'Mes sorties créées' }] : []),
               ].map((tab) => (
                 <button
                   key={tab.id}
                   onClick={() => setTimeTab(tab.id as typeof timeTab)}
                   className={cn(
-                    'px-5 py-3.5 text-xs font-bold transition-all border-b-2 font-heading',
+                    'px-5 py-3.5 text-xs font-bold transition-all border-b-2 font-heading cursor-pointer',
                     timeTab === tab.id
-                      ? 'border-[#1D4ED8] text-[#1D4ED8]'
-                      : 'border-transparent text-[#486581] hover:text-[#102A43]'
+                      ? 'border-[#E86225] text-[#E86225]'
+                      : 'border-transparent text-[#52433B] hover:text-[#2C1810]'
                   )}
                 >
                   {tab.label}
@@ -124,15 +124,15 @@ export function Events() {
           </div>
 
           {/* Search & Event Filters */}
-          <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#E2E8F0] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
+          <div className="bg-white p-4 rounded-2xl shadow-sm border border-[#EFE6DD] flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
             <div className="relative flex-1">
               <Search size={18} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
               <input
                 type="text"
-                placeholder="Search by event title, location, or host community..."
+                placeholder="Rechercher par titre de sortie, lieu ou groupe..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-[#F8FAFC] border border-[#E2E8F0] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:bg-white transition-all text-[#102A43]"
+                className="w-full pl-11 pr-4 py-3 bg-[#FAF5EF] border border-[#EFE6DD] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#E86225] focus:bg-white transition-all text-[#2C1810]"
               />
               {search && (
                 <button
@@ -148,18 +148,18 @@ export function Events() {
             <div className="flex items-center gap-2 overflow-x-auto pb-2 md:pb-0 scrollbar-none">
               <Filter size={16} className="text-slate-400 shrink-0 hidden sm:block" />
               {[
-                { id: 'all', label: 'All Formats' },
-                { id: 'in-person', label: 'In-Person' },
-                { id: 'online', label: 'Online Webinars' }
+                { id: 'all', label: 'Tous les formats' },
+                { id: 'in-person', label: 'En personne' },
+                { id: 'online', label: 'En ligne' }
               ].map((type) => (
                 <button
                   key={type.id}
                   onClick={() => setFilterType(type.id as typeof filterType)}
                   className={cn(
-                    "px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all",
+                    "px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all cursor-pointer",
                     filterType === type.id
-                      ? "bg-[#1D4ED8] text-white shadow-sm"
-                      : "bg-slate-100 text-[#486581] hover:bg-slate-200"
+                      ? "bg-[#1E4D2B] text-white shadow-sm"
+                      : "bg-[#FAF5EF] text-[#52433B] hover:bg-[#EFE6DD]"
                   )}
                 >
                   {type.label}
@@ -184,29 +184,28 @@ export function Events() {
 
                 return (
                   <Link to={`/events/${event.id}`} key={event.id} className="block group h-full">
-                    <Card className="group relative flex flex-col h-full bg-white rounded-3xl overflow-hidden border border-slate-200/80 shadow-[0_4px_25px_-5px_rgba(15,23,42,0.06)] hover:shadow-[0_25px_50px_-12px_rgba(29,78,216,0.20)] hover:border-[#1D4ED8]/50 hover:-translate-y-2 transition-all duration-300 ease-out">
+                    <Card className="group relative flex flex-col h-full bg-white rounded-3xl overflow-hidden border border-[#EFE6DD] shadow-[0_4px_25px_-5px_rgba(44,24,16,0.06)] hover:shadow-[0_25px_50px_-12px_rgba(232,98,37,0.20)] hover:border-[#E86225]/50 hover:-translate-y-2 transition-all duration-300 ease-out">
                       {/* Header Graphic with Ambient Lighting */}
-                      <div className="h-32 bg-gradient-to-r from-[#1D4ED8] via-[#2563EB] to-[#1E40AF] relative p-5 flex justify-between items-start overflow-hidden">
-                        <div className="absolute -right-8 -top-8 w-36 h-36 bg-white/10 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
-                        <div className="absolute left-1/3 -bottom-10 w-28 h-28 bg-blue-400/20 rounded-full blur-xl pointer-events-none" />
+                      <div className="h-32 bg-gradient-to-r from-[#133820] via-[#164025] to-[#1E4D2B] relative p-5 flex justify-between items-start overflow-hidden">
+                        <div className="absolute -right-8 -top-8 w-36 h-36 bg-[#E86225]/20 rounded-full blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500" />
 
                         <span className="relative z-10 bg-white/20 backdrop-blur-md text-white text-[10px] font-extrabold px-3.5 py-1.5 rounded-full uppercase tracking-wider border border-white/25 shadow-sm">
-                          {event.communityName ?? event.organizationName ?? 'New Villages'}
+                          {event.communityName ?? event.organizationName ?? 'Bouffe & Amitié'}
                         </span>
 
                         <div className="relative z-10 flex items-center gap-1.5">
                           {isMine && (
                             <span className="bg-white/20 backdrop-blur-md text-white text-[10px] font-extrabold px-3 py-1.5 rounded-full flex items-center gap-1 border border-white/25">
-                              <UserCheck size={11} /> Created by You
+                              <UserCheck size={11} /> Créé par vous
                             </span>
                           )}
                           {event.online ? (
-                            <span className="flex items-center gap-1 bg-emerald-500/90 text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-sm">
-                              <Video size={12} /> Online
+                            <span className="flex items-center gap-1 bg-[#E86225] text-white text-[10px] font-black px-3 py-1.5 rounded-full shadow-sm">
+                              <Video size={12} /> En ligne
                             </span>
                           ) : (
                             <span className="flex items-center gap-1 bg-white/20 backdrop-blur-md text-white text-[10px] font-extrabold px-3 py-1.5 rounded-full border border-white/25">
-                              <MapPin size={12} /> In-Person
+                              <MapPin size={12} /> En personne
                             </span>
                           )}
                         </div>
@@ -214,27 +213,27 @@ export function Events() {
 
                       <CardContent className="p-6 flex-1 flex flex-col relative -mt-6 bg-white rounded-t-3xl justify-between">
                         <div className="flex items-center justify-between mb-4">
-                          <div className="w-14 h-14 bg-gradient-to-br from-blue-50 to-indigo-50/80 rounded-2xl shadow-md border border-blue-100 flex items-center justify-center text-[#1D4ED8] group-hover:scale-105 transition-transform duration-300">
+                          <div className="w-14 h-14 bg-[#FAF5EF] rounded-2xl shadow-md border border-[#EFE6DD] flex items-center justify-center text-[#E86225] group-hover:scale-105 transition-transform duration-300">
                             <Calendar size={24} />
                           </div>
 
                           {isUpcoming ? (
-                            <span className="text-[11px] font-extrabold text-emerald-700 bg-emerald-50 px-3 py-1 rounded-full border border-emerald-200/80 flex items-center gap-1 shadow-xs">
-                              <Clock size={12} /> Upcoming
+                            <span className="text-[11px] font-extrabold text-[#1E4D2B] bg-[#E8F3EB] px-3 py-1 rounded-full border border-[#1E4D2B]/20 flex items-center gap-1 shadow-xs">
+                              <Clock size={12} /> À venir
                             </span>
                           ) : (
                             <span className="text-[11px] font-extrabold text-slate-500 bg-slate-100 px-3 py-1 rounded-full border border-slate-200">
-                              Past Event
+                              Sortie passée
                             </span>
                           )}
                         </div>
 
-                        <h3 className="font-heading font-extrabold text-[#0F172A] text-xl mb-3 leading-snug group-hover:text-[#1D4ED8] transition-colors line-clamp-2">
+                        <h3 className="font-heading font-extrabold text-[#2C1810] text-xl mb-3 leading-snug group-hover:text-[#E86225] transition-colors line-clamp-2">
                           {event.title}
                         </h3>
 
-                        <div className="space-y-2 mt-auto mb-6 text-xs sm:text-sm text-slate-600 font-medium">
-                          <div className="flex items-center gap-2 text-[#1D4ED8] font-bold">
+                        <div className="space-y-2 mt-auto mb-6 text-xs sm:text-sm text-[#52433B] font-medium">
+                          <div className="flex items-center gap-2 text-[#E86225] font-bold">
                             <Calendar size={15} className="shrink-0" />
                             <span>
                               {formatEventDate(event.startAt)} &bull; {formatEventTime(event.startAt)}
@@ -242,21 +241,21 @@ export function Events() {
                           </div>
                           <div className="flex items-center gap-2 text-slate-500">
                             {event.online ? (
-                              <Video size={15} className="text-emerald-600 shrink-0" />
+                              <Video size={15} className="text-[#1E4D2B] shrink-0" />
                             ) : (
                               <MapPin size={15} className="text-slate-400 shrink-0" />
                             )}
-                            <span className="truncate">{event.online ? 'Online Event Link Provided' : event.location}</span>
+                            <span className="truncate">{event.online ? 'Lien de la rencontre fourni' : event.location}</span>
                           </div>
                         </div>
 
-                        <div className="flex items-center justify-between pt-4 border-t border-slate-100 mt-auto">
-                          <div className="flex items-center gap-1.5 text-xs font-bold text-slate-600 bg-slate-50 px-3 py-1.5 rounded-xl border border-slate-100">
-                            <Users size={14} className="text-[#1D4ED8]" />
-                            <span>{event.goingCount} attending</span>
+                        <div className="flex items-center justify-between pt-4 border-t border-[#EFE6DD] mt-auto">
+                          <div className="flex items-center gap-1.5 text-xs font-bold text-[#52433B] bg-[#FAF5EF] px-3 py-1.5 rounded-xl border border-[#EFE6DD]">
+                            <Users size={14} className="text-[#1E4D2B]" />
+                            <span>{event.goingCount} participant(s)</span>
                           </div>
-                          <span className="inline-flex items-center gap-1 bg-[#1D4ED8]/10 group-hover:bg-[#1D4ED8] text-[#1D4ED8] group-hover:text-white font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all duration-300 shadow-xs">
-                            <span>Event Details</span>
+                          <span className="inline-flex items-center gap-1 bg-[#FDF0E9] group-hover:bg-[#E86225] text-[#E86225] group-hover:text-white font-extrabold text-xs px-3.5 py-2 rounded-xl transition-all duration-300 shadow-xs">
+                            <span>Détails</span>
                             <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
                           </span>
                         </div>
@@ -267,16 +266,16 @@ export function Events() {
               })}
             </div>
           ) : (
-            <div className="text-center py-24 bg-white rounded-3xl border border-[#E2E8F0] max-w-xl mx-auto">
+            <div className="text-center py-24 bg-white rounded-3xl border border-[#EFE6DD] max-w-xl mx-auto">
               <Calendar size={48} className="mx-auto text-slate-300 mb-4" />
-              <h3 className="text-xl font-bold text-[#102A43] mb-2">No events found</h3>
-              <p className="text-xs text-[#486581] mb-4">
-                Try a different search query or change your location / filter options.
+              <h3 className="text-xl font-bold text-[#2C1810] mb-2">Aucune sortie trouvée</h3>
+              <p className="text-xs text-[#52433B] mb-4">
+                Essayez une autre recherche ou modifiez vos filtres de sélection.
               </p>
               {canCreateEvent && (
                 <Link to="/create-event">
-                  <Button className="bg-[#1D4ED8] hover:bg-[#1E40AF] text-white font-bold rounded-xl text-xs px-5 py-2.5">
-                    + Create Your Event Now
+                  <Button className="bg-[#E86225] hover:bg-[#D0521B] text-white font-bold rounded-xl text-xs px-5 py-2.5">
+                    + Proposer une sortie dès maintenant
                   </Button>
                 </Link>
               )}
@@ -295,7 +294,7 @@ export function EventDetail() {
 
   if (isLoading || !event) {
     return (
-      <div className="min-h-screen bg-[#F8FAFC] px-6 py-12">
+      <div className="min-h-screen bg-[#FDFBF7] px-6 py-12">
         <div className="max-w-4xl mx-auto">
           <CardSkeleton />
         </div>
@@ -308,41 +307,41 @@ export function EventDetail() {
   const handleRsvpToggle = () => {
     rsvpMutation.mutate(attending ? 'DECLINED' : 'GOING', {
       onSuccess: () =>
-        toast.success(attending ? 'You have cancelled your RSVP.' : '🎉 You have registered for this event!'),
-      onError: (err) => toast.info(err.message || 'Could not update your RSVP.'),
+        toast.success(attending ? 'Vous avez annulé votre inscription.' : '🎉 Vous êtes inscrit(e) à cette sortie !'),
+      onError: (err) => toast.info(err.message || 'Impossible de mettre à jour votre inscription.'),
     });
   };
 
   return (
     <PageTransition>
-      <div className="min-h-screen bg-[#F8FAFC] pb-24 text-[#102A43]">
+      <div className="min-h-screen bg-[#FDFBF7] pb-24 text-[#2C1810] font-body">
         {/* Detail Hero Banner */}
-        <section className="bg-gradient-to-b from-[#07192C] to-[#0A2540] text-white py-12 px-6 mb-8">
+        <section className="bg-gradient-to-r from-[#133820] via-[#164025] to-[#1E4D2B] text-white py-12 px-6 mb-8">
           <div className="max-w-4xl mx-auto">
             <Link
               to="/events"
-              className="inline-flex items-center gap-2 text-slate-300 hover:text-white font-semibold mb-8 transition-colors text-sm"
+              className="inline-flex items-center gap-2 text-emerald-100 hover:text-white font-semibold mb-8 transition-colors text-sm"
             >
-              <ArrowLeft size={16} /> Back to Events Calendar
+              <ArrowLeft size={16} /> Retour au calendrier des sorties
             </Link>
-            <div className="inline-flex items-center bg-white/10 text-white text-xs font-bold px-3.5 py-1.5 rounded-full uppercase tracking-wider mb-4 border border-white/10">
-              {event.communityName ?? event.organizationName ?? 'New Villages Community Event'}
+            <div className="inline-flex items-center bg-white/10 text-white text-xs font-bold px-3.5 py-1.5 rounded-full uppercase tracking-wider mb-4 border border-white/15">
+              {event.communityName ?? event.organizationName ?? 'Sortie Bouffe & Amitié'}
             </div>
             <h1 className="text-3xl md:text-5xl font-heading font-extrabold mb-6 leading-tight text-white">
               {event.title}
             </h1>
-            <div className="flex flex-wrap gap-6 text-sm font-semibold text-slate-200">
+            <div className="flex flex-wrap gap-6 text-sm font-semibold text-emerald-100">
               <span className="flex items-center gap-2">
-                <Calendar size={18} className="text-[#38BDF8]" />
+                <Calendar size={18} className="text-[#E86225]" />
                 {formatEventDate(event.startAt)} &bull; {formatEventTime(event.startAt)}
               </span>
               <span className="flex items-center gap-2">
-                <MapPin size={18} className="text-[#38BDF8]" />
-                {event.online ? 'Online Event' : event.location}
+                <MapPin size={18} className="text-[#E86225]" />
+                {event.online ? 'Rencontre en ligne' : event.location}
               </span>
               <span className="flex items-center gap-2">
-                <Users size={18} className="text-[#38BDF8]" />
-                {event.goingCount} attending
+                <Users size={18} className="text-[#E86225]" />
+                {event.goingCount} participant(s)
               </span>
             </div>
           </div>
@@ -351,25 +350,25 @@ export function EventDetail() {
         {/* Content & Action Box */}
         <div className="max-w-4xl mx-auto px-6 grid md:grid-cols-3 gap-8">
           <div className="md:col-span-2">
-            <Card className="bg-white rounded-3xl border-[#E2E8F0] shadow-sm p-6 md:p-8 space-y-6">
+            <Card className="bg-white rounded-3xl border-[#EFE6DD] shadow-sm p-6 md:p-8 space-y-6">
               <div>
-                <h2 className="text-2xl font-bold text-[#102A43] mb-4">About this Event</h2>
-                <div className="prose text-[#486581] leading-relaxed max-w-none space-y-4">
-                  <p>{event.description || 'No additional details provided by the event organizer.'}</p>
+                <h2 className="text-2xl font-bold text-[#2C1810] mb-4">À propos de cette sortie</h2>
+                <div className="prose text-[#52433B] leading-relaxed max-w-none space-y-4">
+                  <p>{event.description || 'Aucun détail supplémentaire fourni par l\'organisateur.'}</p>
 
                   {event.online && event.onlineLink && (
-                    <div className="bg-[#F8FAFC] p-4 rounded-2xl border border-blue-100 mt-6 flex items-center justify-between gap-4">
+                    <div className="bg-[#FAF5EF] p-4 rounded-2xl border border-[#EFE6DD] mt-6 flex items-center justify-between gap-4">
                       <div>
-                        <h4 className="font-bold text-sm text-[#102A43]">Online Event Access Link</h4>
-                        <p className="text-xs text-[#486581] truncate max-w-xs">{event.onlineLink}</p>
+                        <h4 className="font-bold text-sm text-[#2C1810]">Lien d'accès à la rencontre en ligne</h4>
+                        <p className="text-xs text-[#52433B] truncate max-w-xs">{event.onlineLink}</p>
                       </div>
                       <a
                         href={event.onlineLink}
                         target="_blank"
                         rel="noreferrer"
-                        className="inline-flex items-center gap-1.5 bg-[#1D4ED8] text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-[#1E40AF] transition-colors shrink-0"
+                        className="inline-flex items-center gap-1.5 bg-[#E86225] text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-[#D0521B] transition-colors shrink-0"
                       >
-                        <span>Join Call</span>
+                        <span>Rejoindre</span>
                         <ExternalLink size={14} />
                       </a>
                     </div>
@@ -381,18 +380,18 @@ export function EventDetail() {
 
           {/* RSVP Sticky Card */}
           <div>
-            <Card className="bg-white rounded-3xl border-[#E2E8F0] shadow-sm sticky top-24 p-6 space-y-5">
+            <Card className="bg-white rounded-3xl border-[#EFE6DD] shadow-sm sticky top-24 p-6 space-y-5">
               <div>
-                <h3 className="font-bold text-xl text-[#102A43] mb-1">Registration & RSVP</h3>
-                <p className="text-xs text-[#486581]">Confirm your attendance for this community event.</p>
+                <h3 className="font-bold text-xl text-[#2C1810] mb-1">Inscription &amp; Réservation</h3>
+                <p className="text-xs text-[#52433B]">Confirmez votre présence pour cette sortie communautaire.</p>
               </div>
 
               <Button
                 className={cn(
-                  "w-full py-6 rounded-2xl font-extrabold text-base transition-all shadow-md flex items-center justify-center gap-2",
+                  "w-full py-6 rounded-2xl font-extrabold text-base transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer",
                   attending
-                    ? "bg-green-600 hover:bg-green-700 text-white"
-                    : "bg-[#1D4ED8] hover:bg-[#1E40AF] text-white"
+                    ? "bg-[#1E4D2B] hover:bg-[#133820] text-white"
+                    : "bg-[#E86225] hover:bg-[#D0521B] text-white"
                 )}
                 onClick={handleRsvpToggle}
                 disabled={rsvpMutation.isPending}
@@ -400,16 +399,16 @@ export function EventDetail() {
                 {attending ? (
                   <>
                     <CheckCircle2 size={18} />
-                    <span>Attending (Cancel RSVP)</span>
+                    <span>Inscrit(e) (Annuler ma réservation)</span>
                   </>
                 ) : (
-                  <span>Attend This Event</span>
+                  <span>S'inscrire à cette sortie</span>
                 )}
               </Button>
 
               {attending && (
-                <div className="bg-green-50 text-green-700 text-xs font-bold text-center py-3 px-4 rounded-xl border border-green-200">
-                  🎉 You are registered for this event!
+                <div className="bg-[#E8F3EB] text-[#1E4D2B] text-xs font-bold text-center py-3 px-4 rounded-xl border border-[#1E4D2B]/20">
+                  🎉 Vous êtes inscrit(e) à cette sortie !
                 </div>
               )}
             </Card>

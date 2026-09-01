@@ -13,8 +13,8 @@ import { useStore } from '../../store/useStore';
 import { ApiError } from '../../lib/apiClient';
 import { toast } from '../../store/useToastStore';
 
-const STEPS = ['Basic Info', 'Details', 'Privacy', 'Review'];
-const DEFAULT_CATEGORIES = ['Culture & Heritage', 'Tech & Innovation', 'Sports & Wellness', 'Arts & Entertainment', 'Parents & Families', 'Local Support'];
+const STEPS = ['Informations de base', 'Détails', 'Confidentialité', 'Vérification'];
+const DEFAULT_CATEGORIES = ['Gastronomie & Sorties', 'Culture & Patrimoine', 'Rencontres & Amitié', 'Loisirs & Activités', 'Familles & Parents', 'Entraide locale'];
 
 export function CreateCommunity() {
   const navigate = useNavigate();
@@ -26,7 +26,7 @@ export function CreateCommunity() {
   useEffect(() => {
     if (currentUser && currentUser.role !== 'COMMUNITY_LEADER') {
       navigate('/communities');
-      toast.info('Only Community Leaders can request to create communities.');
+      toast.info('Seuls les organisateurs peuvent demander la création d\'un groupe.');
     }
   }, [currentUser, navigate]);
 
@@ -42,12 +42,12 @@ export function CreateCommunity() {
   const handleFile = (file: File | undefined) => {
     if (!file) return;
     if (!file.type.startsWith('image/')) {
-      toast.info('Please choose an image file.');
+      toast.info('Veuillez sélectionner un fichier image.');
       return;
     }
     uploadImage.mutate(file, {
       onSuccess: (res) => update('coverImageUrl', res.url),
-      onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Could not upload this image.'),
+      onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Impossible de téléverser cette image.'),
     });
   };
 
@@ -55,21 +55,21 @@ export function CreateCommunity() {
     setFormError(null);
     createRequest.mutate(
       { name: form.name, description: form.description, category: form.category, city: form.city, visibility: form.privacy.toUpperCase(), coverImageUrl: form.coverImageUrl || undefined },
-      { onError: (err) => setFormError(err instanceof ApiError ? err.message : 'Could not submit your request.') }
+      { onError: (err) => setFormError(err instanceof ApiError ? err.message : 'Impossible de soumettre votre demande.') }
     );
   };
 
   if (createRequest.isSuccess) {
     return (
-      <div className="min-h-screen bg-background-light flex items-center justify-center p-6">
-        <Card className="w-full max-w-md text-center">
+      <div className="min-h-screen bg-[#FDFBF7] flex items-center justify-center p-6 font-body">
+        <Card className="w-full max-w-md text-center border-[#EFE6DD] shadow-sm rounded-3xl">
           <CardContent className="p-10">
-            <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+            <div className="w-20 h-20 bg-[#E8F3EB] rounded-full flex items-center justify-center mx-auto mb-6">
               <span className="text-4xl">🎉</span>
             </div>
-            <h2 className="text-2xl font-heading font-bold mb-2">Community Submitted!</h2>
-            <p className="text-gray-600 mb-6">Your community request is pending admin approval. You'll be notified once it's live.</p>
-            <Link to="/communities"><Button className="w-full">Back to Communities</Button></Link>
+            <h2 className="text-2xl font-heading font-extrabold text-[#2C1810] mb-2">Demande soumise avec succès !</h2>
+            <p className="text-[#52433B] text-sm mb-6">Votre demande de groupe d'arrondissement est en cours de validation par l'administration.</p>
+            <Link to="/communities"><Button className="w-full bg-[#E86225] hover:bg-[#D0521B] text-white font-bold rounded-xl py-3">Retour aux groupes</Button></Link>
           </CardContent>
         </Card>
       </div>
@@ -77,38 +77,38 @@ export function CreateCommunity() {
   }
 
   return (
-    <div className="min-h-screen bg-background-light p-4 md:p-8">
+    <div className="min-h-screen bg-[#FDFBF7] p-4 md:p-8 font-body text-[#2C1810]">
       <div className="max-w-2xl mx-auto">
-        <Link to="/communities" className="inline-flex items-center gap-2 text-primary hover:underline mb-6">
-          <ArrowLeft size={16}/> Back to Communities
+        <Link to="/communities" className="inline-flex items-center gap-2 text-[#E86225] font-semibold hover:underline mb-6 text-sm">
+          <ArrowLeft size={16}/> Retour aux groupes
         </Link>
-        <h1 className="text-3xl font-heading font-bold mb-2">Create a Community</h1>
-        <p className="text-gray-600 mb-8">Fill in the details below. New communities require admin approval.</p>
+        <h1 className="text-3xl font-heading font-extrabold mb-2 text-[#2C1810]">Créer un groupe d'arrondissement</h1>
+        <p className="text-[#52433B] text-sm mb-8">Remplissez les détails ci-dessous. Les nouveaux groupes sont validés par l'administration.</p>
 
         {/* Progress */}
         <div className="flex items-center gap-2 mb-8">
           {STEPS.map((_s, i) => (
             <div key={i} className="flex items-center flex-1">
-              <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-colors", i <= step ? 'bg-primary text-white' : 'bg-gray-200 text-gray-500')}>{i + 1}</div>
-              {i < STEPS.length - 1 && <div className={cn("flex-1 h-1 mx-2 rounded", i < step ? 'bg-primary' : 'bg-gray-200')} />}
+              <div className={cn("w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold shrink-0 transition-colors", i <= step ? 'bg-[#E86225] text-white' : 'bg-[#EFE6DD] text-[#52433B]')}>{i + 1}</div>
+              {i < STEPS.length - 1 && <div className={cn("flex-1 h-1 mx-2 rounded", i < step ? 'bg-[#E86225]' : 'bg-[#EFE6DD]')} />}
             </div>
           ))}
         </div>
 
-        <Card>
+        <Card className="bg-white rounded-3xl border border-[#EFE6DD] shadow-sm">
           <CardContent className="p-8">
             <AnimatePresence mode="wait">
               <motion.div key={step} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} transition={{ duration: 0.25 }}>
 
                 {step === 0 && (
                   <div className="space-y-4">
-                    <h2 className="text-xl font-heading font-bold mb-4">Basic Info</h2>
-                    <div><label className="block text-sm font-medium mb-1">Community Name *</label><Input value={form.name} onChange={e => update('name', e.target.value)} placeholder="e.g. Toronto Book Club" required /></div>
+                    <h2 className="text-xl font-heading font-bold text-[#2C1810] mb-4">Informations de base</h2>
+                    <div><label className="block text-sm font-medium mb-1 text-[#2C1810]">Nom du groupe *</label><Input value={form.name} onChange={e => update('name', e.target.value)} placeholder="Ex : Bouffe & Amitié - Plateau-Mont-Royal" required className="bg-[#FAF5EF] border-[#EFE6DD]" /></div>
                     <div>
-                      <label className="block text-sm font-medium mb-2">Category *</label>
+                      <label className="block text-sm font-medium mb-2 text-[#2C1810]">Catégorie *</label>
                       <div className="flex flex-wrap gap-2">
                         {categoriesList.map(cat => (
-                          <button key={cat} type="button" onClick={() => update('category', cat)} className={cn("px-3 py-1.5 rounded-full border text-sm font-medium transition-colors", form.category === cat ? 'bg-primary text-white border-primary' : 'border-gray-300 text-gray-600 hover:border-primary/50')}>{cat}</button>
+                          <button key={cat} type="button" onClick={() => update('category', cat)} className={cn("px-3.5 py-1.5 rounded-full border text-xs font-bold transition-colors cursor-pointer", form.category === cat ? 'bg-[#E86225] text-white border-[#E86225]' : 'border-[#EFE6DD] text-[#52433B] hover:border-[#E86225]')}>{cat}</button>
                         ))}
                       </div>
                     </div>
@@ -117,13 +117,13 @@ export function CreateCommunity() {
 
                 {step === 1 && (
                   <div className="space-y-4">
-                    <h2 className="text-xl font-heading font-bold mb-4">Details</h2>
+                    <h2 className="text-xl font-heading font-bold text-[#2C1810] mb-4">Détails du groupe</h2>
                     <div>
-                      <label className="block text-sm font-medium mb-1">Description *</label>
-                      <textarea value={form.description} onChange={e => update('description', e.target.value)} className="w-full border border-gray-300 rounded-md p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-primary" rows={4} placeholder="What is your community about?" />
+                      <label className="block text-sm font-medium mb-1 text-[#2C1810]">Description *</label>
+                      <textarea value={form.description} onChange={e => update('description', e.target.value)} className="w-full border border-[#EFE6DD] rounded-xl p-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-[#E86225] bg-[#FAF5EF] text-[#2C1810]" rows={4} placeholder="Présentez la communauté, le style de sorties et la philosophie du groupe..." />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium mb-1">Cover Image (optional)</label>
+                      <label className="block text-sm font-medium mb-1 text-[#2C1810]">Image de couverture (optionnelle)</label>
                       <input
                         ref={fileInputRef}
                         type="file"
@@ -132,13 +132,12 @@ export function CreateCommunity() {
                         onChange={(e) => handleFile(e.target.files?.[0])}
                       />
                       {form.coverImageUrl ? (
-                        <div className="relative rounded-xl overflow-hidden border border-gray-200">
-                          <img src={form.coverImageUrl} alt="Cover preview" className="w-full h-40 object-cover" />
+                        <div className="relative rounded-xl overflow-hidden border border-[#EFE6DD]">
+                          <img src={form.coverImageUrl} alt="Aperçu" className="w-full h-40 object-cover" />
                           <button
                             type="button"
                             onClick={() => update('coverImageUrl', '')}
                             className="absolute top-2 right-2 w-8 h-8 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-colors"
-                            aria-label="Remove cover image"
                           >
                             <X size={16} />
                           </button>
@@ -152,17 +151,17 @@ export function CreateCommunity() {
                             handleFile(e.dataTransfer.files?.[0]);
                           }}
                           className={cn(
-                            "border-2 border-dashed border-gray-300 rounded-xl p-8 text-center transition-colors",
-                            uploadImage.isPending ? "cursor-wait opacity-70" : "hover:border-primary/50 cursor-pointer"
+                            "border-2 border-dashed border-[#EFE6DD] bg-[#FAF5EF] rounded-2xl p-8 text-center transition-colors",
+                            uploadImage.isPending ? "cursor-wait opacity-70" : "hover:border-[#E86225] cursor-pointer"
                           )}
                         >
                           {uploadImage.isPending ? (
-                            <Loader2 size={32} className="mx-auto text-primary mb-2 animate-spin" />
+                            <Loader2 size={32} className="mx-auto text-[#E86225] mb-2 animate-spin" />
                           ) : (
-                            <Image size={32} className="mx-auto text-gray-400 mb-2"/>
+                            <Image size={32} className="mx-auto text-[#52433B]/40 mb-2"/>
                           )}
-                          <p className="text-sm text-gray-500">{uploadImage.isPending ? 'Uploading…' : 'Click or drag to upload a cover image'}</p>
-                          <p className="text-xs text-gray-400 mt-1">PNG, JPG up to 5MB</p>
+                          <p className="text-sm text-[#52433B]">{uploadImage.isPending ? 'Téléversement…' : 'Cliquez ou glissez une photo de couverture'}</p>
+                          <p className="text-xs text-[#52433B]/60 mt-1">PNG, JPG jusqu'à 5 Mo</p>
                         </div>
                       )}
                     </div>
@@ -171,15 +170,15 @@ export function CreateCommunity() {
 
                 {step === 2 && (
                   <div className="space-y-4">
-                    <h2 className="text-xl font-heading font-bold mb-4">Privacy Settings</h2>
+                    <h2 className="text-xl font-heading font-bold text-[#2C1810] mb-4">Paramètres de confidentialité</h2>
                     <div className="space-y-3">
                       {[
-                        { id: 'public', label: 'Public', desc: 'Anyone can find and join this community.', icon: Globe },
-                        { id: 'private', label: 'Private', desc: 'Only invited members can join.', icon: Lock },
+                        { id: 'public', label: 'Public', desc: 'Tout membre peut trouver et rejoindre ce groupe.', icon: Globe },
+                        { id: 'private', label: 'Sur invitation', desc: 'Accès limité aux personnes invitées ou approuvées.', icon: Lock },
                       ].map(opt => (
-                        <button key={opt.id} type="button" onClick={() => update('privacy', opt.id)} className={cn("w-full text-left p-4 rounded-xl border-2 flex items-start gap-4 transition-colors", form.privacy === opt.id ? 'border-primary bg-primary/5' : 'border-gray-200 hover:border-gray-300')}>
-                          <opt.icon size={22} className={form.privacy === opt.id ? 'text-primary' : 'text-gray-400'} />
-                          <div><p className="font-semibold text-gray-900">{opt.label}</p><p className="text-sm text-gray-500">{opt.desc}</p></div>
+                        <button key={opt.id} type="button" onClick={() => update('privacy', opt.id)} className={cn("w-full text-left p-4 rounded-2xl border-2 flex items-start gap-4 transition-colors cursor-pointer", form.privacy === opt.id ? 'border-[#E86225] bg-[#FDF0E9]' : 'border-[#EFE6DD] hover:border-gray-300')}>
+                          <opt.icon size={22} className={form.privacy === opt.id ? 'text-[#E86225]' : 'text-gray-400'} />
+                          <div><p className="font-semibold text-[#2C1810]">{opt.label}</p><p className="text-sm text-[#52433B]">{opt.desc}</p></div>
                         </button>
                       ))}
                     </div>
@@ -188,17 +187,17 @@ export function CreateCommunity() {
 
                 {step === 3 && (
                   <div className="space-y-4">
-                    <h2 className="text-xl font-heading font-bold mb-4">Review & Submit</h2>
-                    <div className="bg-gray-50 rounded-xl p-4 space-y-2 text-sm">
-                      <div className="flex justify-between"><span className="text-gray-500">Name</span><span className="font-medium">{form.name || '—'}</span></div>
-                      <div className="flex justify-between"><span className="text-gray-500">Category</span><span className="font-medium">{form.category || '—'}</span></div>
-                      <div className="flex justify-between"><span className="text-gray-500">Privacy</span><span className="font-medium capitalize">{form.privacy}</span></div>
-                      <div className="flex justify-between items-center"><span className="text-gray-500">Cover Image</span><span className="font-medium">{form.coverImageUrl ? '✓ Attached' : 'None'}</span></div>
+                    <h2 className="text-xl font-heading font-bold text-[#2C1810] mb-4">Vérification &amp; Soumission</h2>
+                    <div className="bg-[#FAF5EF] rounded-2xl p-4 space-y-2 text-sm border border-[#EFE6DD]">
+                      <div className="flex justify-between"><span className="text-[#52433B]">Nom</span><span className="font-medium text-[#2C1810]">{form.name || '—'}</span></div>
+                      <div className="flex justify-between"><span className="text-[#52433B]">Catégorie</span><span className="font-medium text-[#2C1810]">{form.category || '—'}</span></div>
+                      <div className="flex justify-between"><span className="text-[#52433B]">Visibilité</span><span className="font-medium capitalize text-[#2C1810]">{form.privacy}</span></div>
+                      <div className="flex justify-between items-center"><span className="text-[#52433B]">Couverture</span><span className="font-medium text-[#2C1810]">{form.coverImageUrl ? '✓ Incluse' : 'Aucune'}</span></div>
                     </div>
                     {form.coverImageUrl && (
-                      <img src={form.coverImageUrl} alt="Cover preview" className="w-full h-32 object-cover rounded-xl border border-gray-200" />
+                      <img src={form.coverImageUrl} alt="Aperçu" className="w-full h-32 object-cover rounded-xl border border-[#EFE6DD]" />
                     )}
-                    <p className="text-xs text-gray-500">By submitting, your community will be reviewed by an admin before going live, usually within 24 hours.</p>
+                    <p className="text-xs text-[#52433B]">En soumettant cette demande, votre groupe sera révisé par l'administration avant sa mise en ligne.</p>
                   </div>
                 )}
               </motion.div>
@@ -210,11 +209,11 @@ export function CreateCommunity() {
               </div>
             )}
 
-            <div className="flex justify-between mt-8 pt-6 border-t border-gray-100">
-              <Button variant="ghost" onClick={() => step > 0 ? setStep(s => s - 1) : navigate('/communities')}><ArrowLeft size={16} className="mr-2"/>Back</Button>
+            <div className="flex justify-between mt-8 pt-6 border-t border-[#EFE6DD]">
+              <Button variant="ghost" onClick={() => step > 0 ? setStep(s => s - 1) : navigate('/communities')} className="text-[#52433B]"><ArrowLeft size={16} className="mr-2"/>Retour</Button>
               {step < STEPS.length - 1
-                ? <Button onClick={() => setStep(s => s + 1)} disabled={step === 0 && (!form.name || !form.category)}>Next <ArrowRight size={16} className="ml-2"/></Button>
-                : <Button onClick={handleSubmit} disabled={createRequest.isPending}>{createRequest.isPending ? 'Submitting…' : 'Submit for Approval'}</Button>
+                ? <Button onClick={() => setStep(s => s + 1)} disabled={step === 0 && (!form.name || !form.category)} className="bg-[#E86225] hover:bg-[#D0521B] text-white font-bold rounded-xl px-5">Suivant <ArrowRight size={16} className="ml-2"/></Button>
+                : <Button onClick={handleSubmit} disabled={createRequest.isPending} className="bg-[#E86225] hover:bg-[#D0521B] text-white font-bold rounded-xl px-5">{createRequest.isPending ? 'Soumission…' : 'Soumettre pour approbation'}</Button>
               }
             </div>
           </CardContent>

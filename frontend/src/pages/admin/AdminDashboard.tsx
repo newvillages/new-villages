@@ -113,18 +113,18 @@ export function AdminDashboard() {
   const pendingInteracCount = (interacPayments.data ?? []).filter((p) => p.status === 'PENDING').length;
 
   const sidebarLinks: { id: AdminSection; label: string; icon: React.ElementType; badge?: number }[] = [
-    { id: 'overview', label: 'Overview', icon: BarChart2 },
+    { id: 'overview', label: 'Aperçu général', icon: BarChart2 },
     { id: 'interac', label: 'Virements Interac', icon: Send, badge: pendingInteracCount },
-    { id: 'broadcast', label: 'Admin Broadcast', icon: Radio },
-    { id: 'users', label: 'Users', icon: Users },
-    { id: 'applications', label: 'Leader Applications', icon: CheckCircle, badge: leaderApps.data?.length },
-    { id: 'communities', label: 'Communities', icon: Users },
-    { id: 'categories', label: 'Categories', icon: Tag },
-    { id: 'pricing', label: 'Pricing Tariffs', icon: DollarSign },
-    { id: 'refunds', label: 'Refund Requests', icon: CreditCard, badge: refunds.data?.filter((r) => r.status === 'PENDING').length },
-    { id: 'reports', label: 'Reports Queue', icon: Flag, badge: reports.data?.filter((r) => r.status === 'OPEN').length },
-    { id: 'subscriptions', label: 'Subscriptions', icon: CreditCard },
-    { id: 'logs', label: 'Activity Logs', icon: FileText },
+    { id: 'broadcast', label: 'Annonce générale (Broadcast)', icon: Radio },
+    { id: 'users', label: 'Gestion des membres', icon: Users },
+    { id: 'applications', label: 'Candidatures d\'organisateurs', icon: CheckCircle, badge: leaderApps.data?.length },
+    { id: 'communities', label: 'Groupes d\'arrondissements', icon: Users },
+    { id: 'categories', label: 'Catégories', icon: Tag },
+    { id: 'pricing', label: 'Tarifs & Formules', icon: DollarSign },
+    { id: 'refunds', label: 'Demandes de remboursement', icon: CreditCard, badge: refunds.data?.filter((r) => r.status === 'PENDING').length },
+    { id: 'reports', label: 'File des signalements', icon: Flag, badge: reports.data?.filter((r) => r.status === 'OPEN').length },
+    { id: 'subscriptions', label: 'Abonnements', icon: CreditCard },
+    { id: 'logs', label: 'Journal d\'activités', icon: FileText },
   ];
 
   return (

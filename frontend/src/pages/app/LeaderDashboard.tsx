@@ -200,18 +200,18 @@ export function LeaderDashboard() {
   }
 
   return (
-    <div className="px-6 md:px-12 py-8 max-w-[1600px] mx-auto space-y-6 w-full">
+    <div className="px-6 md:px-12 py-8 max-w-[1600px] mx-auto space-y-6 w-full font-body">
       <div className="flex flex-col md:flex-row justify-between md:items-center gap-4">
         <div>
-          <h1 className="text-3xl font-heading font-bold text-gray-900">Leader Dashboard</h1>
-          <p className="text-sm text-gray-500">Manage your community circles, send invitations, set terms & request refunds.</p>
+          <h1 className="text-3xl font-heading font-extrabold text-[#2C1810]">Espace Organisateur</h1>
+          <p className="text-sm text-[#52433B]">Gérez votre groupe d'arrondissement, envoyez des invitations et organisez vos sorties.</p>
         </div>
         <div className="flex items-center gap-3">
           {ledCommunities.length > 1 && (
             <select
               value={communityId}
               onChange={(e) => setCommunityId(e.target.value)}
-              className="border border-gray-300 rounded-lg p-2 text-sm focus:ring-primary focus:outline-none"
+              className="border border-[#EFE6DD] rounded-xl p-2.5 text-sm bg-white focus:ring-[#E86225] focus:outline-none"
             >
               {ledCommunities.map((c) => (
                 <option key={c.id} value={c.id}>
@@ -223,42 +223,42 @@ export function LeaderDashboard() {
           <Button
             size="sm"
             variant="outline"
-            className="flex items-center gap-1.5 border-primary text-primary hover:bg-primary/5"
+            className="flex items-center gap-1.5 border-[#E86225] text-[#E86225] hover:bg-[#FDF0E9] font-bold"
             onClick={() => {
               navigator.clipboard.writeText(`${window.location.origin}/communities/${selectedCommunity?.id}`);
-              toast.success('Community invitation link copied to clipboard!');
+              toast.success('Lien d\'invitation copié dans le presse-papier !');
             }}
           >
-            <Copy size={16} /> Copy Invite Link
+            <Copy size={16} /> Copier le lien
           </Button>
           <Button
             size="sm"
-            className="flex items-center gap-1.5 bg-[#2D2159] hover:bg-[#3F2A78]"
+            className="flex items-center gap-1.5 bg-[#E86225] hover:bg-[#D0521B] text-white font-bold"
             onClick={() => setIsInviteModalOpen(true)}
           >
-            <Mail size={16} /> Send Email Invite
+            <Mail size={16} /> Inviter par courriel
           </Button>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex overflow-x-auto space-x-1 border-b border-gray-200">
+      <div className="flex overflow-x-auto space-x-1 border-b border-[#EFE6DD]">
         {[
-          { id: 'members', label: 'Member Roster' },
-          { id: 'requests', label: `Join Requests (${pendingRequests?.length ?? 0})` },
-          { id: 'composer', label: 'Broadcast Message' },
-          { id: 'events', label: 'Manage Events' },
-          { id: 'terms', label: 'Group Terms & Conditions' },
-          { id: 'refunds', label: 'Refund Requests' },
-          { id: 'analytics', label: 'Analytics' },
+          { id: 'members', label: 'Liste des membres' },
+          { id: 'requests', label: `Demandes d'adhésion (${pendingRequests?.length ?? 0})` },
+          { id: 'composer', label: 'Publier une annonce' },
+          { id: 'events', label: 'Sorties du groupe' },
+          { id: 'terms', label: 'Règles du groupe' },
+          { id: 'refunds', label: 'Demandes de remboursement' },
+          { id: 'analytics', label: 'Statistiques' },
         ].map((tab) => (
           <button
             key={tab.id}
             onClick={() => setActiveSubTab(tab.id as typeof activeSubTab)}
-            className={`px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-all ${
+            className={`px-4 py-3 text-sm font-medium border-b-2 whitespace-nowrap transition-all cursor-pointer ${
               activeSubTab === tab.id
-                ? 'border-primary text-primary font-bold'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
+                ? 'border-[#E86225] text-[#E86225] font-bold'
+                : 'border-transparent text-[#52433B] hover:text-[#2C1810]'
             }`}
           >
             {tab.label}
