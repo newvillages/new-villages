@@ -144,12 +144,12 @@ export function Layout() {
   return (
     <div className="min-h-screen bg-[#FDFBF7] flex flex-col text-[#2C1810] w-full overflow-x-hidden font-body">
       {/* Desktop Top Navigation Bar */}
-      <header className="hidden md:flex h-20 bg-white/95 backdrop-blur-md border-b border-[#EFE6DD] items-center justify-between px-4 lg:px-8 sticky top-0 z-40 shadow-xs w-full">
-        <div className="flex items-center gap-3 lg:gap-5 min-w-0 flex-1">
+      <header className="hidden md:flex h-20 bg-white/95 backdrop-blur-md border-b border-[#EFE6DD] items-center justify-between px-3 lg:px-6 xl:px-8 sticky top-0 z-40 shadow-xs w-full">
+        <div className="flex items-center gap-2 lg:gap-4 xl:gap-5 min-w-0 flex-1">
           <Logo />
 
           {/* Main Navigation Links */}
-          <nav className="flex items-center gap-1 sm:gap-1.5 lg:gap-2 shrink-0">
+          <nav className="flex items-center gap-1 xl:gap-2 overflow-x-auto scrollbar-none py-1">
             {mainNavItems.map((item) => {
               const isActive = pathname === item.href || (item.href !== '/' && pathname.startsWith(item.href));
               return (
@@ -157,7 +157,7 @@ export function Layout() {
                   key={item.href}
                   to={item.href}
                   className={cn(
-                    'px-3.5 py-2 rounded-full font-bold transition-all duration-200 text-xs xl:text-sm whitespace-nowrap shrink-0',
+                    'px-2.5 lg:px-3.5 py-1.5 lg:py-2 rounded-full font-extrabold transition-all duration-200 text-xs xl:text-sm whitespace-nowrap shrink-0',
                     isActive ? 'bg-[#1E4D2B] text-white shadow-sm' : 'text-[#52433B] hover:bg-[#E8F3EB] hover:text-[#1E4D2B]'
                   )}
                 >
@@ -170,8 +170,8 @@ export function Layout() {
 
         <div className="flex items-center gap-2 lg:gap-3 shrink-0 ml-2">
           {/* Global Search */}
-          <div className="flex items-center bg-[#FAF5EF] rounded-full px-3.5 py-2 w-32 sm:w-40 lg:w-48 xl:w-56 transition-all focus-within:w-48 lg:focus-within:w-60 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#E86225]/20 focus-within:shadow-sm border border-[#EFE6DD] focus-within:border-[#E86225] shrink-0">
-            <Search size={15} className="text-slate-400 mr-2 shrink-0" />
+          <div className="flex items-center bg-[#FAF5EF] rounded-full px-3 py-1.5 lg:px-3.5 lg:py-2 w-28 lg:w-36 xl:w-48 transition-all focus-within:w-40 lg:focus-within:w-52 focus-within:bg-white focus-within:ring-2 focus-within:ring-[#E86225]/20 focus-within:shadow-sm border border-[#EFE6DD] focus-within:border-[#E86225] shrink-0">
+            <Search size={15} className="text-slate-400 mr-1.5 shrink-0" />
             <input
               type="text"
               placeholder="Rechercher..."
