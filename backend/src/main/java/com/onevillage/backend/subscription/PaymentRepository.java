@@ -9,4 +9,10 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
     List<Payment> findBySubscriptionId(UUID subscriptionId);
 
     boolean existsByStripeInvoiceId(String stripeInvoiceId);
+
+    java.util.Optional<Payment> findByReferenceNumber(String referenceNumber);
+
+    List<Payment> findAllByOrderByCreatedAtDesc();
+
+    List<Payment> findByStatus(String status);
 }

@@ -308,3 +308,38 @@ export function useReviewRefundRequest() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['admin', 'refund-requests'] }),
   });
 }
+
+// --- Interac Payments ---
+export interface InteracPayment {
+  id: string;
+  userId: string;
+  userName: string | null;
+  userEmail: string | null;
+  communityName: string | null;
+  referenceNumber: string;
+  amount: number;
+  currency: string;
+  paymentMethod: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  paidAt: string | null;
+  createdAt: string;
+}
+
+export function useAdminInteracPayments() {
+  return useQuery({
+    queryKey: ['admin', 'interac-payments'],
+    queryFn: () => api.get<InteracPayment[]>('/api/admin/payments/interac'),
+  });
+}
+
+export function useConfirmInteracPayment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (paymentId: string) => api.post<InteracPayment>(`/api/admin/payments/interac/${paymentId}/confirm`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'interac-payments'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'subscriptions'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+    },
+  });
+}

@@ -40,9 +40,8 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedMemo, setCopiedMemo] = useState(false);
 
-  // Form states
-  const [interacEmail, setInteracEmail] = useState('');
-  const [interacSenderName, setInteracSenderName] = useState('');
+  // Terms acceptance & Form states
+  const [termsAccepted, setTermsAccepted] = useState(false);
   const [cardName, setCardName] = useState('');
   const [cardNumber, setCardNumber] = useState('');
   const [cardExpiry, setCardExpiry] = useState('');
@@ -159,6 +158,21 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
                 exit={{ opacity: 0, x: 10 }}
                 className="space-y-5 sm:space-y-6"
               >
+                {/* Conditions d'adhésion Checkbox */}
+                <div className="bg-[#FAF5EF] border border-[#EFE6DD] rounded-2xl p-4 sm:p-5">
+                  <label className="flex items-start gap-3 cursor-pointer">
+                    <input
+                      type="checkbox"
+                      checked={termsAccepted}
+                      onChange={(e) => setTermsAccepted(e.target.checked)}
+                      className="mt-1 w-5 h-5 rounded border-slate-300 text-[#E86225] focus:ring-[#E86225]"
+                    />
+                    <div className="text-xs text-[#2C1810] leading-relaxed">
+                      <strong>J'ai lu et j'accepte les Conditions d'adhésion et la Politique de confidentialité de Bouffe &amp; Amitié.</strong> Je comprends que je paie 20 $ CAD pour le mois choisi, que ce paiement ne sera pas renouvelé automatiquement et que mes repas et consommations ne sont pas inclus.
+                    </div>
+                  </label>
+                </div>
+
                 {/* Interac Highlight Box */}
                 <div className="bg-[#FAF5EF] border border-[#EFE6DD] rounded-2xl p-4 sm:p-5">
                   <div className="flex gap-3 items-start">
@@ -185,7 +199,7 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
                       <div className="font-extrabold text-sm sm:text-base text-amber-950">{currencyAmountCAD}</div>
                     </div>
                     <span className="text-[10px] font-extrabold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-full border border-amber-200 shrink-0">
-                      Montant exact requis 🔒
+                      Montant mensuel unique 🔒
                     </span>
                   </div>
 
@@ -193,14 +207,14 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-white border border-[#EFE6DD] rounded-xl">
                     <div className="min-w-0 flex-1">
                       <div className="text-[10px] sm:text-[11px] font-semibold text-slate-400 uppercase">Courriel du destinataire</div>
-                      <div className="font-mono font-bold text-xs sm:text-sm text-[#133820] break-all">payments@newvillages.ca</div>
+                      <div className="font-mono font-bold text-xs sm:text-sm text-[#133820] break-all">payment@newvillages.ca</div>
                     </div>
                     <Button 
                       type="button" 
                       variant="outline" 
                       size="sm" 
                       className="h-8 sm:h-9 px-3 text-xs gap-1.5 font-bold border-[#EFE6DD] w-full sm:w-auto justify-center"
-                      onClick={() => handleCopy('payments@newvillages.ca', 'email')}
+                      onClick={() => handleCopy('payment@newvillages.ca', 'email')}
                     >
                       {copiedEmail ? <Check size={14} className="text-[#1E4D2B]" /> : <Copy size={14} />}
                       {copiedEmail ? 'Copié' : 'Copier'}
@@ -220,7 +234,7 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
                   {/* Reference Memo Code */}
                   <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 p-3 bg-[#FDF0E9] border border-[#E86225]/30 rounded-xl">
                     <div>
-                      <div className="text-[10px] sm:text-[11px] font-bold text-[#E86225] uppercase">Code de référence (Raison / Message)</div>
+                      <div className="text-[10px] sm:text-[11px] font-bold text-[#E86225] uppercase">N° de référence unique (à inclure dans le message)</div>
                       <div className="font-mono font-extrabold text-sm sm:text-base text-[#2C1810] tracking-wider">{memoCode}</div>
                     </div>
                     <Button 
@@ -243,35 +257,14 @@ export function PaymentModal({ plan, onBack, onSuccess }: PaymentModalProps) {
 
                 {/* Form to submit notification */}
                 <form onSubmit={handleInteracSubmit} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-bold text-[#2C1810] mb-1">Votre adresse courriel bancaire</label>
-                    <Input 
-                      type="email" 
-                      placeholder="votre.courriel@exemple.ca" 
-                      value={interacEmail}
-                      onChange={(e) => setInteracEmail(e.target.value)}
-                      className="bg-[#FAF5EF] border-[#EFE6DD] rounded-xl py-4 text-xs" 
-                      required 
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-bold text-[#2C1810] mb-1">Nom du titulaire de compte (Optionnel)</label>
-                    <Input 
-                      type="text" 
-                      placeholder="Marie Tremblay" 
-                      value={interacSenderName}
-                      onChange={(e) => setInteracSenderName(e.target.value)}
-                      className="bg-[#FAF5EF] border-[#EFE6DD] rounded-xl py-4 text-xs" 
-                    />
-                  </div>
-
                   <Button 
                     type="submit" 
-                    disabled={isSubmitting}
-                    className="w-full py-6 rounded-full bg-[#E86225] hover:bg-[#D0521B] text-white font-bold text-base shadow-lg"
+                    disabled={!termsAccepted || isSubmitting}
+                    className={`w-full py-6 rounded-full font-bold text-base shadow-lg transition-all ${
+                      termsAccepted ? 'bg-[#E86225] hover:bg-[#D0521B] text-white' : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                    }`}
                   >
-                    {isSubmitting ? 'Vérification du virement...' : `Confirmer l'envoi du virement (${currencyAmountCAD})`}
+                    {isSubmitting ? 'Enregistrement du virement...' : `J'ai effectué mon virement (${currencyAmountCAD})`}
                   </Button>
                 </form>
               </motion.div>

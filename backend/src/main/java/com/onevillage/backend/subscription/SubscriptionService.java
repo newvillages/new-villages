@@ -96,6 +96,87 @@ public class SubscriptionService {
         stripeService.cancelAtPeriodEnd(subscription.getStripeSubscriptionId());
     }
 
+    // --- Interac e-Transfer Payments ---
+
+    @Transactional
+    public com.onevillage.backend.subscription.dto.InteracPaymentResponse initiateInteracPayment(UUID userId, String planRaw, BigDecimal amount, String communityName) {
+        User user = userRepository.findById(userId).orElseThrow(() -> ApiException.notFound("User not found"));
+        SubscriptionPlan plan;
+        try {
+            plan = SubscriptionPlan.valueOf(planRaw.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            plan = SubscriptionPlan.COMMUNITY_LEADER;
+        }
+
+        validatePlanPaymentAmount(plan, amount);
+
+        String refCode = "REF-BA-" + java.util.UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+
+        Payment payment = new Payment();
+        payment.setUserId(userId);
+        payment.setUserName(user.getFullName());
+        payment.setUserEmail(user.getEmail());
+        payment.setCommunityName(communityName);
+        payment.setReferenceNumber(refCode);
+        payment.setPaymentMethod("INTERAC");
+        payment.setAmount(amount);
+        payment.setCurrency("CAD");
+        payment.setStatus("PENDING");
+
+        Payment saved = paymentRepository.save(payment);
+        return toInteracResponse(saved);
+    }
+
+    @Transactional
+    public com.onevillage.backend.subscription.dto.InteracPaymentResponse adminConfirmInteracPayment(UUID paymentId, UUID adminId) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> ApiException.notFound("Payment request not found"));
+
+        payment.setStatus("APPROVED");
+        payment.setPaidAt(Instant.now());
+
+        if (payment.getUserId() != null) {
+            User user = userRepository.findById(payment.getUserId()).orElse(null);
+            if (user != null) {
+                // Determine target plan
+                SubscriptionPlan plan = payment.getAmount().compareTo(new BigDecimal("20.00")) >= 0
+                        ? SubscriptionPlan.ORGANIZATION
+                        : SubscriptionPlan.COMMUNITY_LEADER;
+
+                Subscription subscription = subscriptionRepository.findByUserId(user.getId()).orElseGet(Subscription::new);
+                subscription.setUserId(user.getId());
+                subscription.setPlan(plan);
+                subscription.setStatus(SubscriptionStatus.ACTIVE);
+                subscription.setCurrentPeriodEnd(Instant.now().plus(30, java.time.temporal.ChronoUnit.DAYS));
+                subscriptionRepository.save(subscription);
+
+                payment.setSubscriptionId(subscription.getId());
+
+                if (user.getRole() == UserRole.MEMBER) {
+                    user.setRole(plan == SubscriptionPlan.ORGANIZATION ? UserRole.ORGANIZATION : UserRole.COMMUNITY_LEADER);
+                    userRepository.save(user);
+                }
+            }
+        }
+
+        Payment saved = paymentRepository.save(payment);
+        return toInteracResponse(saved);
+    }
+
+    public List<com.onevillage.backend.subscription.dto.InteracPaymentResponse> adminListInteracPayments() {
+        return paymentRepository.findAllByOrderByCreatedAtDesc().stream()
+                .map(this::toInteracResponse)
+                .toList();
+    }
+
+    private com.onevillage.backend.subscription.dto.InteracPaymentResponse toInteracResponse(Payment p) {
+        return new com.onevillage.backend.subscription.dto.InteracPaymentResponse(
+                p.getId(), p.getUserId(), p.getUserName(), p.getUserEmail(), p.getCommunityName(),
+                p.getReferenceNumber(), p.getAmount(), p.getCurrency(), p.getPaymentMethod(),
+                p.getStatus(), p.getPaidAt(), p.getCreatedAt()
+        );
+    }
+
     // --- Admin ---
 
     public List<com.onevillage.backend.subscription.dto.AdminSubscriptionResponse> adminListAll() {

@@ -65,30 +65,71 @@ public class DataSeeder implements ApplicationRunner {
     }
 
     private TermsVersion seedTermsVersion() {
+        String officialBody = """
+                Conditions d'adhésion - Bouffe & Amitié
+
+                1. Objet de l'adhésion
+                Bouffe & Amitié est un service communautaire qui facilite l'organisation de rencontres sociales, notamment des sorties dans des restaurants.
+                L'adhésion concerne le service d'organisation et de participation aux activités de Bouffe & Amitié. Elle ne constitue pas l'achat d'un repas.
+
+                2. Âge
+                Le membre confirme avoir 18 ans ou plus au moment de son inscription.
+
+                3. Frais d'adhésion
+                L'adhésion est de 20 $ CAD pour le mois choisi, auxquels s'ajoutent les taxes applicables, le cas échéant.
+                Le prix total et les modalités de paiement sont présentés au membre avant la confirmation du paiement.
+
+                4. Aucun renouvellement automatique
+                L'adhésion n'est pas renouvelée automatiquement.
+                Aucun nouveau paiement de 20 $ n'est prélevé automatiquement sur le moyen de paiement du membre.
+                Pour participer à un nouveau mois, le membre doit retourner sur la plateforme et effectuer volontairement un nouveau paiement.
+                S'il ne paie pas pour le mois suivant, aucune nouvelle somme ne lui est facturée.
+
+                5. Sorties
+                Bouffe & Amitié organise des rencontres et activités pour ses différents groupes.
+                Les dates, heures, restaurants et disponibilités peuvent varier.
+                Certaines sorties peuvent avoir un nombre limité de places. Le paiement d'une adhésion ne garantit une place à une sortie particulière que lorsque cette place a été confirmée au membre.
+
+                6. Repas et consommations
+                Les repas, boissons, pourboires et autres dépenses personnelles ne sont pas compris dans les 20 $.
+                Chaque membre commande et paie directement au restaurant ses propres consommations.
+
+                7. Réservation, absence et retard
+                Lorsqu'une réservation est nécessaire, le membre doit respecter les modalités communiquées pour la sortie.
+                Un membre qui prévoit être absent ou en retard est invité à prévenir le responsable du groupe dès que possible.
+                Les règles concernant une annulation ou un remboursement sont celles présentées au membre avant son paiement, sous réserve des droits prévus par les lois applicables.
+
+                8. Modification ou annulation d'une activité
+                Bouffe & Amitié peut devoir modifier le restaurant, la date ou l'heure d'une activité lorsqu'une situation raisonnable l'exige.
+                Les membres concernés seront informés dès que raisonnablement possible.
+                Les droits du consommateur prévus par les lois applicables demeurent applicables.
+
+                9. Comportement
+                Chaque membre doit adopter un comportement respectueux envers les autres membres, les responsables de groupe et le personnel des établissements visités.
+                Le harcèlement, les menaces, la violence, la discrimination ou tout comportement gravement perturbateur peuvent entraîner une suspension ou une exclusion, sous réserve des droits prévus par la loi.
+
+                10. Responsabilité
+                Bouffe & Amitié organise ou facilite des rencontres sociales. Les restaurants demeurent responsables des produits et services qu'ils fournissent directement aux membres.
+                Aucune disposition des présentes conditions ne vise à exclure ou limiter un droit ou une responsabilité lorsque la loi interdit une telle exclusion ou limitation.
+
+                11. Renseignements personnels
+                Les renseignements personnels recueillis lors de l'inscription sont utilisés notamment pour administrer l'adhésion, les paiements, les communications et les activités.
+                Le traitement des renseignements personnels est également décrit dans la Politique de confidentialité de Bouffe & Amitié.
+
+                12. Acceptation avant le paiement
+                Avant d'effectuer son paiement, le membre doit confirmer son acceptation des présentes conditions.
+                Checkbox: "J'ai lu et j'accepte les Conditions d'adhésion et la Politique de confidentialité de Bouffe & Amitié. Je comprends que je paie 20 $ CAD pour le mois choisi, que ce paiement ne sera pas renouvelé automatiquement et que mes repas et consommations ne sont pas inclus."
+                """;
+
         Optional<TermsVersion> existing = termsVersionRepository.findByCurrentTrue();
         if (existing.isPresent()) {
-            return existing.get();
+            TermsVersion v = existing.get();
+            v.setBody(officialBody);
+            return termsVersionRepository.save(v);
         }
         TermsVersion version = new TermsVersion();
         version.setVersion(seedTermsVersion);
-        version.setBody("""
-                NewVillages - Terms and Conditions
-
-                1. Users are responsible for their own posts, messages, and behavior.
-                2. The platform acts only as an intermediary and is not responsible for agreements made between users.
-                3. Users must provide accurate information when creating an account.
-                4. Illegal, hateful, violent, fraudulent, or rights-infringing content is prohibited.
-                5. Users must comply with all applicable laws in their country or region.
-                6. Subscriptions and participation fees, when applicable, must be paid according to the displayed terms and may be non-refundable unless required by law.
-                7. Each user is responsible for their own personal expenses, including transportation, food, purchases, and other costs.
-                8. The platform may suspend or permanently remove accounts that violate these Terms.
-                9. The platform may modify its features, pricing, or these Terms and Conditions at any time. Changes become effective once published on the platform unless applicable law requires otherwise. Continued use of the platform after changes means you accept the updated Terms.
-                10. The platform does not guarantee the success, quality, or outcome of any event, activity, or interaction between users.
-                11. To the maximum extent permitted by law, the platform is not liable for damages, losses, or disputes arising from interactions between users.
-                12. Users agree to the platform's Privacy Policy regarding the collection and use of personal information.
-                13. Any fraudulent activity or attempt to bypass the platform's security measures may result in account termination.
-                14. By accessing or using the platform, users acknowledge that they have read, understood, and agree to these Terms and Conditions.
-                """);
+        version.setBody(officialBody);
         version.setPublishedAt(Instant.now());
         version.setCurrent(true);
         TermsVersion saved = termsVersionRepository.save(version);

@@ -39,6 +39,8 @@ import {
   useDeletePricingPlan,
   useAdminRefundRequests,
   useReviewRefundRequest,
+  useAdminInteracPayments,
+  useConfirmInteracPayment,
   type AdminStats,
   type CommunityCategory,
   type PricingPlan,
@@ -49,6 +51,7 @@ import { ApiError } from '../../lib/apiClient';
 
 type AdminSection =
   | 'overview'
+  | 'interac'
   | 'broadcast'
   | 'users'
   | 'applications'
@@ -105,9 +108,13 @@ export function AdminDashboard() {
   const reports = useAdminReports();
   const leaderApps = useAdminLeaderApplications();
   const refunds = useAdminRefundRequests();
+  const interacPayments = useAdminInteracPayments();
+
+  const pendingInteracCount = (interacPayments.data ?? []).filter((p) => p.status === 'PENDING').length;
 
   const sidebarLinks: { id: AdminSection; label: string; icon: React.ElementType; badge?: number }[] = [
     { id: 'overview', label: 'Overview', icon: BarChart2 },
+    { id: 'interac', label: 'Virements Interac', icon: Send, badge: pendingInteracCount },
     { id: 'broadcast', label: 'Admin Broadcast', icon: Radio },
     { id: 'users', label: 'Users', icon: Users },
     { id: 'applications', label: 'Leader Applications', icon: CheckCircle, badge: leaderApps.data?.length },
@@ -157,6 +164,7 @@ export function AdminDashboard() {
       {/* Admin Content */}
       <div className="flex-1 overflow-y-auto p-6">
         {section === 'overview' && <OverviewSection stats={stats.data} reports={reports.data ?? []} />}
+        {section === 'interac' && <InteracSection />}
         {section === 'broadcast' && <BroadcastSection />}
         {section === 'users' && <UsersSection search={userSearch} setSearch={setUserSearch} />}
         {section === 'applications' && <ApplicationsSection />}
@@ -1249,6 +1257,96 @@ function LogsSection() {
           )}
         </CardContent>
       </Card>
+    </div>
+  );
+}
+
+function InteracSection() {
+  const { data: payments, isLoading } = useAdminInteracPayments();
+  const confirmPayment = useConfirmInteracPayment();
+
+  const handleConfirm = (id: string, name: string | null) => {
+    if (confirm(`Confirmer la réception du virement Interac pour ${name || 'ce membre'} ? Le compte sera activé immédiatement.`)) {
+      confirmPayment.mutate(id, {
+        onSuccess: () => toast.success(`Paiement confirmé et compte activé avec succès !`),
+        onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Erreur lors de la confirmation.'),
+      });
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <h1 className="text-2xl font-heading font-bold text-gray-900">Virements Interac e-Transfer</h1>
+        <p className="text-sm text-gray-500">
+          Vérifiez les paiements reçus par Virement Interac et confirmez l'activation des membres.
+        </p>
+      </div>
+
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+        {isLoading ? (
+          <div className="flex justify-center py-10">
+            <Loader2 className="animate-spin text-primary" />
+          </div>
+        ) : (payments ?? []).length === 0 ? (
+          <div className="text-center py-12 px-4">
+            <Send className="mx-auto text-gray-300 mb-2" size={32} />
+            <p className="text-sm font-semibold text-gray-700">Aucun virement Interac enregistré.</p>
+            <p className="text-xs text-gray-400 mt-1">Les demandes de virement s'afficheront ici en temps réel.</p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 text-xs uppercase text-gray-500 font-semibold border-b border-gray-100">
+                <tr>
+                  {['Membre', 'Groupe', 'N° Référence', 'Montant', 'Date', 'Statut', 'Action'].map((h) => (
+                    <th key={h} className="px-4 py-3 text-left">
+                      {h}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-100">
+                {(payments ?? []).map((p) => (
+                  <tr key={p.id} className="hover:bg-gray-50/80 transition-colors">
+                    <td className="px-4 py-3">
+                      <div>
+                        <p className="font-semibold text-gray-900">{p.userName || 'Membre'}</p>
+                        <p className="text-xs text-gray-400">{p.userEmail || '—'}</p>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 text-gray-600 font-medium">{p.communityName || 'Général'}</td>
+                    <td className="px-4 py-3">
+                      <span className="font-mono font-bold text-xs bg-amber-50 text-amber-900 px-2 py-1 rounded border border-amber-200">
+                        {p.referenceNumber}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 font-bold text-gray-900">${p.amount} {p.currency}</td>
+                    <td className="px-4 py-3 text-xs text-gray-500">{new Date(p.createdAt).toLocaleDateString()}</td>
+                    <td className="px-4 py-3">
+                      <StatusBadge status={p.status} />
+                    </td>
+                    <td className="px-4 py-3">
+                      {p.status === 'PENDING' ? (
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700 text-white font-bold text-xs shadow-sm"
+                          onClick={() => handleConfirm(p.id, p.userName)}
+                          disabled={confirmPayment.isPending}
+                        >
+                          <CheckCircle size={14} className="mr-1" /> Confirmer le paiement
+                        </Button>
+                      ) : (
+                        <span className="text-xs text-gray-400 font-semibold">Activé ✓</span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
