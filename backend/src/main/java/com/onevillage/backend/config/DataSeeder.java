@@ -97,11 +97,16 @@ public class DataSeeder implements ApplicationRunner {
     }
 
     private void seedAdminUser(TermsVersion currentTerms) {
-        User admin = userRepository.findByEmailIgnoreCase(adminEmail)
-                .orElseGet(() -> userRepository.findByEmailIgnoreCase("admin@onevillage.ca")
-                        .orElseGet(() -> userRepository.findFirstByRole(UserRole.ADMIN)
-                                .orElseGet(User::new)));
+        Optional<User> existing = userRepository.findByEmailIgnoreCase(adminEmail)
+                .or(() -> userRepository.findByEmailIgnoreCase("admin@onevillage.ca"))
+                .or(() -> userRepository.findFirstByRole(UserRole.ADMIN));
 
+        if (existing.isPresent()) {
+            ensureTermsAccepted(existing.get(), currentTerms);
+            return;
+        }
+
+        User admin = new User();
         admin.setFullName("Bouffe & Amitié Admin");
         admin.setEmail(adminEmail);
         admin.setPasswordHash(passwordEncoder.encode(adminPassword));
@@ -113,11 +118,17 @@ public class DataSeeder implements ApplicationRunner {
         User savedAdmin = userRepository.save(admin);
 
         ensureTermsAccepted(savedAdmin, currentTerms);
-        log.info("Seeded/updated Super Admin account '{}' with configured password.", adminEmail);
+        log.info("Seeded Super Admin account '{}'.", adminEmail);
     }
 
     private void seedTestUser(String email, String name, UserRole role, TermsVersion currentTerms) {
-        User user = userRepository.findByEmailIgnoreCase(email).orElseGet(User::new);
+        Optional<User> existing = userRepository.findByEmailIgnoreCase(email);
+        if (existing.isPresent()) {
+            ensureTermsAccepted(existing.get(), currentTerms);
+            return;
+        }
+
+        User user = new User();
         user.setFullName(name);
         user.setEmail(email);
         user.setPasswordHash(passwordEncoder.encode(adminPassword));
