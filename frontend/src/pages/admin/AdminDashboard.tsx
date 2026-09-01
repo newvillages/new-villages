@@ -133,11 +133,11 @@ export function AdminDashboard() {
       <aside className="w-60 bg-gray-900 text-white flex flex-col shrink-0">
         <div className="p-5 border-b border-gray-800">
           <div className="flex items-center gap-2">
-            <Shield size={20} className="text-primary" />
-            <span className="font-heading font-bold text-sm">Admin Portal</span>
+            <Shield size={20} className="text-[#E86225]" />
+            <span className="font-heading font-bold text-sm">Administration</span>
           </div>
-          <Link to="/dashboard" className="text-xs text-gray-500 hover:text-gray-300 transition-colors mt-1 block">
-            ← Back to App
+          <Link to="/dashboard" className="text-xs text-gray-400 hover:text-white transition-colors mt-1 block">
+            ← Retour à l'application
           </Link>
         </div>
         <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
@@ -148,8 +148,8 @@ export function AdminDashboard() {
                 key={link.id}
                 onClick={() => setSection(link.id)}
                 className={cn(
-                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition-colors',
-                  section === link.id ? 'bg-primary text-white font-bold' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                  'w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-left transition-colors cursor-pointer',
+                  section === link.id ? 'bg-[#E86225] text-white font-bold' : 'text-gray-400 hover:bg-gray-800 hover:text-white'
                 )}
               >
                 <Icon size={18} />
@@ -162,7 +162,7 @@ export function AdminDashboard() {
       </aside>
 
       {/* Admin Content */}
-      <div className="flex-1 overflow-y-auto p-6">
+      <div className="flex-1 overflow-y-auto p-6 bg-[#FDFBF7] font-body text-[#2C1810]">
         {section === 'overview' && <OverviewSection stats={stats.data} reports={reports.data ?? []} />}
         {section === 'interac' && <InteracSection />}
         {section === 'broadcast' && <BroadcastSection />}
@@ -181,23 +181,27 @@ export function AdminDashboard() {
 }
 
 function OverviewSection({ stats, reports }: { stats: AdminStats | undefined; reports: ReportResponse[] | undefined }) {
-  const reportsByStatus = ['OPEN', 'REVIEWING', 'RESOLVED'].map((status) => ({
-    status,
-    count: (reports ?? []).filter((r) => r.status === status).length,
+  const reportsByStatus = [
+    { status: 'Ouvert (OPEN)', rawStatus: 'OPEN' },
+    { status: 'En révision (REVIEWING)', rawStatus: 'REVIEWING' },
+    { status: 'Résolu (RESOLVED)', rawStatus: 'RESOLVED' },
+  ].map((item) => ({
+    status: item.status,
+    count: (reports ?? []).filter((r) => r.status === item.rawStatus).length,
   }));
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-heading font-bold">Platform Overview</h1>
+      <h1 className="text-2xl font-heading font-extrabold text-[#2C1810]">Aperçu de la plateforme</h1>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatTile label="Total Users" value={stats?.totalUsers ?? '—'} icon={Users} color="bg-blue-500" />
-        <StatTile label="Communities" value={stats?.totalCommunities ?? '—'} icon={Users} color="bg-green-500" />
-        <StatTile label="Active Subscriptions" value={stats?.activeSubscriptions ?? '—'} icon={CreditCard} color="bg-purple-500" />
-        <StatTile label="Open Reports" value={stats?.openReports ?? '—'} icon={Flag} color="bg-red-500" />
+        <StatTile label="Membres inscrits" value={stats?.totalUsers ?? '—'} icon={Users} color="bg-[#E86225]" />
+        <StatTile label="Groupes d'arrondissements" value={stats?.totalCommunities ?? '—'} icon={Users} color="bg-[#1E4D2B]" />
+        <StatTile label="Abonnements actifs" value={stats?.activeSubscriptions ?? '—'} icon={CreditCard} color="bg-purple-600" />
+        <StatTile label="Signalements ouverts" value={stats?.openReports ?? '—'} icon={Flag} color="bg-red-600" />
       </div>
-      <Card>
+      <Card className="bg-white rounded-3xl border border-[#EFE6DD] shadow-sm">
         <CardHeader>
-          <CardTitle>Reports by Status</CardTitle>
+          <CardTitle className="text-[#2C1810]">Signalements par statut</CardTitle>
         </CardHeader>
         <CardContent className="p-4 pt-0">
           <ResponsiveContainer width="100%" height={220}>

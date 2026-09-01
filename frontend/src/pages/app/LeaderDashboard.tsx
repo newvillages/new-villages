@@ -268,51 +268,53 @@ export function LeaderDashboard() {
 
       {/* Roster tab */}
       {activeSubTab === 'members' && (
-        <Card>
+        <Card className="bg-white rounded-3xl border border-[#EFE6DD] shadow-sm">
           <CardContent className="p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-lg">Active Roster — {selectedCommunity?.name}</h3>
-              <Button size="sm" variant="outline" onClick={() => setIsInviteModalOpen(true)}>
-                <Plus size={16} className="mr-1" /> Invite Member
+              <h3 className="font-bold text-lg text-[#2C1810]">Liste des membres — {selectedCommunity?.name}</h3>
+              <Button size="sm" variant="outline" onClick={() => setIsInviteModalOpen(true)} className="border-[#E86225] text-[#E86225] hover:bg-[#FDF0E9] font-bold rounded-xl">
+                <Plus size={16} className="mr-1" /> Inviter un membre
               </Button>
             </div>
             {membersLoading ? (
               <div className="flex justify-center py-8">
-                <Loader2 className="animate-spin text-primary" />
+                <Loader2 className="animate-spin text-[#E86225]" />
               </div>
             ) : (
               <div className="overflow-x-auto">
                 <table className="w-full text-sm text-left">
-                  <thead className="bg-gray-50 text-xs uppercase text-gray-500 font-semibold">
+                  <thead className="bg-[#FAF5EF] text-xs uppercase text-[#52433B] font-extrabold border-b border-[#EFE6DD]">
                     <tr>
-                      <th className="px-4 py-3">Member</th>
-                      <th className="px-4 py-3">Role</th>
-                      <th className="px-4 py-3">Joined</th>
+                      <th className="px-4 py-3">Membre</th>
+                      <th className="px-4 py-3">Rôle</th>
+                      <th className="px-4 py-3">Adhésion</th>
                       <th className="px-4 py-3 text-right">Actions</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100">
+                  <tbody className="divide-y divide-[#EFE6DD]">
                     {(members ?? []).map((member) => (
-                      <tr key={member.userId} className="hover:bg-gray-50">
+                      <tr key={member.userId} className="hover:bg-[#FAF5EF]/50">
                         <td className="px-4 py-3 flex items-center gap-3">
                           <img
                             src={member.avatarUrl || `https://i.pravatar.cc/150?u=${member.userId}`}
-                            className="w-8 h-8 rounded-full"
+                            className="w-8 h-8 rounded-full border border-[#EFE6DD] object-cover"
                             alt=""
                           />
                           <div>
-                            <p className="font-semibold text-gray-900">{member.fullName ?? 'Member'}</p>
+                            <p className="font-bold text-[#2C1810]">{member.fullName ?? 'Membre'}</p>
                             {(member.email || member.city) && (
-                              <p className="text-xs text-gray-400">
+                              <p className="text-xs text-[#52433B]">
                                 {member.city ? `${member.city} ` : ''}
                                 {member.email ? `(${member.email})` : ''}
                               </p>
                             )}
                           </div>
                         </td>
-                        <td className="px-4 py-3 capitalize">{member.roleInCommunity.toLowerCase()}</td>
-                        <td className="px-4 py-3 text-gray-500">
-                          {member.joinedAt ? new Date(member.joinedAt).toLocaleDateString() : '—'}
+                        <td className="px-4 py-3 font-semibold text-[#E86225]">
+                          {member.roleInCommunity === 'LEADER' ? 'Organisateur' : 'Membre'}
+                        </td>
+                        <td className="px-4 py-3 text-[#52433B]">
+                          {member.joinedAt ? new Date(member.joinedAt).toLocaleDateString('fr-CA') : '—'}
                         </td>
                         <td className="px-4 py-3 text-right">
                           <div className="flex justify-end gap-2">
@@ -321,18 +323,20 @@ export function LeaderDashboard() {
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  title="Direct Message Member"
+                                  title="Envoyer un message privé"
                                   onClick={() => handleMessageMember(member.userId, member.fullName)}
+                                  className="text-[#E86225] hover:bg-[#FDF0E9]"
                                 >
-                                  <MessageSquare size={16} className="text-primary" />
+                                  <MessageSquare size={16} />
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="sm"
-                                  title="Report Member to Admin"
-                                  onClick={() => setReportTarget({ id: member.userId, name: member.fullName || 'Member' })}
+                                  title="Signaler ce membre"
+                                  onClick={() => setReportTarget({ id: member.userId, name: member.fullName || 'Membre' })}
+                                  className="text-red-500 hover:bg-red-50"
                                 >
-                                  <Flag size={16} className="text-red-500" />
+                                  <Flag size={16} />
                                 </Button>
                               </>
                             )}
