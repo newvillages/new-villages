@@ -79,7 +79,7 @@ app:
     success-url: ${STRIPE_SUCCESS_URL:http://localhost:5173/pricing?checkout=success}
     cancel-url: ${STRIPE_CANCEL_URL:http://localhost:5173/pricing?checkout=cancelled}
   terms:
-    seed-version: 1.0.0
+    seed-version: 2.0.0
   seed:
     admin-email: ${ADMIN_SEED_EMAIL:admin@newvillages.ca}
     admin-password: ${ADMIN_SEED_PASSWORD:ChangeMe123!}
