@@ -48,7 +48,7 @@ public class CommunityController {
 
     @GetMapping("/api/communities/{id}")
     public CommunityResponse getOne(@PathVariable UUID id) {
-        return communityService.getById(id, SecurityUtils.currentUserId());
+        return communityService.getById(id, SecurityUtils.currentUserIdOrNull());
     }
 
     @PostMapping("/api/communities")

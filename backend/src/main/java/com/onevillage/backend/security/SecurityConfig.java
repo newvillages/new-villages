@@ -95,9 +95,11 @@ public class SecurityConfig {
                                 "/api/admin/email/**",
                                 "/api/public/contact"
                         ).permitAll()
-                        // Anyone can browse the community directory; joining, viewing full
-                        // detail, and every other community endpoint still require a session.
-                        .requestMatchers(HttpMethod.GET, "/api/communities").permitAll()
+                        // Anyone can browse community directory, community details, events, and organizations.
+                        // Joining, creating, RSVPing, and mutation endpoints still require authentication.
+                        .requestMatchers(HttpMethod.GET, "/api/communities", "/api/communities/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/events", "/api/events/*").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/organizations", "/api/organizations/*").permitAll()
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
                 )

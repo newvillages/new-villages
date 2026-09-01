@@ -30,12 +30,12 @@ public class EventController {
                                              @RequestParam(defaultValue = "0") int page,
                                              @RequestParam(defaultValue = "20") int size) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("startAt").ascending());
-        return PageResponse.from(eventService.list(communityId, upcoming, SecurityUtils.currentUserId(), pageable));
+        return PageResponse.from(eventService.list(communityId, upcoming, SecurityUtils.currentUserIdOrNull(), pageable));
     }
 
     @GetMapping("/{id}")
     public EventResponse getOne(@PathVariable UUID id) {
-        return eventService.getById(id, SecurityUtils.currentUserId());
+        return eventService.getById(id, SecurityUtils.currentUserIdOrNull());
     }
 
     @PostMapping
