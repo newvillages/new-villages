@@ -21,11 +21,11 @@ const ICONS: Record<NotificationType, React.ReactNode> = {
 };
 
 const ACTION_LABELS: Record<NotificationType, string> = {
-  MESSAGE: 'Open message',
-  INVITATION: 'View invitation',
-  EVENT: 'View event',
-  ANNOUNCEMENT: 'View announcement',
-  SYSTEM: 'View details',
+  MESSAGE: 'Ouvrir le message',
+  INVITATION: "Voir l'invitation",
+  EVENT: 'Voir la sortie',
+  ANNOUNCEMENT: "Voir l'annonce",
+  SYSTEM: 'Voir les détails',
 };
 
 export function NotificationsDrawer({ isOpen, onClose }: NotificationsDrawerProps) {
@@ -112,9 +112,9 @@ export function NotificationsDrawer({ isOpen, onClose }: NotificationsDrawerProp
                   <div>
                     <h2 className="font-heading font-bold text-base text-slate-900 leading-tight">Notifications</h2>
                     {unreadCount > 0 ? (
-                      <p className="text-xs text-slate-500">{unreadCount} unread update{unreadCount > 1 ? 's' : ''}</p>
+                      <p className="text-xs text-slate-500">{unreadCount} notification{unreadCount > 1 ? 's' : ''} non lue{unreadCount > 1 ? 's' : ''}</p>
                     ) : (
-                      <p className="text-xs text-slate-400">All caught up</p>
+                      <p className="text-xs text-slate-400">Vous êtes à jour</p>
                     )}
                   </div>
                 </div>
@@ -127,13 +127,13 @@ export function NotificationsDrawer({ isOpen, onClose }: NotificationsDrawerProp
                       className="text-xs text-primary hover:text-primary-dark hover:bg-primary/5 h-8 px-2.5 flex items-center gap-1 font-medium"
                     >
                       <CheckCheck size={14} />
-                      Mark all read
+                      Tout marquer comme lu
                     </Button>
                   )}
                   <button 
                     onClick={onClose} 
                     className="p-1.5 hover:bg-slate-200/60 rounded-full text-slate-500 hover:text-slate-700 transition-colors"
-                    aria-label="Close notifications drawer"
+                    aria-label="Fermer les notifications"
                   >
                     <X size={18} />
                   </button>
@@ -150,7 +150,7 @@ export function NotificationsDrawer({ isOpen, onClose }: NotificationsDrawerProp
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  All ({notifications.length})
+                  Toutes ({notifications.length})
                 </button>
                 <button
                   onClick={() => setFilter('unread')}
@@ -160,7 +160,7 @@ export function NotificationsDrawer({ isOpen, onClose }: NotificationsDrawerProp
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
-                  <span>Unread</span>
+                  <span>Non lues</span>
                   {unreadCount > 0 && (
                     <span className="px-1.5 py-0.2 bg-primary text-white text-[10px] rounded-full font-bold">
                       {unreadCount}
@@ -205,13 +205,13 @@ export function NotificationsDrawer({ isOpen, onClose }: NotificationsDrawerProp
 
                       <div className="mt-2.5 flex items-center justify-between">
                         <span className="inline-flex items-center text-xs font-semibold text-primary group-hover:underline gap-1">
-                          {ACTION_LABELS[notif.type] || 'View details'}
+                          {ACTION_LABELS[notif.type] || 'Voir les détails'}
                           <ChevronRight size={14} className="group-hover:translate-x-0.5 transition-transform" />
                         </span>
 
                         {!notif.isRead && (
                           <button
-                            title="Mark as read"
+                            title="Marquer comme lu"
                             onClick={(e) => {
                               e.stopPropagation();
                               markRead.mutate(notif.id);
@@ -231,12 +231,12 @@ export function NotificationsDrawer({ isOpen, onClose }: NotificationsDrawerProp
                     <Bell size={24} className="opacity-60" />
                   </div>
                   <p className="text-sm font-medium text-slate-600">
-                    {filter === 'unread' ? 'No unread notifications' : 'No notifications yet'}
+                    {filter === 'unread' ? 'Aucune notification non lue' : 'Aucune notification pour le moment'}
                   </p>
                   <p className="text-xs text-slate-400 mt-1 max-w-xs">
                     {filter === 'unread' 
-                      ? 'You are all caught up! Switch to "All" to view past notifications.' 
-                      : 'When you get messages, invitations or event updates, they will show up here.'}
+                      ? 'Vous êtes parfaitement à jour ! Basculez sur « Toutes » pour voir vos notifications antérieures.' 
+                      : 'Lorsque vous recevrez des messages, invitations ou sorties, ils apparaîtront ici.'}
                   </p>
                 </div>
               )}

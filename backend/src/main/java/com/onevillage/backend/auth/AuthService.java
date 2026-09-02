@@ -62,17 +62,17 @@ public class AuthService {
     @Transactional
     public RegisterResponse register(RegisterRequest request, String ipAddress) {
         if (userRepository.existsByEmailIgnoreCase(request.email())) {
-            throw ApiException.conflict(ErrorCode.EMAIL_ALREADY_REGISTERED, "An account with this email already exists");
+            throw ApiException.conflict(ErrorCode.EMAIL_ALREADY_REGISTERED, "Un compte avec cette adresse courriel existe déjà");
         }
 
         String accountType = request.accountType().toUpperCase();
         if (!REGISTERABLE_ROLES.contains(accountType)) {
-            throw ApiException.badRequest("accountType must be one of MEMBER, COMMUNITY_LEADER, ORGANIZATION");
+            throw ApiException.badRequest("Le type de compte doit être MEMBER, COMMUNITY_LEADER ou ORGANIZATION");
         }
 
         TermsVersion current = termsService.getCurrentVersionEntity();
         if (!current.getVersion().equals(request.acceptedTermsVersion())) {
-            throw ApiException.badRequest("You must accept the current Terms of Use version (" + current.getVersion() + ")");
+            throw ApiException.badRequest("Vous devez accepter la version actuelle des conditions d'adhésion (" + current.getVersion() + ")");
         }
 
         User user = new User();
@@ -91,7 +91,7 @@ public class AuthService {
 
         issueVerificationToken(user);
 
-        return new RegisterResponse(user.getEmail(), "Account created. Please check your email to verify your address.");
+        return new RegisterResponse(user.getEmail(), "Compte créé avec succès. Veuillez consulter vos courriels pour activer votre adresse.");
     }
 
     private void issueVerificationToken(User user) {
@@ -106,12 +106,12 @@ public class AuthService {
     @Transactional
     public void verifyEmail(String token) {
         EmailVerificationToken verification = verificationTokenRepository.findByToken(token)
-                .orElseThrow(() -> ApiException.badRequest("Invalid or expired verification link"));
+                .orElseThrow(() -> ApiException.badRequest("Lien de vérification invalide ou expiré"));
         if (verification.getExpiresAt().isBefore(Instant.now())) {
-            throw ApiException.badRequest("This verification link has expired. Please request a new one.");
+            throw ApiException.badRequest("Ce lien d'activation a expiré. Veuillez en demander un nouveau.");
         }
         User user = userRepository.findById(verification.getUserId())
-                .orElseThrow(() -> ApiException.notFound("User not found"));
+                .orElseThrow(() -> ApiException.notFound("Utilisateur introuvable"));
         user.setEmailVerified(true);
         userRepository.save(user);
         verificationTokenRepository.delete(verification);
@@ -130,16 +130,16 @@ public class AuthService {
     @Transactional
     public AuthTokens login(String email, String password) {
         User user = userRepository.findByEmailIgnoreCase(email)
-                .orElseThrow(() -> ApiException.unauthorized(ErrorCode.INVALID_CREDENTIALS, "Invalid email or password"));
+                .orElseThrow(() -> ApiException.unauthorized(ErrorCode.INVALID_CREDENTIALS, "Adresse courriel ou mot de passe invalide"));
 
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
-            throw ApiException.unauthorized(ErrorCode.INVALID_CREDENTIALS, "Invalid email or password");
+            throw ApiException.unauthorized(ErrorCode.INVALID_CREDENTIALS, "Adresse courriel ou mot de passe invalide");
         }
         if (!user.isEmailVerified()) {
-            throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.EMAIL_NOT_VERIFIED, "Please verify your email before logging in");
+            throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.EMAIL_NOT_VERIFIED, "Veuillez confirmer votre adresse courriel avant de vous connecter");
         }
         if (!user.isActive()) {
-            throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.ACCOUNT_SUSPENDED, "This account has been suspended");
+            throw new ApiException(HttpStatus.FORBIDDEN, ErrorCode.ACCOUNT_SUSPENDED, "Ce compte a été suspendu");
         }
 
         return issueTokens(user);
@@ -230,12 +230,12 @@ public class AuthService {
     @Transactional
     public void resetPassword(String token, String newPassword) {
         PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token)
-                .orElseThrow(() -> ApiException.badRequest("Invalid or expired reset link"));
+                .orElseThrow(() -> ApiException.badRequest("Lien de réinitialisation invalide ou expiré"));
         if (resetToken.isUsed() || resetToken.getExpiresAt().isBefore(Instant.now())) {
-            throw ApiException.badRequest("Invalid or expired reset link");
+            throw ApiException.badRequest("Lien de réinitialisation invalide ou expiré");
         }
         User user = userRepository.findById(resetToken.getUserId())
-                .orElseThrow(() -> ApiException.notFound("User not found"));
+                .orElseThrow(() -> ApiException.notFound("Utilisateur introuvable"));
 
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);

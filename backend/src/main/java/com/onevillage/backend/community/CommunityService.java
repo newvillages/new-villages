@@ -123,9 +123,9 @@ public class CommunityService {
     @Transactional
     public void leave(UUID communityId, UUID userId) {
         CommunityMembership membership = membershipRepository.findByCommunityIdAndUserId(communityId, userId)
-                .orElseThrow(() -> ApiException.notFound("You are not a member of this community"));
+                .orElseThrow(() -> ApiException.notFound("Vous n'êtes pas membre de ce groupe"));
         if (membership.getRoleInCommunity() == CommunityMemberRole.LEADER) {
-            throw ApiException.badRequest("A community leader cannot leave their own community");
+            throw ApiException.badRequest("Un organisateur ne peut pas quitter son propre groupe");
         }
         membershipRepository.delete(membership);
     }
@@ -135,10 +135,10 @@ public class CommunityService {
         requireLeader(communityId, inviterId);
         Community community = getEntity(communityId);
         User inviter = userRepository.findById(inviterId).orElse(null);
-        String inviterName = inviter != null ? inviter.getFullName() : "Community Leader";
+        String inviterName = inviter != null ? inviter.getFullName() : "Organisateur de groupe";
 
         if (invitedEmail == null || invitedEmail.trim().isBlank()) {
-            throw ApiException.badRequest("Invitee email address is required");
+            throw ApiException.badRequest("L'adresse courriel de l'invité est requise");
         }
 
         String cleanEmail = invitedEmail.trim().toLowerCase();
@@ -148,7 +148,7 @@ public class CommunityService {
             UUID targetUserId = existingUser.get().getId();
             Optional<CommunityMembership> existingMembership = membershipRepository.findByCommunityIdAndUserId(communityId, targetUserId);
             if (existingMembership.isPresent() && existingMembership.get().getStatus() == MembershipStatus.JOINED) {
-                throw ApiException.badRequest(cleanEmail + " is already an active member of this community");
+                throw ApiException.badRequest(cleanEmail + " est déjà un membre actif de ce groupe");
             }
         }
 
@@ -234,9 +234,9 @@ public class CommunityService {
     @Transactional
     public void approveCreationRequest(UUID requestId, UUID adminId) {
         CommunityCreationRequest request = creationRequestRepository.findById(requestId)
-                .orElseThrow(() -> ApiException.notFound("Request not found"));
+                .orElseThrow(() -> ApiException.notFound("Demande introuvable"));
         if (request.getStatus() != CreationRequestStatus.PENDING) {
-            throw ApiException.badRequest("This request has already been reviewed");
+            throw ApiException.badRequest("Cette demande a déjà été traitée");
         }
 
         Community community = new Community();
@@ -274,9 +274,9 @@ public class CommunityService {
     @Transactional
     public void rejectCreationRequest(UUID requestId, UUID adminId) {
         CommunityCreationRequest request = creationRequestRepository.findById(requestId)
-                .orElseThrow(() -> ApiException.notFound("Request not found"));
+                .orElseThrow(() -> ApiException.notFound("Demande introuvable"));
         if (request.getStatus() != CreationRequestStatus.PENDING) {
-            throw ApiException.badRequest("This request has already been reviewed");
+            throw ApiException.badRequest("Cette demande a déjà été traitée");
         }
         request.setStatus(CreationRequestStatus.REJECTED);
         request.setReviewedBy(adminId);

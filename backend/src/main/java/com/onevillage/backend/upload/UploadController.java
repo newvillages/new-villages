@@ -31,10 +31,10 @@ public class UploadController {
     @PostMapping(value = "/images", consumes = "multipart/form-data")
     public UploadResponse uploadImage(@RequestParam("file") MultipartFile file) {
         if (file.getContentType() == null || !file.getContentType().startsWith("image/")) {
-            throw ApiException.badRequest("Only image files are allowed");
+            throw ApiException.badRequest("Seuls les fichiers image sont acceptés");
         }
         if (file.getSize() > MAX_BYTES) {
-            throw ApiException.badRequest("Image must be 5MB or smaller");
+            throw ApiException.badRequest("L'image doit être de 5 Mo ou moins");
         }
         return new UploadResponse(fileStorageService.store(file, "images"));
     }

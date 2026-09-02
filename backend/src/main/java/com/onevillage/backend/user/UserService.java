@@ -86,7 +86,7 @@ public class UserService {
         }
         if (request.selectedCommunityId() != null) {
             if (!communityRepository.existsById(request.selectedCommunityId())) {
-                throw ApiException.badRequest("Selected community does not exist");
+                throw ApiException.badRequest("Le groupe sélectionné n'existe pas");
             }
             user.setSelectedCommunityId(request.selectedCommunityId());
         }
@@ -106,7 +106,7 @@ public class UserService {
     public void changePassword(UUID userId, String currentPassword, String newPassword) {
         User user = getEntity(userId);
         if (!passwordEncoder.matches(currentPassword, user.getPasswordHash())) {
-            throw ApiException.badRequest("Current password is incorrect");
+            throw ApiException.badRequest("Le mot de passe actuel est incorrect");
         }
         user.setPasswordHash(passwordEncoder.encode(newPassword));
         userRepository.save(user);

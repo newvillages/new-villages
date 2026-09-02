@@ -16,7 +16,7 @@ import {
   Calendar,
   Sparkles
 } from 'lucide-react';
-import { cn, getUserAvatar } from '../lib/utils';
+import { cn, getUserAvatar, getRoleLabel } from '../lib/utils';
 import { useStore } from '../store/useStore';
 import { useLogout } from '../hooks/useAuth';
 import { useNotifications } from '../hooks/useNotifications';
@@ -281,7 +281,7 @@ export function Layout() {
                     >
                       <div className="p-4 border-b border-slate-50 bg-[#FAF5EF]">
                         <p className="font-bold text-[#2C1810] truncate">{currentUser?.fullName || 'Membre'}</p>
-                        <p className="text-xs text-[#E86225] font-semibold capitalize mt-0.5">{role.toLowerCase().replace('_', ' ')}</p>
+                        <p className="text-xs text-[#E86225] font-semibold mt-0.5">{getRoleLabel(role)}</p>
                       </div>
                       <div className="p-2 space-y-1">
                         <Link to="/profile" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#52433B] hover:bg-[#FDF0E9] hover:text-[#E86225] rounded-xl transition-colors">
@@ -375,7 +375,7 @@ export function Layout() {
                     >
                       <div className="p-3 border-b border-slate-50 bg-[#FAF5EF]">
                         <p className="font-bold text-xs text-[#2C1810] truncate">{currentUser?.fullName || 'Membre'}</p>
-                        <p className="text-[11px] text-[#E86225] font-semibold capitalize mt-0.5">{role.toLowerCase().replace('_', ' ')}</p>
+                        <p className="text-[11px] text-[#E86225] font-semibold mt-0.5">{getRoleLabel(role)}</p>
                       </div>
                       <div className="p-1.5 space-y-0.5">
                         <Link to="/profile" className="flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-[#52433B] hover:bg-[#FDF0E9] rounded-xl transition-colors">

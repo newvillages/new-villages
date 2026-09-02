@@ -58,7 +58,7 @@ public class TermsService {
     public void recordAcceptance(UUID userId, String version, String ipAddress) {
         TermsVersion current = getCurrentVersionEntity();
         if (!current.getVersion().equals(version)) {
-            throw ApiException.badRequest("The Terms version you accepted is no longer current. Please reload and try again.");
+            throw ApiException.badRequest("La version des conditions que vous avez acceptée n'est plus à jour. Veuillez actualiser la page et réessayer.");
         }
         if (acceptanceRepository.existsByUserIdAndTermsVersionId(userId, current.getId())) {
             return;

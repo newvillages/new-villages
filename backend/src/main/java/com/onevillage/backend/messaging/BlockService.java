@@ -24,7 +24,7 @@ public class BlockService {
     @Transactional
     public void block(UUID blockerId, UUID blockedId) {
         if (blockerId.equals(blockedId)) {
-            throw ApiException.badRequest("You cannot block yourself");
+            throw ApiException.badRequest("Vous ne pouvez pas vous bloquer vous-même");
         }
         if (blockedUserRepository.existsByBlockerIdAndBlockedId(blockerId, blockedId)) {
             return;

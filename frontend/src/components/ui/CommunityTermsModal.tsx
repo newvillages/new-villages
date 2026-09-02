@@ -29,12 +29,12 @@ export function CommunityTermsModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title={`Community Guidelines & Terms`}>
+    <Modal isOpen={isOpen} onClose={onClose} title={`Règles et conditions du groupe`}>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="flex items-center gap-3 p-3 bg-amber-50 border border-amber-200 rounded-2xl text-amber-900 text-sm">
           <ShieldCheck className="shrink-0 text-amber-600" size={24} />
           <div>
-            <span className="font-bold block">Accept Terms to Join {communityName}</span>
+            <span className="font-bold block">Accepter les règles pour rejoindre {communityName}</span>
             <span className="text-xs text-amber-700">
               Ce groupe comporte des conditions particulières configurées par l'organisateur de groupe.
             </span>
@@ -54,16 +54,16 @@ export function CommunityTermsModal({
             required
           />
           <span>
-            I have read and agree to follow these specific Community Terms & Conditions while participating in <strong>{communityName}</strong>.
+            J'ai lu et j'accepte de respecter ces règles particulières lors de ma participation au groupe <strong>{communityName}</strong>.
           </span>
         </label>
 
         <div className="flex gap-2 pt-2">
           <Button type="button" variant="ghost" className="flex-1" onClick={onClose}>
-            Cancel
+            Annuler
           </Button>
           <Button type="submit" variant="primary" className="flex-1" disabled={!agreed || isPending}>
-            {isPending ? 'Joining…' : 'Accept & Join Community'}
+            {isPending ? 'Adhésion en cours…' : 'Accepter et rejoindre le groupe'}
           </Button>
         </div>
       </form>

@@ -68,10 +68,10 @@ public class MessagingService {
         UUID recipientId = resolveRecipient(userId, request);
 
         if (recipientId.equals(userId)) {
-            throw ApiException.badRequest("You cannot start a conversation with yourself");
+            throw ApiException.badRequest("Vous ne pouvez pas démarrer une conversation avec vous-même");
         }
         if (blockService.isBlockedEitherDirection(userId, recipientId)) {
-            throw ApiException.forbidden("You cannot message this user");
+            throw ApiException.forbidden("Vous ne pouvez pas envoyer de message à cet utilisateur");
         }
 
         UUID conversationId = participantRepository.findDirectConversationBetween(userId, recipientId)
@@ -86,31 +86,31 @@ public class MessagingService {
         return switch (request.type().toUpperCase()) {
             case "LEADER" -> {
                 if (request.communityId() == null) {
-                    throw ApiException.badRequest("communityId is required to message a community leader");
+                    throw ApiException.badRequest("L'identifiant du groupe est requis pour contacter l'organisateur");
                 }
                 Community community = communityRepository.findById(request.communityId())
-                        .orElseThrow(() -> ApiException.notFound("Community not found"));
+                        .orElseThrow(() -> ApiException.notFound("Groupe introuvable"));
                 yield community.getLeaderId();
             }
             case "ORG" -> {
                 if (request.organizationId() == null) {
-                    throw ApiException.badRequest("organizationId is required to message an organization");
+                    throw ApiException.badRequest("L'identifiant de l'organisation est requis");
                 }
                 Organization org = organizationRepository.findById(request.organizationId())
-                        .orElseThrow(() -> ApiException.notFound("Organization not found"));
+                        .orElseThrow(() -> ApiException.notFound("Organisation introuvable"));
                 yield org.getOwnerUserId();
             }
             case "ADMIN" -> findAnyAdminId(userId);
             case "USER", "MEMBER" -> {
                 if (request.targetUserId() == null) {
-                    throw ApiException.badRequest("targetUserId is required for direct messaging");
+                    throw ApiException.badRequest("L'identifiant du destinataire est requis");
                 }
                 if (!userRepository.existsById(request.targetUserId())) {
-                    throw ApiException.notFound("Target user not found");
+                    throw ApiException.notFound("Utilisateur destinataire introuvable");
                 }
                 yield request.targetUserId();
             }
-            default -> throw ApiException.badRequest("type must be one of LEADER, ORG, ADMIN, USER, MEMBER");
+            default -> throw ApiException.badRequest("Le type doit être l'un de LEADER, ORG, ADMIN, USER, MEMBER");
         };
     }
 

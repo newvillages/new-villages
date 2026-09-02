@@ -39,23 +39,23 @@ public class EventService {
         try {
             type = EventType.valueOf(request.type().toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw ApiException.badRequest("Invalid event type");
+            throw ApiException.badRequest("Type de sortie invalide");
         }
 
         if (request.communityId() != null) {
             Community community = communityRepository.findById(request.communityId())
-                    .orElseThrow(() -> ApiException.notFound("Community not found"));
+                    .orElseThrow(() -> ApiException.notFound("Groupe introuvable"));
             if (!community.getLeaderId().equals(userId)) {
-                throw ApiException.forbidden("Only the community leader can publish events for this community");
+                throw ApiException.forbidden("Seul l'organisateur du groupe peut publier des sorties pour ce groupe");
             }
         } else if (request.organizationId() != null) {
             Organization org = organizationRepository.findById(request.organizationId())
-                    .orElseThrow(() -> ApiException.notFound("Organization not found"));
+                    .orElseThrow(() -> ApiException.notFound("Organisation introuvable"));
             if (!org.getOwnerUserId().equals(userId)) {
-                throw ApiException.forbidden("Only the organization owner can publish events for this organization");
+                throw ApiException.forbidden("Seul le gestionnaire de l'organisation peut publier des sorties");
             }
         } else {
-            throw ApiException.badRequest("An event must belong to a community or an organization");
+            throw ApiException.badRequest("Une sortie doit être rattachée à un groupe ou une organisation");
         }
 
         Event event = new Event();
@@ -87,14 +87,14 @@ public class EventService {
     }
 
     public Event getEntity(UUID id) {
-        return eventRepository.findById(id).orElseThrow(() -> ApiException.notFound("Event not found"));
+        return eventRepository.findById(id).orElseThrow(() -> ApiException.notFound("Sortie introuvable"));
     }
 
     @Transactional
     public void delete(UUID id, UUID userId) {
         Event event = getEntity(id);
         if (!event.getCreatedBy().equals(userId)) {
-            throw ApiException.forbidden("Only the event creator can delete this event");
+            throw ApiException.forbidden("Seul le créateur de la sortie peut la supprimer");
         }
         eventRepository.delete(event);
     }
@@ -106,7 +106,7 @@ public class EventService {
         try {
             status = RsvpStatus.valueOf(statusRaw.toUpperCase());
         } catch (IllegalArgumentException e) {
-            throw ApiException.badRequest("Invalid RSVP status");
+            throw ApiException.badRequest("Statut d'inscription invalide");
         }
         EventRsvp rsvp = rsvpRepository.findByEventIdAndUserId(eventId, userId).orElseGet(EventRsvp::new);
         rsvp.setEventId(eventId);

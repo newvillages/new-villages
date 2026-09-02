@@ -59,15 +59,34 @@ public class DataSeeder implements ApplicationRunner {
         TermsVersion currentTerms = seedTermsVersion();
         seedAdminUser(currentTerms);
         seedTestUser("member@newvillages.ca", "Jean Tremblay", UserRole.MEMBER, currentTerms);
-        seedTestUser("leader@newvillages.ca", "Community Leader", UserRole.COMMUNITY_LEADER, currentTerms);
-        seedTestUser("christian.leader@newvillages.ca", "Christian Leader", UserRole.COMMUNITY_LEADER, currentTerms);
-        seedTestUser("org@newvillages.ca", "Organization Lead", UserRole.ORGANIZATION, currentTerms);
+        seedTestUser("leader@newvillages.ca", "Marc Tremblay", UserRole.COMMUNITY_LEADER, currentTerms);
+        seedTestUser("christian.leader@newvillages.ca", "Christian Tremblay", UserRole.COMMUNITY_LEADER, currentTerms);
+        seedTestUser("org@newvillages.ca", "Association Restos Montréal", UserRole.ORGANIZATION, currentTerms);
 
+        userRepository.findByEmailIgnoreCase(adminEmail).ifPresent(a -> {
+            a.setFullName("Administration Bouffe & Amitié");
+            a.setCity("Montréal");
+            userRepository.save(a);
+        });
         userRepository.findByEmailIgnoreCase("member@newvillages.ca").ifPresent(m -> {
-            if ("Community Member".equalsIgnoreCase(m.getFullName())) {
-                m.setFullName("Jean Tremblay");
-                userRepository.save(m);
-            }
+            m.setFullName("Jean Tremblay");
+            m.setCity("Montréal");
+            userRepository.save(m);
+        });
+        userRepository.findByEmailIgnoreCase("leader@newvillages.ca").ifPresent(l -> {
+            l.setFullName("Marc Tremblay");
+            l.setCity("Montréal");
+            userRepository.save(l);
+        });
+        userRepository.findByEmailIgnoreCase("christian.leader@newvillages.ca").ifPresent(c -> {
+            c.setFullName("Christian Tremblay");
+            c.setCity("Montréal");
+            userRepository.save(c);
+        });
+        userRepository.findByEmailIgnoreCase("org@newvillages.ca").ifPresent(o -> {
+            o.setFullName("Association Restos Montréal");
+            o.setCity("Montréal");
+            userRepository.save(o);
         });
     }
 
@@ -155,12 +174,12 @@ public class DataSeeder implements ApplicationRunner {
         }
 
         User admin = new User();
-        admin.setFullName("Bouffe & Amitié Admin");
+        admin.setFullName("Administration Bouffe & Amitié");
         admin.setEmail(adminEmail);
         admin.setPasswordHash(passwordEncoder.encode(adminPassword));
         admin.setRole(UserRole.ADMIN);
         admin.setCountry("Canada");
-        admin.setCity("Toronto");
+        admin.setCity("Montréal");
         admin.setAccountStatus(AccountStatus.ACTIVE);
         admin.setEmailVerified(true);
         User savedAdmin = userRepository.save(admin);

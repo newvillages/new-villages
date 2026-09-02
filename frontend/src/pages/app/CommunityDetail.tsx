@@ -48,9 +48,9 @@ export function CommunityDetail() {
   const posts = postsPage?.content ?? [];
 
   const tabs: { id: Tab; label: string }[] = [
-    { id: 'feed', label: 'Feed' },
+    { id: 'feed', label: 'Actualités & Discussions' },
     { id: 'members', label: 'Membres' },
-    { id: 'events', label: `Événements (${communityEvents.length})` },
+    { id: 'events', label: `Sorties (${communityEvents.length})` },
     { id: 'about', label: 'À propos' },
   ];
 
@@ -70,7 +70,7 @@ export function CommunityDetail() {
   const handleJoinClick = () => {
     if (joined) {
       leaveMutation.mutate(community.id, {
-        onError: (err) => toast.info(err.message || 'Could not leave this community.'),
+        onError: (err) => toast.info(err.message || 'Impossible de quitter ce groupe.'),
       });
     } else if (!pending) {
       if (community.customTerms && community.customTerms.trim().length > 0) {
@@ -84,10 +84,10 @@ export function CommunityDetail() {
   const executeJoin = () => {
     joinMutation.mutate(community.id, {
       onSuccess: () => {
-        toast.success('Join request sent / joined community!');
+        toast.success('Demande envoyée / groupe rejoint avec succès !');
         setTermsModalOpen(false);
       },
-      onError: (err) => toast.info(err.message || 'Could not join this community.'),
+      onError: (err) => toast.info(err.message || 'Impossible de rejoindre ce groupe.'),
     });
   };
 
@@ -96,11 +96,11 @@ export function CommunityDetail() {
     if (!inviteEmail.trim() || !id) return;
     inviteMutation.mutate(inviteEmail, {
       onSuccess: () => {
-        toast.success(`Invitation sent to ${inviteEmail}!`);
+        toast.success(`Invitation envoyée à ${inviteEmail} !`);
         setInviteEmail('');
         setInviteModalOpen(false);
       },
-      onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Could not send invitation email.'),
+      onError: (err) => toast.info(err instanceof ApiError ? err.message : "Impossible d'envoyer le courriel d'invitation."),
     });
   };
 
@@ -109,7 +109,7 @@ export function CommunityDetail() {
     if (!postDraft.trim()) return;
     createPost.mutate(postDraft, {
       onSuccess: () => setPostDraft(''),
-      onError: (err) => toast.info(err.message || 'Could not publish your post.'),
+      onError: (err) => toast.info(err.message || 'Impossible de publier votre message.'),
     });
   };
 
@@ -118,11 +118,11 @@ export function CommunityDetail() {
       {
         type: 'LEADER',
         communityId: community.id,
-        initialMessage: `Hi ${community.leaderName ?? 'Leader'}, I have a question about ${community.name}.`,
+        initialMessage: `Bonjour ${community.leaderName ?? "l'organisateur"}, j'ai une question concernant le groupe ${community.name}.`,
       },
       {
         onSuccess: () => navigate('/messages'),
-        onError: (err) => toast.info(err.message || 'Could not start conversation with leader.'),
+        onError: (err) => toast.info(err.message || "Impossible de démarrer la conversation avec l'organisateur."),
       }
     );
   };
@@ -130,7 +130,7 @@ export function CommunityDetail() {
   return (
     <div className="max-w-5xl mx-auto px-4 py-8">
       <Link to="/communities" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 mb-6 font-medium">
-        <ArrowLeft size={16} /> Back to Directory
+        <ArrowLeft size={16} /> Retour aux groupes
       </Link>
 
       {/* Banner & Header */}
@@ -164,7 +164,7 @@ export function CommunityDetail() {
             {!isLeader && (
               pending ? (
                 <span className="flex items-center gap-1.5 text-sm font-semibold text-amber-600 bg-amber-50 px-4 py-2 rounded-full">
-                  <Clock size={16} /> Requested
+                  <Clock size={16} /> Demande envoyée
                 </span>
               ) : (
                 <Button
@@ -172,7 +172,7 @@ export function CommunityDetail() {
                   onClick={handleJoinClick}
                   disabled={joinMutation.isPending || leaveMutation.isPending}
                 >
-                  {joined ? <><UserMinus size={16} className="mr-2"/> Leave</> : <><UserPlus size={16} className="mr-2"/>Join</>}
+                  {joined ? <><UserMinus size={16} className="mr-2"/> Quitter le groupe</> : <><UserPlus size={16} className="mr-2"/> Rejoindre le groupe</>}
                 </Button>
               )
             )}
@@ -180,15 +180,16 @@ export function CommunityDetail() {
               variant="outline"
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href);
-                toast.success('Community link copied to clipboard!');
+                toast.success('Lien du groupe copié dans le presse-papier !');
               }}
               className="flex items-center gap-1.5"
             >
-              <Share2 size={16} /> Share Link
+              <Share2 size={16} /> Partager le lien
             </Button>
             <button
               onClick={() => setReportModalOpen(true)}
               className="p-2 text-gray-400 hover:text-red-500 transition-colors"
+              title="Signaler ce groupe"
             >
               <Flag size={20} />
             </button>
@@ -199,10 +200,10 @@ export function CommunityDetail() {
           <div className="mx-6 mb-6 p-3 bg-blue-50 border border-blue-200 rounded-xl text-blue-900 text-xs flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ShieldAlert size={16} className="text-blue-600" />
-              <span>This community has specific Community Terms & Conditions that apply to members.</span>
+              <span>Ce groupe applique des règles particulières pour ses membres.</span>
             </div>
             <button onClick={() => setTermsModalOpen(true)} className="text-primary font-bold hover:underline">
-              View Terms
+              Consulter les règles
             </button>
           </div>
         )}
@@ -235,11 +236,11 @@ export function CommunityDetail() {
                       onChange={(e) => setPostDraft(e.target.value)}
                       className="flex-1 resize-none border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
                       rows={2}
-                      placeholder="Share something with the community..."
+                      placeholder="Partagez un message ou une annonce avec le groupe..."
                     />
                   </div>
                   <div className="flex justify-end mt-2">
-                    <Button type="submit" size="sm" disabled={!postDraft.trim() || createPost.isPending}>Post</Button>
+                    <Button type="submit" size="sm" disabled={!postDraft.trim() || createPost.isPending}>Publier</Button>
                   </div>
                 </form>
               </CardContent>
@@ -254,7 +255,7 @@ export function CommunityDetail() {
                   <img src={post.authorAvatarUrl || `https://i.pravatar.cc/150?u=${post.authorId}`} alt="" className="w-10 h-10 rounded-full shrink-0" />
                   <div>
                     <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-gray-900 text-sm">{post.authorName ?? 'Someone'}</span>
+                      <span className="font-semibold text-gray-900 text-sm">{post.authorName ?? 'Membre'}</span>
                       <span className="text-gray-400 text-xs">{formatRelativeTime(post.createdAt)}</span>
                     </div>
                     <p className="text-gray-700 text-sm">{post.body}</p>
@@ -263,7 +264,7 @@ export function CommunityDetail() {
               </Card>
             ))
           ) : (
-            <Card><CardContent className="p-5"><p className="text-gray-500 text-center py-4">No posts yet. Be the first to share something!</p></CardContent></Card>
+            <Card><CardContent className="p-5"><p className="text-gray-500 text-center py-4">Aucun message pour l'instant. Soyez le premier à participer !</p></CardContent></Card>
           )}
         </div>
       )}
@@ -283,7 +284,7 @@ export function CommunityDetail() {
                     <div className="min-w-0">
                       <p className="font-semibold text-gray-900 truncate">{member.fullName ?? 'Membre'}</p>
                       <p className="text-xs text-gray-500 capitalize">
-                        {member.roleInCommunity.toLowerCase()} {member.city ? `• ${member.city}` : ''}
+                        {member.roleInCommunity === 'LEADER' ? 'Organisateur' : 'Membre'} {member.city ? `• ${member.city}` : ''}
                       </p>
                       {member.email && <p className="text-[11px] text-gray-400 truncate">{member.email}</p>}
                     </div>
@@ -295,7 +296,7 @@ export function CommunityDetail() {
                       className="shrink-0 text-xs flex items-center gap-1"
                       onClick={() => navigate('/messages', { state: { targetUserId: member.userId, targetUserName: member.fullName } })}
                     >
-                      <MessageSquare size={14} /> Message
+                      <MessageSquare size={14} /> Message privé
                     </Button>
                   )}
                 </CardContent>
@@ -313,24 +314,24 @@ export function CommunityDetail() {
                 <CardContent className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                   <div>
                     <span className="inline-block px-2.5 py-0.5 bg-primary/10 text-primary text-xs font-semibold rounded-full mb-2">
-                      {evt.type}
+                      {evt.type === 'DINNER' ? 'Repas au restaurant' : evt.type === 'SOCIAL' ? 'Activité sociale' : evt.type}
                     </span>
                     <h3 className="font-bold text-gray-900 text-lg">{evt.title}</h3>
                     <p className="text-sm text-gray-600 line-clamp-2 mt-1">{evt.description}</p>
                     <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
                       <span className="flex items-center gap-1"><Calendar size={14} /> {formatEventDate(evt.startAt)}</span>
                       <span className="flex items-center gap-1"><Clock size={14} /> {formatEventTime(evt.startAt)}</span>
-                      <span className="flex items-center gap-1"><MapPin size={14} /> {evt.online ? 'Online' : evt.location}</span>
+                      <span className="flex items-center gap-1"><MapPin size={14} /> {evt.online ? 'En ligne' : evt.location}</span>
                     </div>
                   </div>
                   <Link to={`/events/${evt.id}`}>
-                    <Button variant="outline" size="sm">View Event</Button>
+                    <Button variant="outline" size="sm">Voir la sortie</Button>
                   </Link>
                 </CardContent>
               </Card>
             ))
           ) : (
-            <Card><CardContent className="p-8 text-center text-gray-500">No upcoming events scheduled for this community.</CardContent></Card>
+            <Card><CardContent className="p-8 text-center text-gray-500">Aucune sortie programmée pour ce groupe pour le moment.</CardContent></Card>
           )}
         </div>
       )}
@@ -341,12 +342,12 @@ export function CommunityDetail() {
             <Card>
               <CardContent className="p-6 space-y-4">
                 <div>
-                  <h3 className="font-bold text-gray-900 mb-1">About</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">{community.description || 'No description yet.'}</p>
+                  <h3 className="font-bold text-gray-900 mb-1">À propos du groupe</h3>
+                  <p className="text-gray-600 text-sm leading-relaxed">{community.description || 'Aucune présentation pour le moment.'}</p>
                 </div>
                 {community.category && (
                   <div>
-                    <h3 className="font-bold text-gray-900 mb-1">Category</h3>
+                    <h3 className="font-bold text-gray-900 mb-1">Catégorie</h3>
                     <span className="text-primary bg-primary/10 px-3 py-1 rounded-full text-xs font-semibold">
                       {community.category}
                     </span>
@@ -359,7 +360,7 @@ export function CommunityDetail() {
               <Card>
                 <CardContent className="p-6 space-y-2">
                   <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                    <ShieldAlert size={18} className="text-amber-600" /> Community Specific Terms & Conditions
+                    <ShieldAlert size={18} className="text-amber-600" /> Règles particulières du groupe
                   </h3>
                   <p className="text-xs text-gray-600 whitespace-pre-wrap bg-gray-50 p-3 rounded-xl border border-gray-200">
                     {community.customTerms}
@@ -373,10 +374,10 @@ export function CommunityDetail() {
             <Card>
               <CardContent className="p-5 space-y-3">
                 <h4 className="font-bold text-gray-900 flex items-center gap-1.5 text-sm">
-                  <ShieldAlert size={16} className="text-primary" /> Leadership Portal
+                  <ShieldAlert size={16} className="text-primary" /> Organisateur du groupe
                 </h4>
                 <div className="flex items-center gap-3 pt-2">
-                  <img src="https://i.pravatar.cc/40?u=leader" className="w-10 h-10 rounded-full" alt="Leader" />
+                  <img src="https://i.pravatar.cc/40?u=leader" className="w-10 h-10 rounded-full" alt="Organisateur" />
                   <div>
                     <p className="font-semibold text-sm text-gray-900">{community.leaderName ?? 'Organisateur de groupe'}</p>
                     <p className="text-xs text-gray-500">Organisateur de groupe</p>
@@ -384,10 +385,10 @@ export function CommunityDetail() {
                 </div>
                 <div className="pt-2 space-y-2">
                   <Button variant="outline" size="sm" className="w-full text-xs flex items-center justify-center gap-1" onClick={handleContactLeader}>
-                    <MessageSquare size={14} /> Contact Leader
+                    <MessageSquare size={14} /> Contacter l'organisateur
                   </Button>
                   <Button variant="ghost" size="sm" className="w-full text-xs text-red-600 hover:bg-red-50 flex items-center justify-center gap-1" onClick={() => setReportLeaderOpen(true)}>
-                    <Flag size={14} /> Report Leader
+                    <Flag size={14} /> Signaler l'organisateur
                   </Button>
                 </div>
               </CardContent>
@@ -427,14 +428,14 @@ export function CommunityDetail() {
       <Modal isOpen={inviteModalOpen} onClose={() => setInviteModalOpen(false)} title={`Inviter un membre à ${community.name}`}>
         <form onSubmit={handleSendInvite} className="space-y-4">
           <p className="text-xs text-slate-500">
-            Send a direct invitation email to a potential member. If they already have an account on New Villages, they will also receive an instant in-app notification.
+            Envoyez une invitation par courriel à un membre potentiel. S'il possède déjà un compte sur Bouffe &amp; Amitié, il recevra également une notification instantanée.
           </p>
           <div>
-            <label className="block text-xs font-semibold text-slate-700 mb-1">Invitee Email Address</label>
+            <label className="block text-xs font-semibold text-slate-700 mb-1">Adresse courriel de l'invité</label>
             <Input
               type="email"
               required
-              placeholder="e.g. member@example.com"
+              placeholder="Ex : ami@exemple.ca"
               value={inviteEmail}
               onChange={(e) => setInviteEmail(e.target.value)}
             />
@@ -447,19 +448,19 @@ export function CommunityDetail() {
               size="sm"
               onClick={() => {
                 navigator.clipboard.writeText(window.location.href);
-                toast.success('Invite link copied!');
+                toast.success("Lien d'invitation copié !");
               }}
               className="shrink-0 text-xs h-7 gap-1"
             >
-              <Copy size={12} /> Copy
+              <Copy size={12} /> Copier
             </Button>
           </div>
           <div className="flex gap-2 pt-2">
             <Button type="button" variant="ghost" className="flex-1" onClick={() => setInviteModalOpen(false)}>
-              Cancel
+              Annuler
             </Button>
             <Button type="submit" variant="primary" className="flex-1" disabled={inviteMutation.isPending}>
-              {inviteMutation.isPending ? 'Sending...' : 'Send Invitation'}
+              {inviteMutation.isPending ? 'Envoi…' : "Envoyer l'invitation"}
             </Button>
           </div>
         </form>
