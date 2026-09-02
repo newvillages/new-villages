@@ -115,7 +115,7 @@ export function AdminDashboard() {
   const sidebarLinks: { id: AdminSection; label: string; icon: React.ElementType; badge?: number }[] = [
     { id: 'overview', label: 'Aperçu général', icon: BarChart2 },
     { id: 'interac', label: 'Virements Interac', icon: Send, badge: pendingInteracCount },
-    { id: 'broadcast', label: 'Annonce générale (Broadcast)', icon: Radio },
+    { id: 'broadcast', label: 'Annonce générale', icon: Radio },
     { id: 'users', label: 'Gestion des membres', icon: Users },
     { id: 'applications', label: 'Candidatures d\'organisateurs', icon: CheckCircle, badge: leaderApps.data?.length },
     { id: 'communities', label: 'Groupes d\'arrondissements', icon: Users },
@@ -293,7 +293,7 @@ function BroadcastSection() {
   return (
     <div className="space-y-4 max-w-3xl">
       <div>
-        <h1 className="text-2xl font-heading font-bold text-gray-900">Admin Broadcast Announcement</h1>
+        <h1 className="text-2xl font-heading font-bold text-gray-900">Annonce générale de l'administration</h1>
         <p className="text-sm text-gray-500">
           Send an official broadcast message / announcement to all active groups or target specific communities.
         </p>
@@ -314,7 +314,7 @@ function BroadcastSection() {
             </div>
 
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1">Broadcast Message Body *</label>
+              <label className="block text-sm font-semibold text-gray-700 mb-1">Corps de l'annonce générale *</label>
               <textarea
                 value={message}
                 onChange={(e) => setMessage(e.target.value)}
@@ -425,7 +425,7 @@ function BroadcastSection() {
               </span>
               <Button type="submit" className="bg-primary hover:bg-primary-hover flex items-center gap-2" disabled={broadcastMutation.isPending}>
                 <Send size={16} />
-                {broadcastMutation.isPending ? 'Sending Broadcast…' : `Send Broadcast to ${recipientCount} ${recipientCount === 1 ? 'Group' : 'Groups'}`}
+                {broadcastMutation.isPending ? 'Envoi en cours…' : `Envoyer l'annonce générale à ${recipientCount} ${recipientCount === 1 ? 'groupe' : 'groupes'}`}
               </Button>
             </div>
           </form>
@@ -442,7 +442,7 @@ function UsersSection({ search, setSearch }: { search: string; setSearch: (v: st
   const removeLeader = useRemoveLeaderRole();
 
   const handleRemoveLeader = (userId: string, name: string) => {
-    if (confirm(`Are you sure you want to remove ${name} from Community Leader role? They will be demoted to regular MEMBER.`)) {
+    if (confirm(`Voulez-vous vraiment retirer le rôle d'organisateur de groupe à ${name} ? Il sera rétrogradé au statut de MEMBRE.`)) {
       removeLeader.mutate(userId, {
         onSuccess: () => toast.success(`Leader role removed for ${name}.`),
         onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Could not remove leader role.'),
@@ -472,7 +472,7 @@ function UsersSection({ search, setSearch }: { search: string; setSearch: (v: st
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-xs uppercase text-gray-500 font-semibold">
                 <tr>
-                  {['User', 'Role', 'City', 'Joined', 'Status', 'Actions'].map((h) => (
+                  {['Utilisateur', 'Rôle', 'Ville', 'Rejoint le', 'Statut', 'Actions'].map((h) => (
                     <th key={h} className="px-4 py-3 text-left">
                       {h}
                     </th>
@@ -606,7 +606,7 @@ function CommunitiesSection() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 text-xs uppercase text-gray-500 font-semibold">
                 <tr>
-                  {['Community', 'Category', 'Members', 'Leader', 'Status', 'Actions'].map((h) => (
+                  {['Groupe', 'Catégorie', 'Membres', 'Organisateur', 'Statut', 'Actions'].map((h) => (
                     <th key={h} className="px-4 py-3 text-left">
                       {h}
                     </th>
@@ -953,7 +953,7 @@ function PricingSection() {
                 value={form.name}
                 onChange={(e) => setForm({ ...form, name: e.target.value })}
                 className="w-full border border-gray-300 rounded-xl p-2 text-xs focus:ring-2 focus:ring-primary focus:outline-none"
-                placeholder="e.g. Community Leader"
+                placeholder="ex. Organisateur de groupe"
                 required
               />
             </div>

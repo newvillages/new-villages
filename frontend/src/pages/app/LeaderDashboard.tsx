@@ -368,7 +368,7 @@ export function LeaderDashboard() {
                       alt=""
                     />
                     <div>
-                      <p className="font-bold text-gray-900">{req.fullName ?? 'Member'}</p>
+                      <p className="font-bold text-gray-900">{req.fullName ?? 'Membre'}</p>
                       <p className="text-xs text-gray-500">Requested {new Date(req.requestedAt).toLocaleDateString()}</p>
                     </div>
                   </div>
@@ -432,7 +432,7 @@ export function LeaderDashboard() {
                 )}
                 <span className="flex-1" />
                 <Button type="submit" disabled={createPost.isPending}>
-                  {createPost.isPending ? 'Publishing…' : 'Broadcast Message'}
+                  {createPost.isPending ? 'Publication…' : 'Annonce générale'}
                 </Button>
               </div>
             </form>
@@ -543,7 +543,7 @@ export function LeaderDashboard() {
                       onClick={() => setIsPreviewTermsOpen(true)}
                       className="text-xs gap-1.5 border-slate-200 hover:bg-slate-50"
                     >
-                      <Eye size={14} /> Preview Member View
+                      <Eye size={14} /> Aperçu vue membre
                     </Button>
                     <Button
                       type="button"
@@ -794,7 +794,7 @@ export function LeaderDashboard() {
             <CardContent className="p-6 text-center">
               <Users size={32} className="mx-auto text-primary mb-2" />
               <p className="text-2xl font-bold text-gray-900">{analytics?.totalMembers ?? '—'}</p>
-              <p className="text-sm text-gray-500">Total Members</p>
+              <p className="text-sm text-gray-500">Total des membres</p>
             </CardContent>
           </Card>
           <Card>

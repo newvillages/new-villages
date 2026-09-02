@@ -58,10 +58,17 @@ public class DataSeeder implements ApplicationRunner {
     public void run(ApplicationArguments args) {
         TermsVersion currentTerms = seedTermsVersion();
         seedAdminUser(currentTerms);
-        seedTestUser("member@newvillages.ca", "Community Member", UserRole.MEMBER, currentTerms);
+        seedTestUser("member@newvillages.ca", "Jean Tremblay", UserRole.MEMBER, currentTerms);
         seedTestUser("leader@newvillages.ca", "Community Leader", UserRole.COMMUNITY_LEADER, currentTerms);
         seedTestUser("christian.leader@newvillages.ca", "Christian Leader", UserRole.COMMUNITY_LEADER, currentTerms);
         seedTestUser("org@newvillages.ca", "Organization Lead", UserRole.ORGANIZATION, currentTerms);
+
+        userRepository.findByEmailIgnoreCase("member@newvillages.ca").ifPresent(m -> {
+            if ("Community Member".equalsIgnoreCase(m.getFullName())) {
+                m.setFullName("Jean Tremblay");
+                userRepository.save(m);
+            }
+        });
     }
 
     private TermsVersion seedTermsVersion() {

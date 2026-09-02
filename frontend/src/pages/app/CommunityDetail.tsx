@@ -49,9 +49,9 @@ export function CommunityDetail() {
 
   const tabs: { id: Tab; label: string }[] = [
     { id: 'feed', label: 'Feed' },
-    { id: 'members', label: 'Members' },
-    { id: 'events', label: `Events (${communityEvents.length})` },
-    { id: 'about', label: 'About' },
+    { id: 'members', label: 'Membres' },
+    { id: 'events', label: `Événements (${communityEvents.length})` },
+    { id: 'about', label: 'À propos' },
   ];
 
   if (communityLoading || !community) {
@@ -145,8 +145,8 @@ export function CommunityDetail() {
           <div>
             <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-gray-900">{community.name}</h1>
             <div className="flex flex-wrap items-center gap-4 mt-2 text-sm text-gray-600">
-              <span className="flex items-center gap-1"><Users size={16} /> {community.memberCount} members</span>
-              <span className="flex items-center gap-1"><Calendar size={16} /> Led by <strong className="text-gray-800">{community.leaderName ?? 'Community Leader'}</strong></span>
+              <span className="flex items-center gap-1"><Users size={16} /> {community.memberCount} membres</span>
+              <span className="flex items-center gap-1"><Calendar size={16} /> Organisé par <strong className="text-gray-800">{community.leaderName ?? 'Organisateur de groupe'}</strong></span>
             </div>
           </div>
 
@@ -157,7 +157,7 @@ export function CommunityDetail() {
                 onClick={() => setInviteModalOpen(true)}
                 className="flex items-center gap-1.5 border-primary text-primary hover:bg-primary/5 font-semibold"
               >
-                <Mail size={16} /> Invite Member
+                <Mail size={16} /> Inviter un membre
               </Button>
             )}
 
@@ -281,7 +281,7 @@ export function CommunityDetail() {
                   <div className="flex items-center gap-3 min-w-0">
                     <img src={member.avatarUrl || `https://i.pravatar.cc/150?u=${member.userId}`} alt="" className="w-12 h-12 rounded-full shrink-0" />
                     <div className="min-w-0">
-                      <p className="font-semibold text-gray-900 truncate">{member.fullName ?? 'Member'}</p>
+                      <p className="font-semibold text-gray-900 truncate">{member.fullName ?? 'Membre'}</p>
                       <p className="text-xs text-gray-500 capitalize">
                         {member.roleInCommunity.toLowerCase()} {member.city ? `• ${member.city}` : ''}
                       </p>
@@ -378,8 +378,8 @@ export function CommunityDetail() {
                 <div className="flex items-center gap-3 pt-2">
                   <img src="https://i.pravatar.cc/40?u=leader" className="w-10 h-10 rounded-full" alt="Leader" />
                   <div>
-                    <p className="font-semibold text-sm text-gray-900">{community.leaderName ?? 'Community Leader'}</p>
-                    <p className="text-xs text-gray-500">Community Leader</p>
+                    <p className="font-semibold text-sm text-gray-900">{community.leaderName ?? 'Organisateur de groupe'}</p>
+                    <p className="text-xs text-gray-500">Organisateur de groupe</p>
                   </div>
                 </div>
                 <div className="pt-2 space-y-2">
@@ -411,7 +411,7 @@ export function CommunityDetail() {
         onClose={() => setReportLeaderOpen(false)}
         targetType="USER"
         targetId={community.leaderId}
-        targetName={community.leaderName ?? 'Community Leader'}
+        targetName={community.leaderName ?? 'Organisateur de groupe'}
       />
 
       {/* Community Terms Modal */}
@@ -424,7 +424,7 @@ export function CommunityDetail() {
       />
 
       {/* Send Email Invite Modal */}
-      <Modal isOpen={inviteModalOpen} onClose={() => setInviteModalOpen(false)} title={`Invite Member to ${community.name}`}>
+      <Modal isOpen={inviteModalOpen} onClose={() => setInviteModalOpen(false)} title={`Inviter un membre à ${community.name}`}>
         <form onSubmit={handleSendInvite} className="space-y-4">
           <p className="text-xs text-slate-500">
             Send a direct invitation email to a potential member. If they already have an account on New Villages, they will also receive an instant in-app notification.

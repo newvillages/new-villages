@@ -24,3 +24,13 @@ export function getUserAvatar(user?: { role?: string; avatarUrl?: string | null 
 
   return defaultAvatar;
 }
+
+export function getRoleLabel(role?: string): string {
+  if (!role) return 'Membre de la communauté';
+  const r = role.toUpperCase();
+  if (r === 'ADMIN') return 'Administrateur';
+  if (r === 'COMMUNITY_LEADER' || r === 'LEADER') return 'Organisateur de groupe';
+  if (r === 'ORGANIZATION' || r === 'ORG') return 'Organisation';
+  return 'Membre de la communauté';
+}
+

@@ -36,7 +36,7 @@ export function CommunityTermsModal({
           <div>
             <span className="font-bold block">Accept Terms to Join {communityName}</span>
             <span className="text-xs text-amber-700">
-              This community has specific terms and conditions configured by the Community Leader.
+              Ce groupe comporte des conditions particulières configurées par l'organisateur de groupe.
             </span>
           </div>
         </div>
