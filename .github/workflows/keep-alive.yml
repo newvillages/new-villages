@@ -1,0 +1,25 @@
+name: Supabase & Render Keep-Alive Ping
+
+# This workflow runs automatically on a schedule to keep Render awake and prevent Supabase from pausing due to inactivity.
+on:
+  schedule:
+    # Runs every 6 hours (at minute 0 of hours 0, 6, 12, 18 UTC)
+    - cron: '0 */6 * * *'
+  # Allows you to manually trigger the ping anytime from GitHub with one click
+  workflow_dispatch:
+
+jobs:
+  keep-alive:
+    name: Ping Backend & Database
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send keep-alive ping to API
+        run: |
+          echo "Sending keep-alive request to wake Render and query Supabase..."
+          RESPONSE_CODE=$(curl -s -o /dev/null -w "%{http_code}" https://new-villages.onrender.com/api/communities)
+          echo "Received HTTP status code: $RESPONSE_CODE"
+          if [ "$RESPONSE_CODE" -ge 200 ] && [ "$RESPONSE_CODE" -lt 400 ]; then
+            echo "Success! API and Supabase database are active."
+          else
+            echo "Warning: Response code $RESPONSE_CODE. The service may still be waking up."
+          fi
