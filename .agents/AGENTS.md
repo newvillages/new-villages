@@ -21,3 +21,7 @@
 - **Vercel DNS Settings on GoDaddy**:
   - `A` Record `@` -> `216.198.79.1`
   - `CNAME` Record `www` -> `c35eb2cc05cbc0bf.vercel-dns-017.com.`
+
+## Mandatory Deployment Rule
+- **Always Publish Changes Live**: Every code change, design update, or feature implementation MUST be verified (`npm run build` / test-compile), staged, committed, and pushed to `origin main` on GitHub immediately during the turn. This ensures Vercel (`https://newvillages.ca`) and Render (`https://new-villages.onrender.com`) continuously deploy all changes live for the user. Never leave changes uncommitted or unpushed.
+
