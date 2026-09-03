@@ -372,30 +372,37 @@ export function Landing() {
       <section className="py-20 bg-white border-t border-[#EFE6DD]">
         <div className="max-w-[1400px] mx-auto px-6 lg:px-12">
           
-          <div className="text-center max-w-2xl mx-auto mb-14">
+          <div className="text-center max-w-2xl mx-auto mb-12">
             <span className="text-xs font-extrabold uppercase tracking-widest text-[#E86225]">
-              Formules d'abonnement
+              Formules &amp; Tarifs
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold font-heading text-[#2C1810] mt-1 mb-3">
               Rejoignez le club des gastronomes
             </h2>
             <p className="text-sm text-[#52433B]">
-              Participez à des sorties mensuelles conviviales et développez votre réseau d'amis.
+              Inscription simple et transparente. Participez à des sorties conviviales et développez votre réseau d'amis.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-8">
+          <div className="grid md:grid-cols-3 gap-8 mb-10">
             
-            {/* Free / Discovery */}
-            <Card className="p-8 border border-[#EFE6DD] rounded-3xl bg-[#FAF6F0] flex flex-col justify-between shadow-sm">
+            {/* Free Member */}
+            <Card className="p-7 sm:p-8 border border-[#EFE6DD] rounded-3xl bg-[#FAF6F0] flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
               <div>
                 <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#52433B]">Pour découvrir</span>
-                <h3 className="text-2xl font-bold text-[#2C1810] mt-1 mb-2">Membre Gratuit</h3>
-                <div className="flex items-end gap-1 mb-6">
+                <h3 className="text-2xl font-bold text-[#2C1810] mt-1 mb-2">Membre</h3>
+                <div className="flex items-baseline gap-1 mb-6">
                   <span className="text-4xl font-extrabold text-[#2C1810]">Gratuit</span>
+                  <span className="text-xs text-[#52433B]">à l'inscription</span>
                 </div>
                 <ul className="space-y-3 mb-8 text-xs text-[#52433B]">
-                  {['Création de profil', 'Consulter le calendrier des sorties', 'Parcourir les groupes par arrondissement', 'Accès à la FAQ'].map((f, i) => (
+                  {[
+                    'Création de profil gratuite',
+                    'Consulter le calendrier des sorties resto',
+                    'Parcourir les groupes par arrondissement',
+                    'Adhésion à un groupe : 20 $ CAD (virement Interac)',
+                    'Accès à la FAQ & au support',
+                  ].map((f, i) => (
                     <li key={i} className="flex items-center gap-2.5">
                       <Check size={16} className="text-[#1E4D2B] shrink-0" />
                       <span>{f}</span>
@@ -410,20 +417,26 @@ export function Landing() {
               </Link>
             </Card>
 
-            {/* Popular / Standard Member */}
-            <Card className="p-8 border-2 border-[#E86225] rounded-3xl bg-white shadow-xl relative flex flex-col justify-between">
+            {/* Group Leader */}
+            <Card className="p-7 sm:p-8 border-2 border-[#E86225] rounded-3xl bg-white shadow-xl relative flex flex-col justify-between">
               <span className="absolute top-4 right-4 bg-[#E86225] text-white text-[10px] font-extrabold px-3 py-1 rounded-full uppercase tracking-wider shadow">
-                Recommandé
+                Populaire
               </span>
               <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#E86225]">Sorties mensuelles</span>
-                <h3 className="text-2xl font-bold text-[#2C1810] mt-1 mb-2">Membre Privilège</h3>
-                <div className="flex items-end gap-1 mb-6">
-                  <span className="text-4xl font-extrabold text-[#2C1810]">20 $</span>
-                  <span className="text-xs text-[#52433B] mb-1">/mois</span>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#E86225]">Pour organisateurs</span>
+                <h3 className="text-2xl font-bold text-[#2C1810] mt-1 mb-2">Leader de groupe</h3>
+                <div className="flex items-baseline gap-1 mb-6">
+                  <span className="text-4xl font-extrabold text-[#2C1810]">50 $</span>
+                  <span className="text-xs text-[#52433B]">CAD (inscription)</span>
                 </div>
                 <ul className="space-y-3 mb-8 text-xs text-[#52433B]">
-                  {['Accès à 1 sortie restaurant par mois', 'Réservation prioritaire des places', 'Accès à la messagerie du groupe', 'Changement d\'arrondissement sans frais'].map((f, i) => (
+                  {[
+                    'Tous les avantages Membre',
+                    'Création et gestion de vos propres groupes',
+                    'Organiser des sorties au restaurant',
+                    'Gestion des réservations et présences',
+                    'Adhésion à d\'autres groupes comme membre : 20 $ CAD',
+                  ].map((f, i) => (
                     <li key={i} className="flex items-center gap-2.5">
                       <Check size={16} className="text-[#E86225] shrink-0" />
                       <span>{f}</span>
@@ -433,22 +446,28 @@ export function Landing() {
               </div>
               <Link to="/register">
                 <Button className="w-full py-3 rounded-xl bg-[#E86225] hover:bg-[#D0521B] text-white font-bold text-xs shadow-md">
-                  Rejoindre le club
+                  Devenir organisateur
                 </Button>
               </Link>
             </Card>
 
-            {/* Group Leader / Org */}
-            <Card className="p-8 border border-[#EFE6DD] rounded-3xl bg-[#FAF6F0] flex flex-col justify-between shadow-sm">
+            {/* Organization */}
+            <Card className="p-7 sm:p-8 border border-[#EFE6DD] rounded-3xl bg-[#FAF6F0] flex flex-col justify-between shadow-sm hover:shadow-md transition-shadow">
               <div>
-                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#1E4D2B]">Pour organisateurs</span>
-                <h3 className="text-2xl font-bold text-[#2C1810] mt-1 mb-2">Organisateur de groupe</h3>
-                <div className="flex items-end gap-1 mb-6">
-                  <span className="text-4xl font-extrabold text-[#2C1810]">20 $</span>
-                  <span className="text-xs text-[#52433B] mb-1">/mois</span>
+                <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#1E4D2B]">Partenaires &amp; Restos</span>
+                <h3 className="text-2xl font-bold text-[#2C1810] mt-1 mb-2">Organisation</h3>
+                <div className="flex items-baseline gap-1 mb-6">
+                  <span className="text-4xl font-extrabold text-[#2C1810]">100 $</span>
+                  <span className="text-xs text-[#52433B]">CAD (inscription)</span>
                 </div>
                 <ul className="space-y-3 mb-8 text-xs text-[#52433B]">
-                  {['Création et gestion d\'un groupe d\'arrondissement', 'Proposer de nouveaux restaurants', 'Gestion des réservations et présences', 'Badges exclusifs d\'hôte'].map((f, i) => (
+                  {[
+                    'Page officielle d\'organisation vérifiée',
+                    'Partenaire officiel de sorties au restaurant',
+                    'Mise en avant auprès de tous les groupes',
+                    'Publication et promotion d\'événements resto',
+                    'Support prioritaire dédié',
+                  ].map((f, i) => (
                     <li key={i} className="flex items-center gap-2.5">
                       <Check size={16} className="text-[#1E4D2B] shrink-0" />
                       <span>{f}</span>
@@ -458,11 +477,29 @@ export function Landing() {
               </div>
               <Link to="/register">
                 <Button className="w-full py-3 rounded-xl bg-[#1E4D2B] hover:bg-[#163E22] text-white font-bold text-xs shadow-sm">
-                  Devenir organisateur
+                  Inscrire une organisation
                 </Button>
               </Link>
             </Card>
 
+          </div>
+
+          {/* Group Join Fee Callout Banner */}
+          <div className="bg-gradient-to-r from-[#FDF0E9] to-[#E8F3EB] border border-[#E86225]/20 rounded-2xl p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 text-[#2C1810]">
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">🍽️</span>
+                <h4 className="font-bold text-sm sm:text-base">Adhésion aux groupes : 20 $ CAD par groupe</h4>
+              </div>
+              <p className="text-xs sm:text-sm text-[#52433B] max-w-2xl">
+                L'inscription est gratuite pour tous. Pour rejoindre un groupe d'arrondissement et participer aux sorties conviviales, chaque membre s'acquitte d'une contribution unique de 20 $ CAD par virement Interac sécurisé à <strong className="text-[#E86225]">bouffe@newvillages.ca</strong>, confirmée par l'administrateur.
+              </p>
+            </div>
+            <Link to="/communities" className="shrink-0">
+              <Button size="sm" className="bg-[#E86225] hover:bg-[#D0521B] text-white font-bold text-xs py-2 px-4 shadow-sm w-full sm:w-auto">
+                Parcourir les groupes
+              </Button>
+            </Link>
           </div>
 
         </div>
