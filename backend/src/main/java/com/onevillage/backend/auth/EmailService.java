@@ -231,6 +231,21 @@ public class EmailService {
     }
 
     @Async
+    public void sendPaymentConfirmationEmail(String toEmail, String name, String paymentDetails, String amount) {
+        String dashboardLink = frontendBaseUrl + "/dashboard";
+        log.info("Sending payment confirmation email to {} for {} ({})", toEmail, paymentDetails, amount);
+        send(toEmail, "Validation de votre paiement - Bouffe & Amitié",
+                "Bonjour " + (name != null && !name.isBlank() ? name : "Membre") + ",\n\n"
+                        + "Nous avons le plaisir de vous confirmer la réception et la validation de votre paiement de " + amount + " pour : " + paymentDetails + ".\n\n"
+                        + "Vos accès sont maintenant actifs ! Vous pouvez dès à présent participer pleinement aux sorties et activités.\n\n"
+                        + "🚀 Accéder à votre tableau de bord :\n"
+                        + dashboardLink + "\n\n"
+                        + "Cordialement,\n"
+                        + "L'équipe Bouffe & Amitié\n"
+                        + "https://newvillages.ca");
+    }
+
+    @Async
     public void sendContactSubmissionEmail(String senderName, String senderEmail, String subject, String message) {
         log.info("[CONTACT FORM] Submission from {} ({}) | Subject: {}", senderName, senderEmail, subject);
 

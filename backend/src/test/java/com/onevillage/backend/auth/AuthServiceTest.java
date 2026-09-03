@@ -12,6 +12,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import com.onevillage.backend.auth.EmailVerificationTokenRepository;
+import com.onevillage.backend.auth.PasswordResetTokenRepository;
+import com.onevillage.backend.auth.RefreshTokenRepository;
 
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,7 +59,7 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.register(request, "127.0.0.1"))
                 .isInstanceOf(ApiException.class)
-                .hasMessageContaining("already exists");
+                .hasMessageContaining("existe déjà");
     }
 
     @Test
@@ -68,7 +71,7 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.register(request, "127.0.0.1"))
                 .isInstanceOf(ApiException.class)
-                .hasMessageContaining("accountType");
+                .hasMessageContaining("type de compte");
     }
 
     @Test
@@ -83,6 +86,6 @@ class AuthServiceTest {
 
         assertThatThrownBy(() -> authService.register(request, "127.0.0.1"))
                 .isInstanceOf(ApiException.class)
-                .hasMessageContaining("current Terms");
+                .hasMessageContaining("conditions");
     }
 }

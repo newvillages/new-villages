@@ -15,6 +15,7 @@ import { cn } from '../../lib/utils';
 import { motion } from 'framer-motion';
 import { GlobalReportModal } from '../../components/ui/GlobalReportModal';
 import { CommunityTermsModal } from '../../components/ui/CommunityTermsModal';
+import { PaymentModal } from '../../components/subscription/PaymentModal';
 import { useStartConversation } from '../../hooks/useMessaging';
 import { useStore } from '../../store/useStore';
 import { toast } from '../../store/useToastStore';
@@ -30,6 +31,7 @@ export function CommunityDetail() {
   const [reportModalOpen, setReportModalOpen] = useState(false);
   const [reportLeaderOpen, setReportLeaderOpen] = useState(false);
   const [termsModalOpen, setTermsModalOpen] = useState(false);
+  const [paymentModalOpen, setPaymentModalOpen] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [postDraft, setPostDraft] = useState('');
@@ -73,19 +75,16 @@ export function CommunityDetail() {
         onError: (err) => toast.info(err.message || 'Impossible de quitter ce groupe.'),
       });
     } else if (!pending) {
-      if (community.customTerms && community.customTerms.trim().length > 0) {
-        setTermsModalOpen(true);
-      } else {
-        executeJoin();
-      }
+      setPaymentModalOpen(true);
     }
   };
 
   const executeJoin = () => {
     joinMutation.mutate(community.id, {
-      onSuccess: () => {
-        toast.success('Demande envoyée / groupe rejoint avec succès !');
+      onSettled: () => {
+        setPaymentModalOpen(false);
         setTermsModalOpen(false);
+        toast.success(`Demande d'adhésion et virement de 20 $ CAD soumis pour ${community.name} ! L'administration activera votre accès dès confirmation.`);
       },
       onError: (err) => toast.info(err.message || 'Impossible de rejoindre ce groupe.'),
     });
@@ -163,16 +162,22 @@ export function CommunityDetail() {
 
             {!isLeader && (
               pending ? (
-                <span className="flex items-center gap-1.5 text-sm font-semibold text-amber-600 bg-amber-50 px-4 py-2 rounded-full">
-                  <Clock size={16} /> Demande envoyée
-                </span>
+                <button 
+                  type="button"
+                  onClick={() => setPaymentModalOpen(true)}
+                  className="flex items-center gap-2 text-xs font-bold text-amber-800 bg-amber-50 border border-amber-300 px-4 py-2.5 rounded-full hover:bg-amber-100 transition-colors cursor-pointer"
+                  title="Voir les instructions de virement Interac"
+                >
+                  <Clock size={15} className="animate-spin text-amber-700" /> 
+                  <span>Adhésion en attente de validation admin (20 $ CAD)</span>
+                </button>
               ) : (
                 <Button
                   variant={joined ? "outline" : "primary"}
                   onClick={handleJoinClick}
                   disabled={joinMutation.isPending || leaveMutation.isPending}
                 >
-                  {joined ? <><UserMinus size={16} className="mr-2"/> Quitter le groupe</> : <><UserPlus size={16} className="mr-2"/> Rejoindre le groupe</>}
+                  {joined ? <><UserMinus size={16} className="mr-2"/> Quitter le groupe</> : <><UserPlus size={16} className="mr-2"/> Rejoindre le groupe (20 $ CAD)</>}
                 </Button>
               )
             )}
@@ -464,6 +469,31 @@ export function CommunityDetail() {
             </Button>
           </div>
         </form>
+      </Modal>
+
+      {/* Group Join Payment Modal */}
+      <Modal isOpen={paymentModalOpen} onClose={() => setPaymentModalOpen(false)} className="max-w-2xl">
+        <PaymentModal
+          plan={{
+            id: 'group_join',
+            label: community.name,
+            price: '20 $',
+            period: '',
+            features: [
+              'Adhésion officielle au groupe ' + community.name,
+              'Participation à toutes les sorties restaurant',
+              'Messagerie et discussions du groupe',
+              'Validation par l\'administration requise',
+            ],
+          }}
+          communityId={community.id}
+          communityName={community.name}
+          isGroupJoin={true}
+          onBack={() => setPaymentModalOpen(false)}
+          onSuccess={() => {
+            executeJoin();
+          }}
+        />
       </Modal>
     </div>
   );

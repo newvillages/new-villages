@@ -7,7 +7,7 @@
 - **Database**: Supabase PostgreSQL (`jdbc:postgresql://aws-0-ca-central-1.pooler.supabase.com:6543/postgres`)
 - **Transactional Email**: Brevo SMTP (`smtp-relay.brevo.com:587`, STARTTLS required, user `b3ee76001@smtp-brevo.com`)
 - **Domain Registrar**: GoDaddy (`newvillages.ca`)
-- **Canadian Payments**: Interac e-Transfer Auto-Deposit (`payments@newvillages.ca`) + Credit/Debit Card
+- **Canadian Payments**: Interac e-Transfer Auto-Deposit (`bouffe@newvillages.ca`) + Credit/Debit Card
 
 ## Key Environment Configurations
 - **Backend Environment Variables on Render**:

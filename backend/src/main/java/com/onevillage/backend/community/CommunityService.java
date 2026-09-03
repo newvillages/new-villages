@@ -103,19 +103,20 @@ public class CommunityService {
     @Transactional
     public CommunityResponse join(UUID communityId, UUID userId) {
         Community community = getEntity(communityId);
-        if (membershipRepository.findByCommunityIdAndUserId(communityId, userId).isPresent()) {
-            throw ApiException.conflict(com.onevillage.backend.common.ErrorCode.CONFLICT, "You already joined or requested to join this community");
+        Optional<CommunityMembership> existing = membershipRepository.findByCommunityIdAndUserId(communityId, userId);
+        if (existing.isPresent()) {
+            if (existing.get().getStatus() == MembershipStatus.JOINED) {
+                throw ApiException.conflict(com.onevillage.backend.common.ErrorCode.CONFLICT, "Vous faites déjà partie de ce groupe");
+            } else {
+                throw ApiException.conflict(com.onevillage.backend.common.ErrorCode.CONFLICT, "Votre demande d'adhésion est en attente de validation de paiement par l'administration");
+            }
         }
         CommunityMembership membership = new CommunityMembership();
         membership.setCommunityId(communityId);
         membership.setUserId(userId);
         membership.setRoleInCommunity(CommunityMemberRole.MEMBER);
-        if (community.getVisibility() == CommunityVisibility.PUBLIC) {
-            membership.setStatus(MembershipStatus.JOINED);
-            membership.setJoinedAt(Instant.now());
-        } else {
-            membership.setStatus(MembershipStatus.PENDING_REQUEST);
-        }
+        // Every member must pay 20 CAD and be confirmed by admin before successfully joining any group
+        membership.setStatus(MembershipStatus.PENDING_REQUEST);
         membershipRepository.save(membership);
         return toResponse(community, userId);
     }

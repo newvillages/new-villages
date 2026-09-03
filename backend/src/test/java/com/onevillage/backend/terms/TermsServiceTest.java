@@ -40,7 +40,7 @@ class TermsServiceTest {
 
         assertThatThrownBy(() -> termsService.recordAcceptance(UUID.randomUUID(), "1.0.0", "127.0.0.1"))
                 .isInstanceOf(ApiException.class)
-                .hasMessageContaining("no longer current");
+                .hasMessageContaining("conditions");
 
         verify(acceptanceRepository, never()).save(any());
     }

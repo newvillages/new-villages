@@ -19,6 +19,8 @@ import { toast } from '../../store/useToastStore';
 import { CardSkeleton } from '../../components/ui/CardSkeleton';
 import { useStore } from '../../store/useStore';
 import { PageTransition } from '../../components/ui/PageTransition';
+import { Modal } from '../../components/ui/Modal';
+import { PaymentModal } from '../../components/subscription/PaymentModal';
 
 export function CommunityDirectory() {
   const navigate = useNavigate();
@@ -27,6 +29,7 @@ export function CommunityDirectory() {
   const [activeTab, setActiveTab] = useState<'discover' | 'my' | 'invitations'>('discover');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
+  const [paymentCommunity, setPaymentCommunity] = useState<{ id: string; name: string } | null>(null);
 
   const discoverQuery = useCommunitySearch(searchQuery, selectedCategory === 'all' ? '' : selectedCategory, 0, 50);
   const myQuery = useMyCommunities(!isGuest);
@@ -51,12 +54,7 @@ export function CommunityDirectory() {
       navigate('/login', { state: { from: `/communities/${id}` } });
       return;
     }
-    joinMutation.mutate(id, {
-      onSuccess: (res) => {
-        toast.success(res.membershipState === 'JOINED' ? `🎉 Bienvenue dans le groupe ${name} !` : `Demande envoyée pour rejoindre ${name}`);
-      },
-      onError: () => toast.info('Impossible de rejoindre ce groupe. Veuillez réessayer.'),
-    });
+    setPaymentCommunity({ id, name });
   };
 
   const handleLeave = (id: string, name: string) => {
@@ -342,8 +340,8 @@ export function CommunityDirectory() {
                             </Button>
                           </div>
                         ) : isPending ? (
-                          <span className="flex items-center gap-1.5 text-xs font-extrabold text-amber-700 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200">
-                            <Clock size={14} /> Demandé
+                          <span className="flex items-center gap-1.5 text-xs font-bold text-amber-800 bg-amber-50 px-3 py-1.5 rounded-xl border border-amber-200">
+                            <Clock size={13} className="animate-spin text-amber-700" /> En attente admin (20 $)
                           </span>
                         ) : (
                           <Button
@@ -352,7 +350,7 @@ export function CommunityDirectory() {
                             onClick={() => handleJoin(community.id, community.name)}
                             disabled={joinMutation.isPending}
                           >
-                            <span>Rejoindre</span>
+                            <span>Rejoindre (20 $)</span>
                             <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />
                           </Button>
                         )}
@@ -383,6 +381,38 @@ export function CommunityDirectory() {
             </div>
           )}
         </div>
+
+        {/* Modal Payment for Group Join */}
+        <Modal isOpen={!!paymentCommunity} onClose={() => setPaymentCommunity(null)} className="max-w-2xl">
+          {paymentCommunity && (
+            <PaymentModal
+              plan={{
+                id: 'group_join',
+                label: paymentCommunity.name,
+                price: '20 $',
+                period: '',
+                features: [
+                  'Adhésion au groupe officiel',
+                  'Accès aux sorties au restaurant',
+                  'Messagerie et discussions du groupe',
+                  'Validation par l\'administration requise',
+                ],
+              }}
+              communityId={paymentCommunity.id}
+              communityName={paymentCommunity.name}
+              isGroupJoin={true}
+              onBack={() => setPaymentCommunity(null)}
+              onSuccess={() => {
+                joinMutation.mutate(paymentCommunity.id, {
+                  onSettled: () => {
+                    setPaymentCommunity(null);
+                    toast.success(`Demande d'adhésion et virement de 20 $ CAD soumis pour ${paymentCommunity.name} ! L'administration activera votre adhésion sous peu.`);
+                  },
+                });
+              }}
+            />
+          )}
+        </Modal>
       </div>
     </PageTransition>
   );

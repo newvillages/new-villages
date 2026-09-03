@@ -171,9 +171,9 @@ export function Register() {
                 <h3 className="text-xs font-extrabold text-[#1E4D2B] uppercase tracking-widest">Choisissez votre formule</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
                   {[
-                    { id: 'MEMBER' as const, label: 'Membre Gratuit', price: 'Gratuit', icon: UserCircle, desc: 'Consultez les sorties et l\'annuaire des groupes.' },
-                    { id: 'COMMUNITY_LEADER' as const, label: 'Organisateur de groupe', price: '20 $/mois CAD', icon: Shield, desc: 'Proposez des restaurants et gérez un groupe.' },
-                    { id: 'ORGANIZATION' as const, label: 'Organisation / Resto', price: '20 $/mois CAD', icon: Building2, desc: 'Accueillez des groupes et partenaire officiel.' }
+                    { id: 'MEMBER' as const, label: 'Membre Gratuit', price: 'Gratuit', icon: UserCircle, desc: 'Inscription gratuite. Cotisation de 20 $ CAD par groupe pour rejoindre et participer.' },
+                    { id: 'COMMUNITY_LEADER' as const, label: 'Organisateur de groupe', price: '50 $ CAD', icon: Shield, desc: '50 $ CAD à l\'inscription. Créez vos groupes. Cotisation de 20 $ CAD pour rejoindre d\'autres groupes.' },
+                    { id: 'ORGANIZATION' as const, label: 'Organisation / Resto', price: '100 $ CAD', icon: Building2, desc: '100 $ CAD à l\'inscription. Accueillez des groupes et partenaire officiel.' }
                   ].map((type) => (
                     <button
                       key={type.id}
@@ -237,7 +237,12 @@ export function Register() {
                   disabled={!termsAccepted || registerMutation.isPending}
                 >
                   {registerMutation.isPending && <Loader2 size={18} className="animate-spin" />}
-                  {role === 'MEMBER' ? 'Créer mon compte gratuit' : 'Procéder au paiement (20 $ CAD)'}
+                  {role === 'MEMBER' 
+                    ? 'Créer mon compte gratuit' 
+                    : role === 'COMMUNITY_LEADER'
+                    ? 'Procéder au paiement (50 $ CAD)'
+                    : 'Procéder au paiement (100 $ CAD)'
+                  }
                 </Button>
                 <p className="text-center text-xs text-[#52433B]">
                   Déjà membre ? <Link to="/login" className="text-[#E86225] font-bold hover:underline">Se connecter</Link>
@@ -255,10 +260,10 @@ export function Register() {
           plan={{
             id: role.toLowerCase(),
             label: role === 'COMMUNITY_LEADER' ? 'Organisateur de groupe' : 'Organisation / Resto',
-            price: '20 $',
-            period: '/mois',
+            price: role === 'COMMUNITY_LEADER' ? '50 $' : '100 $',
+            period: '',
             features: role === 'COMMUNITY_LEADER' 
-              ? ['Créer et gérer un groupe d\'arrondissement', 'Proposer de nouvelles sorties au restaurant', 'Badges exclusifs']
+              ? ['Créer et gérer un groupe d\'arrondissement', 'Proposer de nouvelles sorties au restaurant', 'Badges exclusifs', 'Adhésion aux autres groupes : 20 $ CAD']
               : ['Page d\'organisation vérifiée', 'Partenaire officiel de sorties', 'Accès prioritaire']
           }}
           onBack={() => setShowPaymentModal(false)}

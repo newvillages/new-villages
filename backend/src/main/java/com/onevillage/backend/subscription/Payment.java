@@ -31,6 +31,9 @@ public class Payment extends BaseId {
     @Column(name = "user_email")
     private String userEmail;
 
+    @Column(name = "community_id")
+    private UUID communityId;
+
     @Column(name = "community_name")
     private String communityName;
 

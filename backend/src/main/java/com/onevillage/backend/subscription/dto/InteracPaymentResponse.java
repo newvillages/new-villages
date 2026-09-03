@@ -9,6 +9,7 @@ public record InteracPaymentResponse(
         UUID userId,
         String userName,
         String userEmail,
+        UUID communityId,
         String communityName,
         String referenceNumber,
         BigDecimal amount,

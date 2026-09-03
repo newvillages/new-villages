@@ -11,6 +11,15 @@ import com.stripe.model.Event;
 import com.stripe.model.Invoice;
 import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
+import com.onevillage.backend.auth.EmailService;
+import com.onevillage.backend.community.Community;
+import com.onevillage.backend.community.CommunityMemberRole;
+import com.onevillage.backend.community.CommunityMembership;
+import com.onevillage.backend.community.CommunityMembershipRepository;
+import com.onevillage.backend.community.CommunityRepository;
+import com.onevillage.backend.community.MembershipStatus;
+import com.onevillage.backend.notification.NotificationDispatcher;
+import com.onevillage.backend.notification.NotificationType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,27 +33,39 @@ import java.util.UUID;
 public class SubscriptionService {
 
     private static final List<PlanResponse> PLANS = List.of(
-            new PlanResponse("FREE", "Member", "Free", "", "Join and connect",
-                    List.of("Unlimited communities", "RSVP to events", "Direct messages", "Notifications")),
-            new PlanResponse("COMMUNITY_LEADER", "Community Leader", "$20", "/month", "Most popular",
-                    List.of("All Member features", "Create & manage a community", "Publish announcements & events", "Basic analytics")),
-            new PlanResponse("ORGANIZATION", "Organization", "$20", "/month", "For businesses & nonprofits",
-                    List.of("All Leader features", "Verified org page", "Contact communities directly", "Team seats"))
+            new PlanResponse("FREE", "Membre Gratuit", "Gratuit", "", "Pour découvrir",
+                    List.of("Création de profil", "Consulter le calendrier des sorties", "Parcourir les groupes par arrondissement", "Accès aux notifications", "Adhésion aux groupes : 20 $ CAD / groupe (validation admin)")),
+            new PlanResponse("COMMUNITY_LEADER", "Organisateur de groupe (Leader)", "$50", "", "Pour créateurs de groupes",
+                    List.of("Tous les avantages Membre", "Créer & administrer vos propres groupes", "Organiser des sorties au restaurant", "Adhésion aux autres groupes comme membre : 20 $ CAD")),
+            new PlanResponse("ORGANIZATION", "Organisation / Entreprise", "$100", "", "Partenaires & Restaurateurs",
+                    List.of("Tous les avantages Leader", "Page officielle d'organisation vérifiée", "Partenaire restaurant officiel", "Mise en avant auprès des groupes"))
     );
 
     private final SubscriptionRepository subscriptionRepository;
     private final PaymentRepository paymentRepository;
     private final UserRepository userRepository;
     private final StripeService stripeService;
+    private final CommunityMembershipRepository membershipRepository;
+    private final CommunityRepository communityRepository;
+    private final EmailService emailService;
+    private final NotificationDispatcher notificationDispatcher;
 
     public SubscriptionService(SubscriptionRepository subscriptionRepository,
                                 PaymentRepository paymentRepository,
                                 UserRepository userRepository,
-                                StripeService stripeService) {
+                                StripeService stripeService,
+                                CommunityMembershipRepository membershipRepository,
+                                CommunityRepository communityRepository,
+                                EmailService emailService,
+                                NotificationDispatcher notificationDispatcher) {
         this.subscriptionRepository = subscriptionRepository;
         this.paymentRepository = paymentRepository;
         this.userRepository = userRepository;
         this.stripeService = stripeService;
+        this.membershipRepository = membershipRepository;
+        this.communityRepository = communityRepository;
+        this.emailService = emailService;
+        this.notificationDispatcher = notificationDispatcher;
     }
 
     public List<PlanResponse> getPlans() {
@@ -53,7 +74,8 @@ public class SubscriptionService {
 
     public BigDecimal getRequiredPlanAmountCAD(SubscriptionPlan plan) {
         return switch (plan) {
-            case COMMUNITY_LEADER, ORGANIZATION -> new BigDecimal("20.00");
+            case COMMUNITY_LEADER -> new BigDecimal("50.00");
+            case ORGANIZATION -> new BigDecimal("100.00");
             default -> BigDecimal.ZERO;
         };
     }
@@ -61,9 +83,9 @@ public class SubscriptionService {
     public void validatePlanPaymentAmount(SubscriptionPlan plan, BigDecimal submittedAmount) {
         BigDecimal required = getRequiredPlanAmountCAD(plan);
         if (submittedAmount == null || submittedAmount.compareTo(required) < 0) {
-            throw ApiException.badRequest("Underpayment rejected: Required minimum for " + plan.name() 
-                    + " is $" + required + " CAD. Submitted amount of $" + (submittedAmount == null ? "0.00" : submittedAmount) 
-                    + " CAD is insufficient.");
+            throw ApiException.badRequest("Montant insuffisant : Le tarif requis pour " + plan.name() 
+                    + " est de " + required + " $ CAD. Montant soumis de " + (submittedAmount == null ? "0.00" : submittedAmount) 
+                    + " $ CAD.");
         }
     }
 
@@ -98,24 +120,46 @@ public class SubscriptionService {
     // --- Interac e-Transfer Payments ---
 
     @Transactional
-    public com.onevillage.backend.subscription.dto.InteracPaymentResponse initiateInteracPayment(UUID userId, String planRaw, BigDecimal amount, String communityName) {
+    public com.onevillage.backend.subscription.dto.InteracPaymentResponse initiateInteracPayment(
+            UUID userId, String planRaw, BigDecimal amount, UUID communityId, String communityName) {
         User user = userRepository.findById(userId).orElseThrow(() -> ApiException.notFound("User not found"));
-        SubscriptionPlan plan;
-        try {
-            plan = SubscriptionPlan.valueOf(planRaw.toUpperCase());
-        } catch (IllegalArgumentException e) {
-            plan = SubscriptionPlan.COMMUNITY_LEADER;
+
+        String refCode;
+        if ("GROUP_JOIN".equalsIgnoreCase(planRaw) || communityId != null) {
+            if (amount == null || amount.compareTo(new BigDecimal("20.00")) < 0) {
+                throw ApiException.badRequest("Montant insuffisant : La cotisation requise pour rejoindre un groupe est de 20.00 $ CAD.");
+            }
+            refCode = "BA-JOIN-" + java.util.UUID.randomUUID().toString().substring(0, 6).toUpperCase();
+
+            // Ensure pending membership is recorded
+            if (communityId != null) {
+                membershipRepository.findByCommunityIdAndUserId(communityId, userId).orElseGet(() -> {
+                    CommunityMembership m = new CommunityMembership();
+                    m.setCommunityId(communityId);
+                    m.setUserId(userId);
+                    m.setRoleInCommunity(CommunityMemberRole.MEMBER);
+                    m.setStatus(MembershipStatus.PENDING_REQUEST);
+                    return membershipRepository.save(m);
+                });
+            }
+        } else {
+            SubscriptionPlan plan;
+            try {
+                plan = SubscriptionPlan.valueOf(planRaw.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                plan = SubscriptionPlan.COMMUNITY_LEADER;
+            }
+            validatePlanPaymentAmount(plan, amount);
+            refCode = "BA-" + (plan == SubscriptionPlan.ORGANIZATION ? "ORG-" : "LEADER-") 
+                    + java.util.UUID.randomUUID().toString().substring(0, 6).toUpperCase();
         }
-
-        validatePlanPaymentAmount(plan, amount);
-
-        String refCode = "REF-BA-" + java.util.UUID.randomUUID().toString().substring(0, 6).toUpperCase();
 
         Payment payment = new Payment();
         payment.setUserId(userId);
         payment.setUserName(user.getFullName());
         payment.setUserEmail(user.getEmail());
-        payment.setCommunityName(communityName);
+        payment.setCommunityId(communityId);
+        payment.setCommunityName(communityName != null && !communityName.isBlank() ? communityName : "Général");
         payment.setReferenceNumber(refCode);
         payment.setPaymentMethod("INTERAC");
         payment.setAmount(amount);
@@ -137,23 +181,76 @@ public class SubscriptionService {
         if (payment.getUserId() != null) {
             User user = userRepository.findById(payment.getUserId()).orElse(null);
             if (user != null) {
-                // Determine target plan
-                SubscriptionPlan plan = payment.getAmount().compareTo(new BigDecimal("20.00")) >= 0
-                        ? SubscriptionPlan.ORGANIZATION
-                        : SubscriptionPlan.COMMUNITY_LEADER;
+                boolean isGroupJoin = payment.getCommunityId() != null 
+                        || (payment.getCommunityName() != null && !payment.getCommunityName().isBlank() && !"Général".equalsIgnoreCase(payment.getCommunityName()));
 
-                Subscription subscription = subscriptionRepository.findByUserId(user.getId()).orElseGet(Subscription::new);
-                subscription.setUserId(user.getId());
-                subscription.setPlan(plan);
-                subscription.setStatus(SubscriptionStatus.ACTIVE);
-                subscription.setCurrentPeriodEnd(Instant.now().plus(30, java.time.temporal.ChronoUnit.DAYS));
-                subscriptionRepository.save(subscription);
+                if (isGroupJoin) {
+                    UUID targetCommunityId = payment.getCommunityId();
+                    if (targetCommunityId == null && payment.getCommunityName() != null) {
+                        targetCommunityId = communityRepository.findAll().stream()
+                                .filter(c -> c.getName().equalsIgnoreCase(payment.getCommunityName().trim()))
+                                .map(Community::getId)
+                                .findFirst().orElse(null);
+                    }
 
-                payment.setSubscriptionId(subscription.getId());
+                    if (targetCommunityId != null) {
+                        final UUID cId = targetCommunityId;
+                        CommunityMembership membership = membershipRepository.findByCommunityIdAndUserId(cId, user.getId())
+                                .orElseGet(() -> {
+                                    CommunityMembership m = new CommunityMembership();
+                                    m.setCommunityId(cId);
+                                    m.setUserId(user.getId());
+                                    m.setRoleInCommunity(CommunityMemberRole.MEMBER);
+                                    return m;
+                                });
+                        membership.setStatus(MembershipStatus.JOINED);
+                        membership.setJoinedAt(Instant.now());
+                        membershipRepository.save(membership);
 
-                if (user.getRole() == UserRole.MEMBER) {
-                    user.setRole(plan == SubscriptionPlan.ORGANIZATION ? UserRole.ORGANIZATION : UserRole.COMMUNITY_LEADER);
-                    userRepository.save(user);
+                        if (user.getSelectedCommunityId() == null) {
+                            user.setSelectedCommunityId(cId);
+                            userRepository.save(user);
+                        }
+
+                        String cName = communityRepository.findById(cId).map(Community::getName).orElse(payment.getCommunityName());
+                        emailService.sendPaymentConfirmationEmail(user.getEmail(), user.getFullName(), "Adhésion au groupe " + cName, "$" + payment.getAmount() + " CAD");
+                        notificationDispatcher.dispatch(
+                                user.getId(),
+                                NotificationType.SYSTEM,
+                                "Adhésion confirmée !",
+                                "Votre paiement de 20 $ CAD a été confirmé. Bienvenue dans le groupe « " + cName + " » !",
+                                cId
+                        );
+                    }
+                } else {
+                    // Registration subscription (Leader $50 or Org $100)
+                    SubscriptionPlan plan = payment.getAmount().compareTo(new BigDecimal("100.00")) >= 0
+                            ? SubscriptionPlan.ORGANIZATION
+                            : SubscriptionPlan.COMMUNITY_LEADER;
+
+                    Subscription subscription = subscriptionRepository.findByUserId(user.getId()).orElseGet(Subscription::new);
+                    subscription.setUserId(user.getId());
+                    subscription.setPlan(plan);
+                    subscription.setStatus(SubscriptionStatus.ACTIVE);
+                    subscription.setCurrentPeriodEnd(Instant.now().plus(365, java.time.temporal.ChronoUnit.DAYS));
+                    subscriptionRepository.save(subscription);
+
+                    payment.setSubscriptionId(subscription.getId());
+
+                    if (user.getRole() == UserRole.MEMBER) {
+                        user.setRole(plan == SubscriptionPlan.ORGANIZATION ? UserRole.ORGANIZATION : UserRole.COMMUNITY_LEADER);
+                        userRepository.save(user);
+                    }
+
+                    String planLabel = plan == SubscriptionPlan.ORGANIZATION ? "Organisation / Partenaire" : "Organisateur de groupe (Leader)";
+                    emailService.sendPaymentConfirmationEmail(user.getEmail(), user.getFullName(), planLabel, "$" + payment.getAmount() + " CAD");
+                    notificationDispatcher.dispatch(
+                            user.getId(),
+                            NotificationType.SYSTEM,
+                            "Compte activé !",
+                            "Votre inscription en tant que " + planLabel + " a été validée avec succès.",
+                            null
+                    );
                 }
             }
         }
@@ -170,7 +267,7 @@ public class SubscriptionService {
 
     private com.onevillage.backend.subscription.dto.InteracPaymentResponse toInteracResponse(Payment p) {
         return new com.onevillage.backend.subscription.dto.InteracPaymentResponse(
-                p.getId(), p.getUserId(), p.getUserName(), p.getUserEmail(), p.getCommunityName(),
+                p.getId(), p.getUserId(), p.getUserName(), p.getUserEmail(), p.getCommunityId(), p.getCommunityName(),
                 p.getReferenceNumber(), p.getAmount(), p.getCurrency(), p.getPaymentMethod(),
                 p.getStatus(), p.getPaidAt(), p.getCreatedAt()
         );

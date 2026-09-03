@@ -24,7 +24,7 @@ public class InteracPaymentController {
     public ResponseEntity<InteracPaymentResponse> initiate(@Valid @RequestBody InitiateInteracPaymentRequest request) {
         UUID userId = SecurityUtils.currentUserId();
         InteracPaymentResponse response = subscriptionService.initiateInteracPayment(
-                userId, request.plan(), request.amount(), request.communityName());
+                userId, request.plan(), request.amount(), request.communityId(), request.communityName());
         return ResponseEntity.status(201).body(response);
     }
 

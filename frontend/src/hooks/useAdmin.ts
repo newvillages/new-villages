@@ -315,6 +315,7 @@ export interface InteracPayment {
   userId: string;
   userName: string | null;
   userEmail: string | null;
+  communityId: string | null;
   communityName: string | null;
   referenceNumber: string;
   amount: number;

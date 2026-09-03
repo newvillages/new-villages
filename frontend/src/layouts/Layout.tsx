@@ -430,8 +430,8 @@ export function Layout() {
         <Outlet />
       </main>
 
-      {/* Global Footer */}
-      <Footer />
+      {/* Global Footer (hidden on admin pages) */}
+      {!pathname.startsWith('/admin') && <Footer />}
 
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-slate-200 flex items-center justify-around px-1 sm:px-2 z-50 pb-safe shadow-lg">
