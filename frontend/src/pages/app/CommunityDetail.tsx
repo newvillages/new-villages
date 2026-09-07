@@ -6,7 +6,7 @@ import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
 import { CardSkeleton } from '../../components/ui/CardSkeleton';
-import { useCommunity, useCommunityMembers, useJoinCommunity, useLeaveCommunity, useInviteMember } from '../../hooks/useCommunities';
+import { useCommunity, useCommunityMembers, useJoinCommunity, useLeaveCommunity, useInviteMember, useCommunityInvitations, useRespondToInvitation } from '../../hooks/useCommunities';
 import { useEvents } from '../../hooks/useEvents';
 import { useCommunityPosts, useCreatePost } from '../../hooks/usePosts';
 import { communityColor } from '../../lib/communityVisuals';
@@ -43,8 +43,12 @@ export function CommunityDetail() {
   const joinMutation = useJoinCommunity();
   const leaveMutation = useLeaveCommunity();
   const inviteMutation = useInviteMember(id ?? '');
+  const { data: invitations } = useCommunityInvitations(!!currentUser);
+  const respondInviteMutation = useRespondToInvitation();
   const createPost = useCreatePost(id ?? '');
   const startConversation = useStartConversation();
+
+  const myInvite = invitations?.find((inv) => inv.communityId === id && inv.status === 'PENDING');
 
   const communityEvents = eventsPage?.content ?? [];
   const posts = postsPage?.content ?? [];
@@ -80,11 +84,14 @@ export function CommunityDetail() {
   };
 
   const executeJoin = () => {
+    if (myInvite) {
+      respondInviteMutation.mutate({ id: myInvite.id, accept: true });
+    }
     joinMutation.mutate(community.id, {
       onSettled: () => {
         setPaymentModalOpen(false);
         setTermsModalOpen(false);
-        toast.success(`Demande d'adhésion et virement de 20 $ CAD soumis pour ${community.name} ! L'administration activera votre accès dès confirmation.`);
+        toast.success(`Demande d'adhésion et virement de 20 $ CAD soumis pour ${community.name} ! L'administration activera votre accès dès confirmation du virement Interac.`);
       },
       onError: (err) => toast.info(err.message || 'Impossible de rejoindre ce groupe.'),
     });
@@ -131,6 +138,45 @@ export function CommunityDetail() {
       <Link to="/communities" className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-gray-900 mb-6 font-medium">
         <ArrowLeft size={16} /> Retour aux groupes
       </Link>
+
+      {/* Pending Invitation Alert Banner */}
+      {myInvite && !joined && !pending && (
+        <div className="mb-6 p-4 sm:p-5 rounded-2xl bg-[#FFF8F3] border-2 border-[#E86225] flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-sm">
+          <div className="flex items-start gap-3.5">
+            <div className="w-10 h-10 rounded-xl bg-[#E86225] text-white flex items-center justify-center shrink-0 shadow-sm mt-0.5">
+              <Mail size={20} />
+            </div>
+            <div>
+              <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#E86225] bg-white px-2 py-0.5 rounded border border-[#E86225]/30 inline-block mb-1">
+                Invitation reçue de {myInvite.invitedByName ?? 'un organisateur'}
+              </span>
+              <h3 className="font-extrabold text-[#2C1810] text-sm sm:text-base">
+                Vous êtes invité(e) à rejoindre « {community.name} » !
+              </h3>
+              <p className="text-xs text-[#52433B] mt-0.5 leading-relaxed">
+                Pour valider votre invitation et participer aux sorties, vous devez régler votre contribution unique de 20 $ CAD par Virement Interac.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+            <Button
+              size="sm"
+              variant="outline"
+              className="text-xs font-bold border-slate-300 flex-1 sm:flex-initial"
+              onClick={() => respondInviteMutation.mutate({ id: myInvite.id, accept: false })}
+            >
+              Décliner
+            </Button>
+            <Button
+              size="sm"
+              className="text-xs font-bold bg-[#E86225] hover:bg-[#D0521B] text-white flex-1 sm:flex-initial shadow-sm"
+              onClick={() => setPaymentModalOpen(true)}
+            >
+              Payer &amp; Rejoindre (20 $ CAD)
+            </Button>
+          </div>
+        </div>
+      )}
 
       {/* Banner & Header */}
       <div className="relative rounded-3xl overflow-hidden shadow-lg mb-8 bg-white border border-gray-100">
@@ -459,6 +505,12 @@ export function CommunityDetail() {
             >
               <Copy size={12} /> Copier
             </Button>
+          </div>
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 leading-relaxed">
+            <p className="font-bold text-[11px]">Rappel adhésion :</p>
+            <p className="text-[11px] text-amber-800 mt-0.5">
+              Les invités devront également s'acquitter de leur contribution unique de <strong>20 $ CAD par Virement Interac</strong> (à <code>bouffe@newvillages.ca</code>) pour valider leur adhésion.
+            </p>
           </div>
           <div className="flex gap-2 pt-2">
             <Button type="button" variant="ghost" className="flex-1" onClick={() => setInviteModalOpen(false)}>

@@ -21,6 +21,7 @@ import { useStore } from '../../store/useStore';
 import { PageTransition } from '../../components/ui/PageTransition';
 import { Modal } from '../../components/ui/Modal';
 import { PaymentModal } from '../../components/subscription/PaymentModal';
+import type { CommunityInvitation } from '../../types/community';
 
 export function CommunityDirectory() {
   const navigate = useNavigate();
@@ -30,6 +31,7 @@ export function CommunityDirectory() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [paymentCommunity, setPaymentCommunity] = useState<{ id: string; name: string } | null>(null);
+  const [paymentInvite, setPaymentInvite] = useState<CommunityInvitation | null>(null);
 
   const discoverQuery = useCommunitySearch(searchQuery, selectedCategory === 'all' ? '' : selectedCategory, 0, 50);
   const myQuery = useMyCommunities(!isGuest);
@@ -231,12 +233,22 @@ export function CommunityDirectory() {
                 {invitations.map((invite) => (
                   <Card key={invite.id} className="bg-white rounded-2xl shadow-sm border border-[#EFE6DD]">
                     <CardContent className="p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-                      <div>
-                        <span className="text-[10px] font-bold uppercase tracking-wider text-[#E86225] bg-[#FDF0E9] px-2.5 py-1 rounded-md mb-2 inline-block border border-[#E86225]/30">
-                          Invitation en attente
-                        </span>
+                      <div className="space-y-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-[10px] font-bold uppercase tracking-wider text-[#E86225] bg-[#FDF0E9] px-2.5 py-0.5 rounded-md inline-block border border-[#E86225]/30">
+                            Invitation en attente
+                          </span>
+                          <span className="text-[10px] font-extrabold text-[#1E4D2B] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-md inline-block">
+                            20 $ CAD par Virement Interac
+                          </span>
+                        </div>
                         <p className="font-extrabold text-lg sm:text-xl text-[#2C1810]">{invite.communityName}</p>
-                        <p className="text-xs font-semibold text-[#52433B] mt-1">Invité(e) par {invite.invitedByName ?? 'un organisateur de groupe'}</p>
+                        <p className="text-xs font-semibold text-[#52433B]">
+                          Invité(e) par <strong className="text-[#2C1810]">{invite.invitedByName ?? 'un organisateur de groupe'}</strong>
+                        </p>
+                        <p className="text-[11px] text-[#8C7A70] italic">
+                          Pour finaliser votre adhésion, vous devez vous acquitter de la contribution unique de 20 $ CAD par Virement Interac.
+                        </p>
                       </div>
                       <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto shrink-0 pt-3 sm:pt-0 border-t sm:border-t-0 border-slate-100">
                         <Button
@@ -250,9 +262,9 @@ export function CommunityDirectory() {
                         <Button
                           size="sm"
                           className="flex-1 sm:flex-initial rounded-xl font-bold bg-[#E86225] hover:bg-[#D0521B] text-white text-xs py-2.5 shadow-sm"
-                          onClick={() => respondMutation.mutate({ id: invite.id, accept: true })}
+                          onClick={() => setPaymentInvite(invite)}
                         >
-                          Accepter l'invitation
+                          Payer &amp; Rejoindre (20 $ CAD)
                         </Button>
                       </div>
                     </CardContent>
@@ -390,7 +402,7 @@ export function CommunityDirectory() {
                 id: 'group_join',
                 label: paymentCommunity.name,
                 price: '20 $',
-                period: '',
+                period: 'Paiement unique',
                 features: [
                   'Adhésion au groupe officiel',
                   'Accès aux sorties au restaurant',
@@ -409,6 +421,41 @@ export function CommunityDirectory() {
                     toast.success(`Demande d'adhésion et virement de 20 $ CAD soumis pour ${paymentCommunity.name} ! L'administration activera votre adhésion sous peu.`);
                   },
                 });
+              }}
+            />
+          )}
+        </Modal>
+
+        {/* Modal Payment for Invited Member */}
+        <Modal isOpen={!!paymentInvite} onClose={() => setPaymentInvite(null)} className="max-w-2xl">
+          {paymentInvite && (
+            <PaymentModal
+              plan={{
+                id: 'group_join',
+                label: paymentInvite.communityName ?? 'Adhésion au groupe',
+                price: '20 $',
+                period: 'Paiement unique',
+                features: [
+                  'Validation de votre invitation au groupe',
+                  'Participation aux sorties au restaurant',
+                  'Messagerie et discussions du groupe',
+                  'Validation par l\'administration dès réception',
+                ],
+              }}
+              communityId={paymentInvite.communityId}
+              communityName={paymentInvite.communityName ?? 'Groupe'}
+              isGroupJoin={true}
+              onBack={() => setPaymentInvite(null)}
+              onSuccess={() => {
+                respondMutation.mutate(
+                  { id: paymentInvite.id, accept: true },
+                  {
+                    onSettled: () => {
+                      setPaymentInvite(null);
+                      toast.success(`Demande d'adhésion et virement de 20 $ CAD enregistrés pour ${paymentInvite.communityName ?? 'le groupe'} ! L'administration activera votre adhésion dès confirmation.`);
+                    },
+                  }
+                );
               }}
             />
           )}

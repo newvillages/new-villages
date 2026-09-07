@@ -858,6 +858,13 @@ export function LeaderDashboard() {
             </div>
           </div>
 
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 text-xs text-amber-900 leading-relaxed space-y-1">
+            <p className="font-bold">Information importante pour les invités :</p>
+            <p className="text-[11px] text-amber-800">
+              Chaque personne invitée par courriel ou via le lien direct devra régler sa contribution unique de <strong>20 $ CAD par Virement Interac</strong> (Auto-Dépôt à <code>bouffe@newvillages.ca</code>) pour valider son adhésion et accéder aux sorties.
+            </p>
+          </div>
+
           <div className="flex gap-2 pt-2">
             <Button type="button" variant="ghost" className="flex-1" onClick={() => setIsInviteModalOpen(false)}>
               Annuler

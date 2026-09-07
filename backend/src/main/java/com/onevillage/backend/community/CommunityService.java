@@ -193,8 +193,12 @@ public class CommunityService {
                 membership.setCommunityId(invitation.getCommunityId());
                 membership.setUserId(userId);
                 membership.setRoleInCommunity(CommunityMemberRole.MEMBER);
-                membership.setStatus(MembershipStatus.JOINED);
-                membership.setJoinedAt(Instant.now());
+                // Every member joining via link/invitation must pay 20 CAD and be confirmed by admin
+                membership.setStatus(MembershipStatus.PENDING_REQUEST);
+                membershipRepository.save(membership);
+            } else if (existing.get().getStatus() != MembershipStatus.JOINED) {
+                CommunityMembership membership = existing.get();
+                membership.setStatus(MembershipStatus.PENDING_REQUEST);
                 membershipRepository.save(membership);
             }
         }
