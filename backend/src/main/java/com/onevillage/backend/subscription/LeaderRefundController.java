@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/leader/refund-requests")
+@RequestMapping({"/api/refund-requests", "/api/leader/refund-requests"})
 public class LeaderRefundController {
 
     private final RefundRequestService refundRequestService;

@@ -14,7 +14,8 @@ import {
   ChevronDown,
   Mail,
   Calendar,
-  Sparkles
+  Sparkles,
+  CreditCard
 } from 'lucide-react';
 import { cn, getUserAvatar, getRoleLabel } from '../lib/utils';
 import { useStore } from '../store/useStore';
@@ -302,6 +303,10 @@ export function Layout() {
 
                         <Link to="/settings" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#52433B] hover:bg-slate-50 hover:text-[#2C1810] rounded-xl transition-colors">
                           <Settings size={16} /> Paramètres
+                        </Link>
+
+                        <Link to="/settings?tab=billing" className="flex items-center gap-3 px-3 py-2 text-xs font-semibold text-[#52433B] hover:bg-slate-50 hover:text-[#2C1810] rounded-xl transition-colors">
+                          <CreditCard size={16} /> Paiements &amp; Remboursements
                         </Link>
 
                         {!isLeaderOrOrgOrAdmin && (

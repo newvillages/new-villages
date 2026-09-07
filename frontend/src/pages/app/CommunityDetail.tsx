@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { Users, Calendar, MapPin, ArrowLeft, Flag, UserPlus, UserMinus, ShieldAlert, Clock, MessageSquare, Share2, Mail, Copy } from 'lucide-react';
+import { Users, Calendar, MapPin, ArrowLeft, Flag, UserPlus, UserMinus, ShieldAlert, Clock, MessageSquare, Share2, Mail, Copy, DollarSign } from 'lucide-react';
 import { Card, CardContent } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
@@ -16,6 +16,7 @@ import { motion } from 'framer-motion';
 import { GlobalReportModal } from '../../components/ui/GlobalReportModal';
 import { CommunityTermsModal } from '../../components/ui/CommunityTermsModal';
 import { PaymentModal } from '../../components/subscription/PaymentModal';
+import { RefundRequestModal } from '../../components/subscription/RefundRequestModal';
 import { useStartConversation } from '../../hooks/useMessaging';
 import { useStore } from '../../store/useStore';
 import { toast } from '../../store/useToastStore';
@@ -32,6 +33,7 @@ export function CommunityDetail() {
   const [reportLeaderOpen, setReportLeaderOpen] = useState(false);
   const [termsModalOpen, setTermsModalOpen] = useState(false);
   const [paymentModalOpen, setPaymentModalOpen] = useState(false);
+  const [refundModalOpen, setRefundModalOpen] = useState(false);
   const [inviteModalOpen, setInviteModalOpen] = useState(false);
   const [inviteEmail, setInviteEmail] = useState('');
   const [postDraft, setPostDraft] = useState('');
@@ -418,6 +420,16 @@ export function CommunityDetail() {
                       <Button variant="ghost" size="sm" className="w-full text-xs text-red-600 hover:bg-red-50 flex items-center justify-center gap-1" onClick={() => setReportLeaderOpen(true)}>
                         <Flag size={14} /> Signaler l'organisateur
                       </Button>
+                      {joined && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="w-full text-xs text-slate-500 hover:text-red-600 hover:bg-red-50 flex items-center justify-center gap-1"
+                          onClick={() => setRefundModalOpen(true)}
+                        >
+                          <DollarSign size={14} /> Demander un remboursement (20 $)
+                        </Button>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
@@ -460,13 +472,22 @@ export function CommunityDetail() {
             </div>
           </div>
 
-          <Button
-            variant="outline"
-            onClick={() => setPaymentModalOpen(true)}
-            className="font-bold text-xs border-[#E86225] text-[#E86225] hover:bg-[#FDF0E9]"
-          >
-            Revoir les coordonnées de virement Interac
-          </Button>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+            <Button
+              variant="outline"
+              onClick={() => setPaymentModalOpen(true)}
+              className="font-bold text-xs border-[#E86225] text-[#E86225] hover:bg-[#FDF0E9]"
+            >
+              Revoir les coordonnées de virement Interac
+            </Button>
+            <Button
+              variant="ghost"
+              onClick={() => setRefundModalOpen(true)}
+              className="font-semibold text-xs text-slate-500 hover:text-red-600 hover:bg-red-50"
+            >
+              Demander un remboursement (20 $)
+            </Button>
+          </div>
         </Card>
       ) : (
         <div className="max-w-2xl mx-auto my-6 space-y-6">
@@ -602,6 +623,16 @@ export function CommunityDetail() {
           }}
         />
       </Modal>
+
+      {/* Group Join Refund Request Modal */}
+      <RefundRequestModal
+        isOpen={refundModalOpen}
+        onClose={() => setRefundModalOpen(false)}
+        defaultAmount={20}
+        defaultReason={`Remboursement adhésion au groupe ${community.name}`}
+        defaultDetails={`Groupe: ${community.name} (ID: ${community.id})`}
+        title={`Demande de remboursement - ${community.name}`}
+      />
     </div>
   );
 }

@@ -20,15 +20,18 @@ public class RefundRequestService {
     private final SubscriptionRepository subscriptionRepository;
     private final UserRepository userRepository;
     private final ActivityLogService activityLogService;
+    private final com.onevillage.backend.auth.EmailService emailService;
 
     public RefundRequestService(RefundRequestRepository refundRequestRepository,
                                 SubscriptionRepository subscriptionRepository,
                                 UserRepository userRepository,
-                                ActivityLogService activityLogService) {
+                                ActivityLogService activityLogService,
+                                com.onevillage.backend.auth.EmailService emailService) {
         this.refundRequestRepository = refundRequestRepository;
         this.subscriptionRepository = subscriptionRepository;
         this.userRepository = userRepository;
         this.activityLogService = activityLogService;
+        this.emailService = emailService;
     }
 
     @Transactional
@@ -44,6 +47,12 @@ public class RefundRequestService {
         rr.setStatus("PENDING");
 
         refundRequestRepository.saveAndFlush(rr);
+
+        User user = userRepository.findById(userId).orElse(null);
+        if (user != null) {
+            emailService.sendRefundRequestAdminNotification(user.getFullName(), user.getEmail(), request.amount(), request.reason(), request.details());
+        }
+
         return toResponse(rr);
     }
 
@@ -74,6 +83,11 @@ public class RefundRequestService {
 
         activityLogService.log(adminId, "Refund Request " + (approve ? "Approved" : "Rejected"), "REFUND_REQUEST", rr.getId(),
                 "Refund request #" + rr.getId() + " was " + (approve ? "approved" : "rejected"));
+
+        User user = userRepository.findById(rr.getUserId()).orElse(null);
+        if (user != null && user.getEmail() != null) {
+            emailService.sendRefundDecisionEmail(user.getEmail(), user.getFullName(), rr.getAmount(), approve, rr.getReason());
+        }
     }
 
     private RefundRequestResponse toResponse(RefundRequest rr) {

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Check, Mail } from 'lucide-react';
+import { Check, Mail, CreditCard, Plus } from 'lucide-react';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { cn } from '../../lib/utils';
@@ -8,12 +8,14 @@ import confetti from 'canvas-confetti';
 import { toast } from '../../store/useToastStore';
 import { PageTransition } from '../../components/ui/PageTransition';
 import { PaymentModal } from '../../components/subscription/PaymentModal';
+import { RefundRequestModal } from '../../components/subscription/RefundRequestModal';
 import { usePricingPlans } from '../../hooks/useAdmin';
 
 export function Subscription() {
   const [selected, setSelected] = useState('leader');
   const [checkout, setCheckout] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [refundModalOpen, setRefundModalOpen] = useState(false);
 
   const { data: dynamicPlans } = usePricingPlans();
 
@@ -210,6 +212,28 @@ export function Subscription() {
                     );
                   })}
                 </div>
+
+                {/* Refund Policy & Claim Action */}
+                <div className="mt-12 bg-white rounded-3xl border border-[#EFE6DD] p-6 sm:p-8 text-center max-w-3xl mx-auto shadow-sm space-y-3">
+                  <div className="w-12 h-12 bg-[#FAF5EF] text-[#E86225] rounded-2xl flex items-center justify-center mx-auto">
+                    <CreditCard size={22} />
+                  </div>
+                  <h3 className="font-extrabold text-base sm:text-lg text-[#2C1810]">
+                    Garantie d'adhésion &amp; Demandes de remboursement
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[#52433B] max-w-xl mx-auto leading-relaxed">
+                    Une question sur vos cotisations, un double virement ou une annulation ? Vous pouvez soumettre à tout moment une demande de remboursement formelle auprès des administrateurs.
+                  </p>
+                  <div className="pt-2">
+                    <Button
+                      variant="outline"
+                      onClick={() => setRefundModalOpen(true)}
+                      className="text-xs font-bold border-[#E86225] text-[#E86225] hover:bg-[#FDF0E9] rounded-xl px-4 py-2"
+                    >
+                      <Plus size={14} className="mr-1" /> Demander un remboursement
+                    </Button>
+                  </div>
+                </div>
               </motion.div>
             ) : (
               <motion.div key="checkout" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
@@ -219,6 +243,13 @@ export function Subscription() {
           </AnimatePresence>
         </div>
       </div>
+
+      <RefundRequestModal
+        isOpen={refundModalOpen}
+        onClose={() => setRefundModalOpen(false)}
+        defaultAmount={selectedPlan.priceRaw || 20}
+        defaultReason={`Remboursement formule ${selectedPlan.label}`}
+      />
     </PageTransition>
   );
 }

@@ -1,14 +1,17 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Bell, Lock, EyeOff, Trash2, Moon, Sun, UserX, Loader2 } from 'lucide-react';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { Bell, Lock, EyeOff, Trash2, Moon, Sun, UserX, Loader2, CreditCard, Plus, Clock, CheckCircle2, XCircle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Modal } from '../../components/ui/Modal';
 import { useThemeStore } from '../../store/useThemeStore';
+import { useStore } from '../../store/useStore';
 import { toast } from '../../store/useToastStore';
 import { cn } from '../../lib/utils';
 import { PageTransition } from '../../components/ui/PageTransition';
 import { useBlockedUsers, useChangePassword, useDeactivateAccount, useUnblockUser } from '../../hooks/useUser';
+import { useMyRefundRequests } from '../../hooks/useAdmin';
+import { RefundRequestModal } from '../../components/subscription/RefundRequestModal';
 import { ApiError } from '../../lib/apiClient';
 
 interface ToggleProps { label: string; desc?: string; value: boolean; onChange: () => void; }
@@ -28,16 +31,22 @@ const Toggle = ({ label, desc, value, onChange }: ToggleProps) => (
   </div>
 );
 
-type TabType = 'appearance' | 'security' | 'notifications' | 'privacy' | 'danger';
+type TabType = 'appearance' | 'security' | 'billing' | 'notifications' | 'privacy' | 'danger';
 
 export function Settings() {
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState<TabType>('appearance');
+  const [searchParams] = useSearchParams();
+  const initialTab = (searchParams.get('tab') as TabType) || 'appearance';
+  const [activeTab, setActiveTab] = useState<TabType>(initialTab);
   const [deleteOpen, setDeleteOpen] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [blockedModalOpen, setBlockedModalOpen] = useState(false);
+  const [refundModalOpen, setRefundModalOpen] = useState(false);
   const [notifs, setNotifs] = useState({ messages: true, events: true, invitations: true, announcements: false });
   const toggle = (k: keyof typeof notifs) => setNotifs(p => ({ ...p, [k]: !p[k] }));
+
+  const { currentUser } = useStore();
+  const { data: myRefunds, isLoading: refundsLoading } = useMyRefundRequests(activeTab === 'billing');
 
   const { isDark, toggleDark } = useThemeStore();
 
@@ -90,6 +99,7 @@ export function Settings() {
   const tabs = [
     { id: 'appearance', label: 'Apparence', icon: isDark ? Moon : Sun, danger: false },
     { id: 'security', label: 'Sécurité', icon: Lock, danger: false },
+    { id: 'billing', label: 'Paiements & Remboursements', icon: CreditCard, danger: false },
     { id: 'notifications', label: 'Notifications', icon: Bell, danger: false },
     { id: 'privacy', label: 'Confidentialité', icon: EyeOff, danger: false },
     { id: 'danger', label: 'Zone de danger', icon: Trash2, danger: true },
@@ -242,6 +252,132 @@ export function Settings() {
               </div>
             )}
 
+            {activeTab === 'billing' && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-xl font-bold text-[#2C1810] mb-1">Paiements &amp; Remboursements</h2>
+                  <p className="text-xs text-[#52433B] mb-6">Consultez votre formule et gérez vos demandes de remboursement auprès de l'équipe administrative.</p>
+                </div>
+
+                {/* Account Plan Info */}
+                <Card className="border-[#EFE6DD] shadow-sm rounded-2xl overflow-hidden bg-white">
+                  <CardContent className="p-6 space-y-4">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <span className="text-[10px] font-extrabold uppercase tracking-wider text-[#E86225] bg-[#FDF0E9] px-2.5 py-1 rounded-full inline-block mb-1.5">
+                          Formule actuelle
+                        </span>
+                        <h3 className="font-extrabold text-base text-[#2C1810]">
+                          {currentUser?.role === 'COMMUNITY_LEADER' 
+                            ? 'Organisateur de groupe (Leader)' 
+                            : currentUser?.role === 'ORGANIZATION' 
+                            ? 'Organisation / Partenaire Resto' 
+                            : 'Membre Standard'}
+                        </h3>
+                        <p className="text-xs text-[#52433B] mt-1">
+                          {currentUser?.role === 'COMMUNITY_LEADER'
+                            ? 'Cotisation d\'organisateur (50 $ CAD) — Droit d\'animer et créer des sorties au restaurant.'
+                            : currentUser?.role === 'ORGANIZATION'
+                            ? 'Cotisation organisation (100 $ CAD) — Page officielle partenaire.'
+                            : 'Accès membre — Cotisation d\'adhésion unique de 20 $ CAD par groupe rejoint.'}
+                        </p>
+                      </div>
+
+                      <Button
+                        onClick={() => setRefundModalOpen(true)}
+                        className="bg-[#E86225] hover:bg-[#D0521B] text-white text-xs font-bold py-2.5 px-4 rounded-xl shrink-0 flex items-center gap-1.5 shadow-sm"
+                      >
+                        <Plus size={15} /> Demander un remboursement
+                      </Button>
+                    </div>
+
+                    <div className="bg-[#FAF5EF] rounded-xl p-3.5 border border-[#EFE6DD] text-xs text-[#52433B] leading-relaxed flex items-start gap-2.5">
+                      <CreditCard size={18} className="text-[#E86225] shrink-0 mt-0.5" />
+                      <div>
+                        <p className="font-bold text-[#2C1810]">Règles de remboursement Bouffe &amp; Amitié :</p>
+                        <p className="text-[11px] mt-0.5 text-slate-600">
+                          Vous pouvez solliciter un remboursement en cas de double virement Interac, d'erreur de transaction ou de désistement avant confirmation. Chaque réclamation est auditée et traitée sous 24 à 48 heures.
+                        </p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Refund Requests List */}
+                <Card className="border-[#EFE6DD] shadow-sm rounded-2xl overflow-hidden bg-white">
+                  <CardHeader className="p-5 border-b border-[#EFE6DD]/60 flex flex-row items-center justify-between">
+                    <div>
+                      <CardTitle className="text-sm font-bold text-[#2C1810]">Historique de vos demandes de remboursement</CardTitle>
+                      <p className="text-[11px] text-[#52433B]">Suivi en direct de l'état de validation par l'administration</p>
+                    </div>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    {refundsLoading ? (
+                      <div className="flex justify-center py-10">
+                        <Loader2 className="animate-spin text-[#E86225]" size={24} />
+                      </div>
+                    ) : (myRefunds ?? []).length === 0 ? (
+                      <div className="text-center py-10 px-4">
+                        <CreditCard className="mx-auto text-slate-300 mb-2" size={32} />
+                        <p className="text-xs font-bold text-[#2C1810]">Aucune demande de remboursement enregistrée</p>
+                        <p className="text-[11px] text-slate-500 mt-1 max-w-sm mx-auto">
+                          Si vous avez effectué un paiement que vous souhaitez annuler ou régulariser, utilisez le bouton ci-dessus pour envoyer votre réclamation.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="divide-y divide-[#EFE6DD]">
+                        {(myRefunds ?? []).map((req) => (
+                          <div key={req.id} className="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 hover:bg-[#FAF5EF]/50 transition-colors">
+                            <div className="space-y-1">
+                              <div className="flex items-center gap-2">
+                                <span className="font-extrabold text-sm text-[#2C1810]">
+                                  {req.amount ? req.amount.toFixed(2) : '20.00'} $ CAD
+                                </span>
+                                <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full uppercase tracking-wider ${
+                                  req.status === 'APPROVED'
+                                    ? 'bg-emerald-100 text-emerald-800'
+                                    : req.status === 'REJECTED'
+                                    ? 'bg-red-100 text-red-800'
+                                    : 'bg-amber-100 text-amber-800'
+                                }`}>
+                                  {req.status === 'APPROVED' ? 'Approuvé' : req.status === 'REJECTED' ? 'Refusé' : 'En attente d\'examen'}
+                                </span>
+                              </div>
+                              <p className="text-xs font-semibold text-[#52433B]">Motif : {req.reason}</p>
+                              {req.details && (
+                                <p className="text-[11px] text-slate-500 italic max-w-md">« {req.details} »</p>
+                              )}
+                              <p className="text-[10px] text-slate-400">
+                                Soumise le {new Date(req.createdAt).toLocaleDateString('fr-CA', { year: 'numeric', month: 'long', day: 'numeric' })}
+                              </p>
+                            </div>
+
+                            <div className="shrink-0 text-right sm:text-left">
+                              {req.status === 'PENDING' && (
+                                <span className="text-[11px] font-bold text-amber-700 flex items-center gap-1">
+                                  <Clock size={13} /> Examen en cours
+                                </span>
+                              )}
+                              {req.status === 'APPROVED' && (
+                                <span className="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                                  <CheckCircle2 size={13} /> Validé par l'admin
+                                </span>
+                              )}
+                              {req.status === 'REJECTED' && (
+                                <span className="text-[11px] font-bold text-red-700 flex items-center gap-1">
+                                  <XCircle size={13} /> Non retenu
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            )}
+
             {activeTab === 'danger' && (
               <div className="space-y-6">
                 <div>
@@ -315,6 +451,13 @@ export function Settings() {
           )}
         </div>
       </Modal>
+
+      <RefundRequestModal
+        isOpen={refundModalOpen}
+        onClose={() => setRefundModalOpen(false)}
+        defaultAmount={currentUser?.role === 'ORGANIZATION' ? 100 : currentUser?.role === 'COMMUNITY_LEADER' ? 50 : 20}
+        defaultReason={currentUser?.role === 'ORGANIZATION' ? 'Annulation forfait Organisation' : currentUser?.role === 'COMMUNITY_LEADER' ? 'Annulation forfait Organisateur' : 'Remboursement adhésion de groupe'}
+      />
     </PageTransition>
   );
 }

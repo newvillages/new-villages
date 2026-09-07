@@ -277,19 +277,28 @@ export interface RefundRequest {
   createdAt: string;
 }
 
-export function useLeaderRefundRequests() {
+export function useMyRefundRequests(enabled: boolean = true) {
   return useQuery({
-    queryKey: ['leader', 'refund-requests'],
-    queryFn: () => api.get<RefundRequest[]>('/api/leader/refund-requests'),
+    queryKey: ['refund-requests', 'mine'],
+    queryFn: () => api.get<RefundRequest[]>('/api/refund-requests'),
+    enabled,
   });
+}
+
+export function useLeaderRefundRequests() {
+  return useMyRefundRequests();
 }
 
 export function useSubmitRefundRequest() {
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (payload: { amount?: number; reason: string; details?: string }) =>
-      api.post<RefundRequest>('/api/leader/refund-requests', payload),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['leader', 'refund-requests'] }),
+      api.post<RefundRequest>('/api/refund-requests', payload),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['refund-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['leader', 'refund-requests'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'refund-requests'] });
+    },
   });
 }
 

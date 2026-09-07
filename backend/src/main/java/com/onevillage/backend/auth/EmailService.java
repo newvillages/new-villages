@@ -284,6 +284,73 @@ public class EmailService {
     }
 
     @Async
+    public void sendRefundRequestAdminNotification(String userName, String userEmail, java.math.BigDecimal amount, String reason, String details) {
+        log.info("[REFUND REQUEST] Submitted by {} ({}) for {} $ CAD", userName, userEmail, amount);
+        String subject = "[Bouffe & Amitié] Nouvelle demande de remboursement (" + (amount != null ? amount.toString() : "0.00") + " $ CAD)";
+        String plainText = "Une nouvelle demande de remboursement a été soumise sur Bouffe & Amitié :\n\n"
+                + "Utilisateur : " + (userName != null ? userName : "Membre") + " (" + userEmail + ")\n"
+                + "Montant : " + (amount != null ? amount.toString() : "0.00") + " $ CAD\n"
+                + "Motif : " + reason + "\n"
+                + "Détails : " + (details != null && !details.isBlank() ? details : "Aucun détail") + "\n\n"
+                + "Accédez au tableau de bord administrateur pour l'examiner :\n"
+                + frontendBaseUrl + "/admin\n";
+
+        String htmlContent = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #efe6dd; border-radius: 16px; background-color: #ffffff;\">"
+                + "<h2 style=\"color: #2C1810; margin: 0 0 16px 0;\">Nouvelle demande de remboursement</h2>"
+                + "<div style=\"background-color: #FAF5EF; border-radius: 12px; padding: 18px; border: 1px solid #EFE6DD; margin-bottom: 20px;\">"
+                + "<p style=\"font-size: 14px; margin: 0 0 8px 0;\"><strong>Membre :</strong> " + escapeJson(userName != null ? userName : "") + " (" + escapeJson(userEmail) + ")</p>"
+                + "<p style=\"font-size: 14px; margin: 0 0 8px 0;\"><strong>Montant :</strong> <span style=\"color: #E86225; font-weight: bold;\">" + (amount != null ? amount.toString() : "0.00") + " $ CAD</span></p>"
+                + "<p style=\"font-size: 14px; margin: 0 0 8px 0;\"><strong>Motif :</strong> " + escapeJson(reason) + "</p>"
+                + (details != null && !details.isBlank() ? "<p style=\"font-size: 13px; color: #52433B; margin: 0;\"><strong>Détails :</strong> " + escapeJson(details) + "</p>" : "")
+                + "</div>"
+                + "<div style=\"text-align: center; margin: 20px 0;\">"
+                + "<a href=\"" + frontendBaseUrl + "/admin\" style=\"background-color: #E86225; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;\">Consulter dans l'Administration</a>"
+                + "</div>"
+                + "</div>";
+
+        sendHtml("contact@newvillages.ca", subject, plainText, htmlContent);
+    }
+
+    @Async
+    public void sendRefundDecisionEmail(String toEmail, String name, java.math.BigDecimal amount, boolean approved, String reason) {
+        if (toEmail == null || toEmail.isBlank()) return;
+        String cleanEmail = toEmail.trim().toLowerCase();
+        log.info("[REFUND DECISION] Email to {} | Approved: {} | Amount: {}", cleanEmail, approved, amount);
+        String subject = approved 
+                ? "Votre demande de remboursement a été approuvée - Bouffe & Amitié"
+                : "Information concernant votre demande de remboursement - Bouffe & Amitié";
+
+        String plainText = "Bonjour " + (name != null && !name.isBlank() ? name : "") + ",\n\n"
+                + "Votre demande de remboursement d'un montant de " + (amount != null ? amount.toString() : "0.00") + " $ CAD a été "
+                + (approved ? "approuvée par notre équipe." : "refusée par l'administration.") + "\n\n"
+                + "Motif initial : " + (reason != null ? reason : "—") + "\n\n"
+                + (approved 
+                    ? "Le remboursement sera traité par Virement Interac vers votre compte dans les prochains jours ouvrables." 
+                    : "Pour toute question, vous pouvez nous contacter à contact@newvillages.ca.") + "\n\n"
+                + "Cordialement,\n"
+                + "L'équipe Bouffe & Amitié\n"
+                + "https://newvillages.ca";
+
+        String htmlContent = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #efe6dd; border-radius: 16px; background-color: #ffffff;\">"
+                + "<div style=\"text-align: center; margin-bottom: 20px;\">"
+                + "<h2 style=\"color: #2C1810; margin: 0 0 4px 0;\">Demande de remboursement</h2>"
+                + "<p style=\"color: " + (approved ? "#1E4D2B" : "#C53030") + "; font-size: 14px; font-weight: bold; margin: 0;\">"
+                + (approved ? "Demande approuvée" : "Demande non retenue") + "</p>"
+                + "</div>"
+                + "<div style=\"background-color: " + (approved ? "#E8F3EB" : "#FFF5F5") + "; border-radius: 12px; padding: 20px; border: 1px solid " + (approved ? "#C6F6D5" : "#FED7D7") + "; margin-bottom: 20px;\">"
+                + "<p style=\"font-size: 14px; color: #2C1810; margin: 0 0 10px 0;\">Bonjour <strong>" + escapeJson(name != null ? name : "") + "</strong>,</p>"
+                + "<p style=\"font-size: 14px; color: #2C1810; line-height: 1.6; margin: 0 0 12px 0;\">Votre demande de remboursement de <strong>" + (amount != null ? amount.toString() : "0.00") + " $ CAD</strong> a été " + (approved ? "<strong>approuvée</strong>" : "<strong>refusée</strong>") + ".</p>"
+                + (approved 
+                    ? "<p style=\"font-size: 13px; color: #1E4D2B; margin: 0;\">Le versement sera exécuté par virement bancaire / Interac vers vos coordonnées bancaires.</p>"
+                    : "<p style=\"font-size: 13px; color: #718096; margin: 0;\">Si vous pensez qu'il s'agit d'une erreur, vous pouvez nous écrire à <a href=\"mailto:contact@newvillages.ca\" style=\"color: #E86225;\">contact@newvillages.ca</a>.</p>")
+                + "</div>"
+                + "<p style=\"font-size: 12px; color: #94A3B8; text-align: center; margin: 0;\">L'équipe Bouffe &amp; Amitié &bull; contact@newvillages.ca</p>"
+                + "</div>";
+
+        sendHtml(cleanEmail, subject, plainText, htmlContent);
+    }
+
+    @Async
     public void sendContactSubmissionEmail(String senderName, String senderEmail, String subject, String message) {
         log.info("[CONTACT FORM] Submission from {} ({}) | Subject: {}", senderName, senderEmail, subject);
 
