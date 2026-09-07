@@ -10,6 +10,7 @@ public record InitiateInteracPaymentRequest(
         @NotBlank String plan,
         @NotNull BigDecimal amount,
         UUID communityId,
-        String communityName
+        String communityName,
+        String payerEmail
 ) {
 }

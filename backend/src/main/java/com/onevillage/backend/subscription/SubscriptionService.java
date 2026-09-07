@@ -121,7 +121,7 @@ public class SubscriptionService {
 
     @Transactional
     public com.onevillage.backend.subscription.dto.InteracPaymentResponse initiateInteracPayment(
-            UUID userId, String planRaw, BigDecimal amount, UUID communityId, String communityName) {
+            UUID userId, String planRaw, BigDecimal amount, UUID communityId, String communityName, String payerEmail) {
         User user = userRepository.findById(userId).orElseThrow(() -> ApiException.notFound("User not found"));
 
         String refCode;
@@ -157,7 +157,8 @@ public class SubscriptionService {
         Payment payment = new Payment();
         payment.setUserId(userId);
         payment.setUserName(user.getFullName());
-        payment.setUserEmail(user.getEmail());
+        String effectiveEmail = (payerEmail != null && !payerEmail.isBlank()) ? payerEmail.trim().toLowerCase() : user.getEmail();
+        payment.setUserEmail(effectiveEmail);
         payment.setCommunityId(communityId);
         payment.setCommunityName(communityName != null && !communityName.isBlank() ? communityName : "Général");
         payment.setReferenceNumber(refCode);
@@ -256,6 +257,48 @@ public class SubscriptionService {
         }
 
         Payment saved = paymentRepository.save(payment);
+        return toInteracResponse(saved);
+    }
+
+    @Transactional
+    public com.onevillage.backend.subscription.dto.InteracPaymentResponse adminRejectInteracPayment(UUID paymentId, UUID adminId, String reason) {
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> ApiException.notFound("Demande de paiement introuvable"));
+
+        payment.setStatus("REJECTED");
+        Payment saved = paymentRepository.save(payment);
+
+        if (payment.getUserId() != null) {
+            User user = userRepository.findById(payment.getUserId()).orElse(null);
+            if (payment.getCommunityId() != null) {
+                // Cancel/remove the pending membership so access remains denied
+                membershipRepository.deleteByCommunityIdAndUserId(payment.getCommunityId(), payment.getUserId());
+            }
+
+            String recipientEmail = (payment.getUserEmail() != null && !payment.getUserEmail().isBlank())
+                    ? payment.getUserEmail()
+                    : (user != null ? user.getEmail() : null);
+
+            String userName = user != null ? user.getFullName() : (payment.getUserName() != null ? payment.getUserName() : "Membre");
+            String targetName = payment.getCommunityName() != null && !payment.getCommunityName().isBlank()
+                    ? payment.getCommunityName()
+                    : "votre demande d'adhésion";
+
+            if (recipientEmail != null && !recipientEmail.isBlank()) {
+                emailService.sendPaymentRejectedEmail(recipientEmail, userName, targetName, payment.getReferenceNumber(), reason);
+            }
+
+            if (user != null) {
+                notificationDispatcher.dispatch(
+                        user.getId(),
+                        NotificationType.SYSTEM,
+                        "Virement non validé",
+                        "Votre demande pour « " + targetName + " » a été rejetée par l'administration. Motif : " + (reason != null && !reason.isBlank() ? reason : "Virement non reçu"),
+                        payment.getCommunityId()
+                );
+            }
+        }
+
         return toInteracResponse(saved);
     }
 

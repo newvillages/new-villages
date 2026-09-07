@@ -3,6 +3,7 @@ package com.onevillage.backend.subscription;
 import com.onevillage.backend.security.SecurityUtils;
 import com.onevillage.backend.subscription.dto.InitiateInteracPaymentRequest;
 import com.onevillage.backend.subscription.dto.InteracPaymentResponse;
+import com.onevillage.backend.subscription.dto.RejectInteracPaymentRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -24,7 +25,7 @@ public class InteracPaymentController {
     public ResponseEntity<InteracPaymentResponse> initiate(@Valid @RequestBody InitiateInteracPaymentRequest request) {
         UUID userId = SecurityUtils.currentUserId();
         InteracPaymentResponse response = subscriptionService.initiateInteracPayment(
-                userId, request.plan(), request.amount(), request.communityId(), request.communityName());
+                userId, request.plan(), request.amount(), request.communityId(), request.communityName(), request.payerEmail());
         return ResponseEntity.status(201).body(response);
     }
 
@@ -39,6 +40,17 @@ public class InteracPaymentController {
     public ResponseEntity<InteracPaymentResponse> adminConfirmPayment(@PathVariable UUID id) {
         UUID adminId = SecurityUtils.currentUserId();
         InteracPaymentResponse response = subscriptionService.adminConfirmInteracPayment(id, adminId);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/api/admin/payments/interac/{id}/reject")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<InteracPaymentResponse> adminRejectPayment(
+            @PathVariable UUID id,
+            @RequestBody(required = false) RejectInteracPaymentRequest request) {
+        UUID adminId = SecurityUtils.currentUserId();
+        String reason = request != null ? request.reason() : null;
+        InteracPaymentResponse response = subscriptionService.adminRejectInteracPayment(id, adminId, reason);
         return ResponseEntity.ok(response);
     }
 }

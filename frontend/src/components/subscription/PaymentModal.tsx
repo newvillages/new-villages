@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
+import { Input } from '../ui/Input';
 import { 
   Check, 
   Copy, 
@@ -8,11 +9,13 @@ import {
   ShieldCheck, 
   Building2, 
   ArrowLeft,
-  AlertCircle
+  AlertCircle,
+  Mail
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { toast } from '../../store/useToastStore';
 import { api } from '../../lib/apiClient';
+import { useStore } from '../../store/useStore';
 
 export interface Plan {
   id: string;
@@ -39,6 +42,8 @@ export function PaymentModal({
   communityName,
   isGroupJoin = false,
 }: PaymentModalProps) {
+  const currentUser = useStore((s) => s.currentUser);
+
   // Unique auto-generated reference code for Canadian Interac e-Transfer
   const memoCode = React.useMemo(() => {
     const random = Math.floor(1000 + Math.random() * 9000);
@@ -50,6 +55,9 @@ export function PaymentModal({
 
   const [copiedEmail, setCopiedEmail] = useState(false);
   const [copiedMemo, setCopiedMemo] = useState(false);
+
+  // Email entered during payment for confirmation and follow-up
+  const [payerEmail, setPayerEmail] = useState(currentUser?.email || '');
 
   // Terms acceptance & Form states
   const [termsAccepted, setTermsAccepted] = useState(false);
@@ -76,6 +84,12 @@ export function PaymentModal({
 
   const handleInteracSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const cleanPayerEmail = payerEmail.trim().toLowerCase();
+    if (!cleanPayerEmail) {
+      toast.info('Veuillez renseigner votre adresse courriel pour le suivi de votre virement.');
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       await api.post('/api/subscriptions/interac/initiate', {
@@ -83,6 +97,7 @@ export function PaymentModal({
         amount: parsedPriceNumber,
         communityId: communityId || undefined,
         communityName: communityName || plan.label,
+        payerEmail: cleanPayerEmail,
       });
     } catch (err) {
       // Gracefully continue even if session is in registration transition
@@ -249,6 +264,25 @@ export function PaymentModal({
             </div>
           </div>
 
+          {/* Payer Email Input */}
+          <div className="bg-[#FAF5EF] border border-[#EFE6DD] rounded-2xl p-4 sm:p-5 space-y-2">
+            <label className="block text-xs font-black text-[#2C1810] flex items-center gap-1.5">
+              <Mail size={14} className="text-[#E86225]" />
+              <span>Votre adresse courriel (pour la confirmation de validation ou suivi du virement) *</span>
+            </label>
+            <Input
+              type="email"
+              required
+              placeholder="votre.courriel@exemple.ca"
+              value={payerEmail}
+              onChange={(e) => setPayerEmail(e.target.value)}
+              className="bg-white border-[#EFE6DD] rounded-xl text-xs py-2.5 font-medium"
+            />
+            <p className="text-[11px] text-[#8C7A70] leading-relaxed">
+              L'administration de Bouffe &amp; Amitié utilisera cette adresse pour vous contacter directement et vous confirmer l'activation de votre adhésion.
+            </p>
+          </div>
+
           {/* Conditions d'adhésion Checkbox */}
           <div className="bg-[#FAF5EF] border border-[#EFE6DD] rounded-2xl p-4 sm:p-5">
             <label className="flex items-start gap-3 cursor-pointer">
@@ -276,9 +310,9 @@ export function PaymentModal({
           <form onSubmit={handleInteracSubmit} className="space-y-3">
             <Button 
               type="submit" 
-              disabled={!termsAccepted || isSubmitting}
+              disabled={!termsAccepted || isSubmitting || !payerEmail.trim()}
               className={`w-full py-6 rounded-full font-bold text-base shadow-lg transition-all ${
-                termsAccepted ? 'bg-[#E86225] hover:bg-[#D0521B] text-white cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'
+                termsAccepted && payerEmail.trim() ? 'bg-[#E86225] hover:bg-[#D0521B] text-white cursor-pointer' : 'bg-slate-200 text-slate-400 cursor-not-allowed'
               }`}
             >
               {isSubmitting ? 'Enregistrement de la demande…' : `J'ai effectué mon virement (${currencyAmountCAD})`}

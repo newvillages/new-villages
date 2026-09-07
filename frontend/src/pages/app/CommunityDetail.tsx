@@ -71,7 +71,9 @@ export function CommunityDetail() {
 
   const joined = community.membershipState === 'JOINED';
   const pending = community.membershipState === 'PENDING_REQUEST';
-  const isLeader = community.leaderId === currentUser?.id || currentUser?.role === 'COMMUNITY_LEADER';
+  const isLeader = community.leaderId === currentUser?.id;
+  const isAdmin = currentUser?.role === 'ADMIN';
+  const hasAccess = joined || isLeader || isAdmin;
 
   const handleJoinClick = () => {
     if (joined) {
@@ -259,192 +261,245 @@ export function CommunityDetail() {
           </div>
         )}
 
-        <div className="flex space-x-1 border-b border-gray-200 px-6">
-          {tabs.map(tab => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={cn("relative px-4 py-3 text-sm font-medium transition-colors", activeTab === tab.id ? 'text-primary font-bold' : 'text-gray-500 hover:text-gray-700')}
-            >
-              {tab.label}
-              {activeTab === tab.id && <motion.div layoutId="communityTabIndicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Tab Content */}
-      {activeTab === 'feed' && (
-        <div className="space-y-4">
-          {joined && (
-            <Card>
-              <CardContent className="p-5">
-                <form onSubmit={handlePost}>
-                  <div className="flex gap-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold shrink-0">+</div>
-                    <textarea
-                      value={postDraft}
-                      onChange={(e) => setPostDraft(e.target.value)}
-                      className="flex-1 resize-none border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-                      rows={2}
-                      placeholder="Partagez un message ou une annonce avec le groupe..."
-                    />
-                  </div>
-                  <div className="flex justify-end mt-2">
-                    <Button type="submit" size="sm" disabled={!postDraft.trim() || createPost.isPending}>Publier</Button>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
-          )}
-          {postsLoading ? (
-            <CardSkeleton />
-          ) : posts.length > 0 ? (
-            posts.map(post => (
-              <Card key={post.id}>
-                <CardContent className="p-5 flex gap-3">
-                  <img src={post.authorAvatarUrl || `https://i.pravatar.cc/150?u=${post.authorId}`} alt="" className="w-10 h-10 rounded-full shrink-0" />
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="font-semibold text-gray-900 text-sm">{post.authorName ?? 'Membre'}</span>
-                      <span className="text-gray-400 text-xs">{formatRelativeTime(post.createdAt)}</span>
-                    </div>
-                    <p className="text-gray-700 text-sm">{post.body}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <Card><CardContent className="p-5"><p className="text-gray-500 text-center py-4">Aucun message pour l'instant. Soyez le premier à participer !</p></CardContent></Card>
-          )}
-        </div>
-      )}
-
-      {activeTab === 'members' && (
-        membersLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            <CardSkeleton /><CardSkeleton /><CardSkeleton />
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {(members ?? []).map(member => (
-              <Card key={member.userId}>
-                <CardContent className="p-4 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <img src={member.avatarUrl || `https://i.pravatar.cc/150?u=${member.userId}`} alt="" className="w-12 h-12 rounded-full shrink-0" />
-                    <div className="min-w-0">
-                      <p className="font-semibold text-gray-900 truncate">{member.fullName ?? 'Membre'}</p>
-                      <p className="text-xs text-gray-500 capitalize">
-                        {member.roleInCommunity === 'LEADER' ? 'Organisateur' : 'Membre'} {member.city ? `• ${member.city}` : ''}
-                      </p>
-                      {member.email && <p className="text-[11px] text-gray-400 truncate">{member.email}</p>}
-                    </div>
-                  </div>
-                  {member.userId !== currentUser?.id && (
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="shrink-0 text-xs flex items-center gap-1"
-                      onClick={() => navigate('/messages', { state: { targetUserId: member.userId, targetUserName: member.fullName } })}
-                    >
-                      <MessageSquare size={14} /> Message privé
-                    </Button>
-                  )}
-                </CardContent>
-              </Card>
+        {hasAccess && (
+          <div className="flex space-x-1 border-b border-gray-200 px-6">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={cn("relative px-4 py-3 text-sm font-medium transition-colors", activeTab === tab.id ? 'text-primary font-bold' : 'text-gray-500 hover:text-gray-700')}
+              >
+                {tab.label}
+                {activeTab === tab.id && <motion.div layoutId="communityTabIndicator" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />}
+              </button>
             ))}
           </div>
-        )
-      )}
+        )}
+      </div>
 
-      {activeTab === 'events' && (
-        <div className="space-y-4">
-          {communityEvents.length > 0 ? (
-            communityEvents.map(evt => (
-              <Card key={evt.id} className="hover:shadow-md transition-shadow">
-                <CardContent className="p-5 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-                  <div>
-                    <span className="inline-block px-2.5 py-0.5 bg-primary/10 text-primary text-xs font-semibold rounded-full mb-2">
-                      {evt.type === 'DINNER' ? 'Repas au restaurant' : evt.type === 'SOCIAL' ? 'Activité sociale' : evt.type}
-                    </span>
-                    <h3 className="font-bold text-gray-900 text-lg">{evt.title}</h3>
-                    <p className="text-sm text-gray-600 line-clamp-2 mt-1">{evt.description}</p>
-                    <div className="flex items-center gap-4 mt-3 text-xs text-gray-500">
-                      <span className="flex items-center gap-1"><Calendar size={14} /> {formatEventDate(evt.startAt)}</span>
-                      <span className="flex items-center gap-1"><Clock size={14} /> {formatEventTime(evt.startAt)}</span>
-                      <span className="flex items-center gap-1"><MapPin size={14} /> {evt.online ? 'En ligne' : evt.location}</span>
-                    </div>
-                  </div>
-                  <Link to={`/events/${evt.id}`}>
-                    <Button variant="outline" size="sm">Voir la sortie</Button>
-                  </Link>
-                </CardContent>
-              </Card>
-            ))
-          ) : (
-            <Card><CardContent className="p-8 text-center text-gray-500">Aucune sortie programmée pour ce groupe pour le moment.</CardContent></Card>
+      {hasAccess ? (
+        <>
+          {/* Tab Content */}
+          {activeTab === 'feed' && (
+            <div className="space-y-4">
+              {joined && (
+                <Card>
+                  <CardContent className="p-5">
+                    <form onSubmit={handlePost}>
+                      <div className="flex gap-3">
+                        <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center text-primary font-bold shrink-0">+</div>
+                        <textarea
+                          value={postDraft}
+                          onChange={(e) => setPostDraft(e.target.value)}
+                          className="flex-1 resize-none border border-gray-200 rounded-lg p-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+                          rows={2}
+                          placeholder="Partagez un message ou une annonce avec le groupe..."
+                        />
+                      </div>
+                      <div className="flex justify-end mt-2">
+                        <Button type="submit" size="sm" disabled={!postDraft.trim() || createPost.isPending}>Publier</Button>
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
+              )}
+              {postsLoading ? (
+                <CardSkeleton />
+              ) : posts.length > 0 ? (
+                posts.map(post => (
+                  <Card key={post.id}>
+                    <CardContent className="p-5 flex gap-3">
+                      <img src={post.authorAvatarUrl || `https://i.pravatar.cc/150?u=${post.authorId}`} alt="" className="w-10 h-10 rounded-full shrink-0" />
+                      <div>
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold text-gray-900 text-sm">{post.authorName ?? 'Membre'}</span>
+                          <span className="text-gray-400 text-xs">{formatRelativeTime(post.createdAt)}</span>
+                        </div>
+                        <p className="text-gray-700 text-sm">{post.body}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Card><CardContent className="p-5"><p className="text-gray-500 text-center py-4">Aucun message pour l'instant. Soyez le premier à participer !</p></CardContent></Card>
+              )}
+            </div>
           )}
-        </div>
-      )}
 
-      {activeTab === 'about' && (
-        <div className="grid md:grid-cols-3 gap-6">
-          <div className="md:col-span-2 space-y-4">
-            <Card>
-              <CardContent className="p-6 space-y-4">
-                <div>
-                  <h3 className="font-bold text-gray-900 mb-1">À propos du groupe</h3>
-                  <p className="text-gray-600 text-sm leading-relaxed">{community.description || 'Aucune présentation pour le moment.'}</p>
-                </div>
-                {community.category && (
-                  <div>
-                    <h3 className="font-bold text-gray-900 mb-1">Catégorie</h3>
-                    <span className="text-primary bg-primary/10 px-3 py-1 rounded-full text-xs font-semibold">
-                      {community.category}
-                    </span>
-                  </div>
+          {activeTab === 'members' && (
+            membersLoading ? (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <CardSkeleton /><CardSkeleton /><CardSkeleton />
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {(members ?? []).map(member => (
+                  <Card key={member.userId}>
+                    <CardContent className="p-4 flex items-center gap-3">
+                      <img src={member.avatarUrl || `https://i.pravatar.cc/150?u=${member.userId}`} alt="" className="w-10 h-10 rounded-full" />
+                      <div className="min-w-0 flex-1">
+                        <p className="font-semibold text-sm text-gray-900 truncate">{member.fullName ?? 'Membre'}</p>
+                        <p className="text-xs text-gray-500">{member.roleInCommunity === 'LEADER' ? '👑 Organisateur' : 'Membre'}</p>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )
+          )}
+
+          {activeTab === 'events' && (
+            <div className="space-y-4">
+              {communityEvents.length > 0 ? (
+                communityEvents.map(event => (
+                  <Card key={event.id}>
+                    <CardContent className="p-5 flex justify-between items-center">
+                      <div>
+                        <span className="text-xs font-semibold text-primary">{event.type}</span>
+                        <h3 className="font-bold text-gray-900 text-base">{event.title}</h3>
+                        <div className="flex items-center gap-4 mt-1 text-xs text-gray-500">
+                          <span>{formatEventDate(event.startAt)} à {formatEventTime(event.startAt)}</span>
+                          <span className="flex items-center gap-1"><MapPin size={12} /> {event.online ? 'En ligne' : event.location}</span>
+                        </div>
+                      </div>
+                      <Link to={`/events/${event.id}`}>
+                        <Button size="sm" variant="outline">Détails de la sortie</Button>
+                      </Link>
+                    </CardContent>
+                  </Card>
+                ))
+              ) : (
+                <Card><CardContent className="p-5 text-center text-gray-500 py-8">Aucune sortie prévue pour le moment dans ce groupe.</CardContent></Card>
+              )}
+            </div>
+          )}
+
+          {activeTab === 'about' && (
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              <div className="lg:col-span-2 space-y-6">
+                <Card>
+                  <CardContent className="p-6">
+                    <h3 className="font-bold text-gray-900 mb-2">Description du groupe</h3>
+                    <p className="text-sm text-gray-600 leading-relaxed">{community.description}</p>
+                  </CardContent>
+                </Card>
+
+                {community.customTerms && (
+                  <Card>
+                    <CardContent className="p-6">
+                      <h3 className="font-bold text-gray-900 mb-2 flex items-center gap-2 text-sm">
+                        <ShieldAlert size={16} className="text-primary" /> Règlement intérieur du groupe
+                      </h3>
+                      <p className="text-xs text-gray-600 whitespace-pre-wrap bg-gray-50 p-3 rounded-xl border border-gray-200">
+                        {community.customTerms}
+                      </p>
+                    </CardContent>
+                  </Card>
                 )}
-              </CardContent>
-            </Card>
+              </div>
 
-            {community.customTerms && (
-              <Card>
-                <CardContent className="p-6 space-y-2">
-                  <h3 className="font-bold text-gray-900 flex items-center gap-2">
-                    <ShieldAlert size={18} className="text-amber-600" /> Règles particulières du groupe
-                  </h3>
-                  <p className="text-xs text-gray-600 whitespace-pre-wrap bg-gray-50 p-3 rounded-xl border border-gray-200">
-                    {community.customTerms}
-                  </p>
-                </CardContent>
-              </Card>
-            )}
+              <div>
+                <Card>
+                  <CardContent className="p-5 space-y-3">
+                    <h4 className="font-bold text-gray-900 flex items-center gap-1.5 text-sm">
+                      <ShieldAlert size={16} className="text-primary" /> Organisateur du groupe
+                    </h4>
+                    <div className="flex items-center gap-3 pt-2">
+                      <img src="https://i.pravatar.cc/40?u=leader" className="w-10 h-10 rounded-full" alt="Organisateur" />
+                      <div>
+                        <p className="font-semibold text-sm text-gray-900">{community.leaderName ?? 'Organisateur de groupe'}</p>
+                        <p className="text-xs text-gray-500">Organisateur de groupe</p>
+                      </div>
+                    </div>
+                    <div className="pt-2 space-y-2">
+                      <Button variant="outline" size="sm" className="w-full text-xs flex items-center justify-center gap-1" onClick={handleContactLeader}>
+                        <MessageSquare size={14} /> Contacter l'organisateur
+                      </Button>
+                      <Button variant="ghost" size="sm" className="w-full text-xs text-red-600 hover:bg-red-50 flex items-center justify-center gap-1" onClick={() => setReportLeaderOpen(true)}>
+                        <Flag size={14} /> Signaler l'organisateur
+                      </Button>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          )}
+        </>
+      ) : pending ? (
+        <Card className="rounded-3xl border-[#EFE6DD] shadow-sm bg-white overflow-hidden p-6 sm:p-10 text-center max-w-2xl mx-auto my-8 space-y-5">
+          <div className="w-16 h-16 bg-amber-50 text-[#E86225] rounded-2xl flex items-center justify-center mx-auto shadow-sm">
+            <Clock size={32} className="animate-spin text-[#E86225]" />
           </div>
-
           <div>
-            <Card>
-              <CardContent className="p-5 space-y-3">
-                <h4 className="font-bold text-gray-900 flex items-center gap-1.5 text-sm">
-                  <ShieldAlert size={16} className="text-primary" /> Organisateur du groupe
-                </h4>
-                <div className="flex items-center gap-3 pt-2">
-                  <img src="https://i.pravatar.cc/40?u=leader" className="w-10 h-10 rounded-full" alt="Organisateur" />
-                  <div>
-                    <p className="font-semibold text-sm text-gray-900">{community.leaderName ?? 'Organisateur de groupe'}</p>
-                    <p className="text-xs text-gray-500">Organisateur de groupe</p>
-                  </div>
-                </div>
-                <div className="pt-2 space-y-2">
-                  <Button variant="outline" size="sm" className="w-full text-xs flex items-center justify-center gap-1" onClick={handleContactLeader}>
-                    <MessageSquare size={14} /> Contacter l'organisateur
-                  </Button>
-                  <Button variant="ghost" size="sm" className="w-full text-xs text-red-600 hover:bg-red-50 flex items-center justify-center gap-1" onClick={() => setReportLeaderOpen(true)}>
-                    <Flag size={14} /> Signaler l'organisateur
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100 px-3 py-1 rounded-full inline-block mb-2">
+              Validation administrative en cours
+            </span>
+            <h2 className="text-xl sm:text-2xl font-black text-[#2C1810]">
+              Adhésion à « {community.name} » en attente de confirmation
+            </h2>
+            <p className="text-xs sm:text-sm text-[#52433B] mt-2 max-w-lg mx-auto leading-relaxed">
+              Votre demande d'adhésion pour rejoindre <strong>{community.name}</strong> a bien été enregistrée.
+              L'accès complet au groupe (actualités, discussions et sorties au restaurant) sera débloqué dès que l'administration aura confirmé la réception de votre virement Interac de 20 $ CAD.
+            </p>
           </div>
+
+          <div className="bg-[#FAF5EF] rounded-2xl border border-[#EFE6DD] p-4 text-xs text-left max-w-md mx-auto space-y-2.5">
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 font-semibold">Destinataire (Auto-Dépôt) :</span>
+              <span className="font-mono font-bold text-[#133820]">bouffe@newvillages.ca</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 font-semibold">Montant d'adhésion :</span>
+              <span className="font-extrabold text-[#E86225]">20,00 $ CAD</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 font-semibold">Statut :</span>
+              <span className="font-bold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full text-[11px]">
+                En attente de vérification bancaire
+              </span>
+            </div>
+          </div>
+
+          <Button
+            variant="outline"
+            onClick={() => setPaymentModalOpen(true)}
+            className="font-bold text-xs border-[#E86225] text-[#E86225] hover:bg-[#FDF0E9]"
+          >
+            Revoir les coordonnées de virement Interac
+          </Button>
+        </Card>
+      ) : (
+        <div className="max-w-2xl mx-auto my-6 space-y-6">
+          <div className="bg-[#FAF5EF] border border-[#EFE6DD] rounded-2xl p-5 sm:p-6 text-center space-y-2">
+            <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#E86225] bg-white px-3 py-1 rounded-full border border-[#E86225]/30 inline-block">
+              🔒 Portail d'adhésion obligatoire
+            </span>
+            <h2 className="text-xl sm:text-2xl font-black text-[#2C1810]">
+              Rejoindre le groupe « {community.name} »
+            </h2>
+            <p className="text-xs sm:text-sm text-[#52433B] leading-relaxed max-w-lg mx-auto">
+              Pour accéder à ce groupe, voir les actualités et participer aux sorties conviviales au restaurant, chaque nouveau membre doit s'acquitter de la contribution unique de 20 $ CAD par Virement Interac.
+            </p>
+          </div>
+
+          <PaymentModal
+            plan={{
+              id: 'group_join',
+              label: `Adhésion à ${community.name}`,
+              price: '20 $',
+              period: 'Paiement unique',
+              features: [
+                'Accès complet aux annonces du groupe',
+                'Participation aux sorties conviviales au restaurant',
+                'Échanges avec tous les membres du groupe',
+                'Validation par l\'administration dès réception',
+              ],
+            }}
+            communityId={community.id}
+            communityName={community.name}
+            isGroupJoin={true}
+            onSuccess={() => executeJoin()}
+          />
         </div>
       )}
 

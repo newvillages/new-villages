@@ -41,6 +41,7 @@ import {
   useReviewRefundRequest,
   useAdminInteracPayments,
   useConfirmInteracPayment,
+  useRejectInteracPayment,
   type InteracPayment,
   type AdminStats,
   type CommunityCategory,
@@ -1988,6 +1989,7 @@ function LogsSection({ onBack }: { onBack?: () => void }) {
 function InteracSection({ onBack }: { onBack?: () => void }) {
   const { data: payments, isLoading } = useAdminInteracPayments();
   const confirmPayment = useConfirmInteracPayment();
+  const rejectPayment = useRejectInteracPayment();
 
   const handleConfirm = (p: InteracPayment) => {
     const isGroup = p.communityId || p.amount === 20 || (p.referenceNumber && p.referenceNumber.includes('JOIN'));
@@ -2001,6 +2003,23 @@ function InteracSection({ onBack }: { onBack?: () => void }) {
         onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Erreur lors de la confirmation.'),
       });
     }
+  };
+
+  const handleReject = (p: InteracPayment) => {
+    const recipient = p.userEmail || 'ce membre';
+    const reason = window.prompt(
+      `Rejeter le virement Interac de ${p.userName || 'ce membre'} (${p.referenceNumber}) ?\n\nUn courriel sera immédiatement envoyé à : ${recipient}\n\nIndiquez la raison du rejet :`,
+      'Virement non reçu sur le compte bancaire'
+    );
+    if (reason === null) return;
+
+    rejectPayment.mutate(
+      { paymentId: p.id, reason: reason.trim() },
+      {
+        onSuccess: () => toast.success(`Virement rejeté et courriel d'explication envoyé à ${recipient} !`),
+        onError: (err) => toast.info(err instanceof ApiError ? err.message : 'Erreur lors du rejet.'),
+      }
+    );
   };
 
   return (
@@ -2104,17 +2123,32 @@ function InteracSection({ onBack }: { onBack?: () => void }) {
                   <div className="pt-1 flex items-center justify-between gap-2">
                     <StatusBadge status={p.status} />
                     {p.status === 'PENDING' ? (
-                      <Button
-                        size="sm"
-                        className="bg-green-600 hover:bg-green-700 text-white font-bold text-xs py-2 px-3 flex-1 justify-center shadow-xs"
-                        onClick={() => handleConfirm(p)}
-                        disabled={confirmPayment.isPending}
-                      >
-                        <CheckCircle size={14} className="mr-1" /> Confirmer le paiement
-                      </Button>
-                    ) : (
+                      <div className="flex items-center gap-1.5 flex-1">
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="border-red-300 text-red-700 hover:bg-red-50 font-bold text-xs py-2 px-2.5 shadow-xs"
+                          onClick={() => handleReject(p)}
+                          disabled={confirmPayment.isPending || rejectPayment.isPending}
+                        >
+                          <XCircle size={14} className="mr-1" /> Rejeter
+                        </Button>
+                        <Button
+                          size="sm"
+                          className="bg-green-600 hover:bg-green-700 text-white font-bold text-xs py-2 px-3 flex-1 justify-center shadow-xs"
+                          onClick={() => handleConfirm(p)}
+                          disabled={confirmPayment.isPending || rejectPayment.isPending}
+                        >
+                          <CheckCircle size={14} className="mr-1" /> Confirmer
+                        </Button>
+                      </div>
+                    ) : p.status === 'APPROVED' ? (
                       <span className="text-xs text-green-700 font-bold bg-green-50 px-2.5 py-1 rounded-full border border-green-200">
                         Validé ✓
+                      </span>
+                    ) : (
+                      <span className="text-xs text-red-700 font-bold bg-red-50 px-2.5 py-1 rounded-full border border-red-200">
+                        Rejeté ✕
                       </span>
                     )}
                   </div>
@@ -2178,17 +2212,32 @@ function InteracSection({ onBack }: { onBack?: () => void }) {
                         </td>
                         <td className="px-4 py-3">
                           {p.status === 'PENDING' ? (
-                            <Button
-                              size="sm"
-                              className="bg-green-600 hover:bg-green-700 text-white font-bold text-xs shadow-sm whitespace-nowrap"
-                              onClick={() => handleConfirm(p)}
-                              disabled={confirmPayment.isPending}
-                            >
-                              <CheckCircle size={14} className="mr-1" /> Confirmer le paiement
-                            </Button>
-                          ) : (
+                            <div className="flex items-center gap-2">
+                              <Button
+                                size="sm"
+                                variant="outline"
+                                className="border-red-300 text-red-700 hover:bg-red-50 font-bold text-xs shadow-sm whitespace-nowrap"
+                                onClick={() => handleReject(p)}
+                                disabled={confirmPayment.isPending || rejectPayment.isPending}
+                              >
+                                <XCircle size={14} className="mr-1" /> Rejeter
+                              </Button>
+                              <Button
+                                size="sm"
+                                className="bg-green-600 hover:bg-green-700 text-white font-bold text-xs shadow-sm whitespace-nowrap"
+                                onClick={() => handleConfirm(p)}
+                                disabled={confirmPayment.isPending || rejectPayment.isPending}
+                              >
+                                <CheckCircle size={14} className="mr-1" /> Confirmer
+                              </Button>
+                            </div>
+                          ) : p.status === 'APPROVED' ? (
                             <span className="text-xs text-green-700 font-bold bg-green-50 px-2.5 py-1 rounded-full border border-green-200">
                               Validé ✓
+                            </span>
+                          ) : (
+                            <span className="text-xs text-red-700 font-bold bg-red-50 px-2.5 py-1 rounded-full border border-red-200">
+                              Rejeté ✕
                             </span>
                           )}
                         </td>

@@ -341,6 +341,21 @@ export function useConfirmInteracPayment() {
       queryClient.invalidateQueries({ queryKey: ['admin', 'interac-payments'] });
       queryClient.invalidateQueries({ queryKey: ['admin', 'subscriptions'] });
       queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
+    },
+  });
+}
+
+export function useRejectInteracPayment() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ paymentId, reason }: { paymentId: string; reason?: string }) =>
+      api.post<InteracPayment>(`/api/admin/payments/interac/${paymentId}/reject`, { reason }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'interac-payments'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'subscriptions'] });
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] });
+      queryClient.invalidateQueries({ queryKey: ['communities'] });
     },
   });
 }

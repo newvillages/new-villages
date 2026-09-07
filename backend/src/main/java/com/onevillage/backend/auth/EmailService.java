@@ -246,6 +246,44 @@ public class EmailService {
     }
 
     @Async
+    public void sendPaymentRejectedEmail(String toEmail, String name, String targetName, String referenceNumber, String reason) {
+        if (toEmail == null || toEmail.isBlank()) return;
+        String cleanEmail = toEmail.trim().toLowerCase();
+        log.info("Sending payment rejected email to {} for {} (ref: {})", cleanEmail, targetName, referenceNumber);
+        String subject = "Information concernant votre virement Interac - Bouffe & Amitié";
+        String motif = (reason != null && !reason.isBlank()) ? reason : "Virement non reçu ou informations bancaires non concordantes";
+
+        String plainText = "Bonjour " + (name != null && !name.isBlank() ? name : "") + ",\n\n"
+                + "Votre virement Interac pour « " + targetName + " » n'a pas pu être validé par l'administration.\n\n"
+                + "Motif : " + motif + "\n"
+                + "Numéro de référence mémoire : " + (referenceNumber != null ? referenceNumber : "—") + "\n\n"
+                + "Si vous souhaitez régulariser votre virement ou si vous avez des questions, veuillez nous contacter directement à bouffe@newvillages.ca.\n\n"
+                + "Cordialement,\n"
+                + "L'équipe Bouffe & Amitié\n"
+                + "https://newvillages.ca";
+
+        String htmlContent = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #efe6dd; border-radius: 16px; background-color: #ffffff;\">"
+                + "<div style=\"text-align: center; margin-bottom: 24px;\">"
+                + "<h2 style=\"color: #2C1810; margin: 0 0 4px 0;\">Information sur votre virement</h2>"
+                + "<p style=\"color: #E86225; font-size: 14px; font-weight: bold; margin: 0;\">Validation non effectuée</p>"
+                + "</div>"
+                + "<div style=\"background-color: #FFF5F5; border-radius: 12px; padding: 20px; margin-bottom: 20px; border: 1px solid #FED7D7;\">"
+                + "<p style=\"font-size: 15px; color: #2C1810; line-height: 1.6; margin: 0 0 12px 0;\">Bonjour <strong>" + escapeJson(name != null ? name : "") + "</strong>,</p>"
+                + "<p style=\"font-size: 14px; color: #2C1810; line-height: 1.6; margin: 0 0 16px 0;\">Votre virement Interac pour <strong>« " + escapeJson(targetName) + " »</strong> n'a pas pu être validé par l'administration.</p>"
+                + "<div style=\"background-color: #ffffff; border: 1px solid #E2E8F0; border-radius: 8px; padding: 14px; margin-bottom: 16px;\">"
+                + "<p style=\"font-size: 13px; color: #718096; margin: 0 0 4px 0;\">Motif communiqué :</p>"
+                + "<p style=\"font-size: 14px; font-weight: bold; color: #C53030; margin: 0;\">" + escapeJson(motif) + "</p>"
+                + (referenceNumber != null ? "<p style=\"font-size: 12px; color: #A0AEC0; margin: 8px 0 0 0;\">Référence mémoire : " + escapeJson(referenceNumber) + "</p>" : "")
+                + "</div>"
+                + "<p style=\"font-size: 13px; color: #4A5568; line-height: 1.6; margin: 0;\">Si vous avez des questions ou souhaitez renouveler votre virement, contactez-nous directement à <a href=\"mailto:bouffe@newvillages.ca\" style=\"color: #E86225; font-weight: bold;\">bouffe@newvillages.ca</a>.</p>"
+                + "</div>"
+                + "<p style=\"font-size: 12px; color: #94A3B8; text-align: center; margin: 0;\">L'équipe Bouffe &amp; Amitié &bull; contact@newvillages.ca</p>"
+                + "</div>";
+
+        sendHtml(cleanEmail, subject, plainText, htmlContent);
+    }
+
+    @Async
     public void sendContactSubmissionEmail(String senderName, String senderEmail, String subject, String message) {
         log.info("[CONTACT FORM] Submission from {} ({}) | Subject: {}", senderName, senderEmail, subject);
 
