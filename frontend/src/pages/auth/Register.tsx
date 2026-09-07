@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Modal } from '../../components/ui/Modal';
@@ -12,8 +12,18 @@ import { PaymentModal } from '../../components/subscription/PaymentModal';
 
 export function Register() {
   const navigate = useNavigate();
+  const location = useLocation();
+  const [searchParams] = useSearchParams();
   const { data: terms, isLoading: termsLoading } = useCurrentTerms();
   const registerMutation = useRegister();
+
+  const queryFrom = searchParams.get('from') || searchParams.get('redirect');
+  const communityParam = searchParams.get('communityId');
+  const fallbackFrom = communityParam ? `/communities/${communityParam}` : queryFrom;
+  const stateFrom = (location.state as any)?.from;
+  const rawFrom = stateFrom || fallbackFrom;
+  const fromPath = typeof rawFrom === 'string' ? rawFrom : rawFrom?.pathname || '';
+  const isCommunityJoin = fromPath.includes('/communities') || fromPath.includes('/groupes');
 
   const [role, setRole] = useState<RegisterRequest['accountType']>('MEMBER');
   const [fullName, setFullName] = useState('');
@@ -45,7 +55,7 @@ export function Register() {
         acceptedTermsVersion: terms.version,
       },
       {
-        onSuccess: () => navigate('/verify-email', { state: { email } }),
+        onSuccess: () => navigate('/verify-email', { state: { email, from: fromPath } }),
         onError: (err) => {
           setShowPaymentModal(false);
           if (err instanceof ApiError) {
@@ -98,7 +108,7 @@ export function Register() {
               <span>Retour à l'accueil</span>
             </Link>
           </div>
-          <Link to="/login" className="text-[#2C1810] font-bold text-xs hover:underline">
+          <Link to="/login" state={{ from: rawFrom }} className="text-[#2C1810] font-bold text-xs hover:underline">
             Se connecter &rarr;
           </Link>
         </header>
@@ -106,6 +116,25 @@ export function Register() {
         {/* Main Content */}
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-8">
           <div className="w-full max-w-[900px]">
+            {isCommunityJoin && (
+              <div className="bg-[#FAF5EF] border border-[#E86225]/30 rounded-2xl p-4 sm:p-5 mb-6 flex items-start gap-3.5 shadow-sm">
+                <div className="w-10 h-10 rounded-full bg-[#E86225]/10 text-[#E86225] flex items-center justify-center shrink-0 mt-0.5">
+                  <UserCircle size={24} />
+                </div>
+                <div>
+                  <span className="text-[11px] font-extrabold uppercase tracking-wider text-[#E86225] bg-white px-2.5 py-0.5 rounded-full border border-[#E86225]/20 inline-block mb-1">
+                    Première visite ?
+                  </span>
+                  <p className="font-bold text-[#2C1810] text-sm sm:text-base">
+                    Créez votre compte pour rejoindre le groupe
+                  </p>
+                  <p className="text-xs text-[#52433B] mt-0.5 leading-relaxed">
+                    Après votre inscription rapide, vous accéderez directement au portail de paiement et de validation de votre groupe.
+                  </p>
+                </div>
+              </div>
+            )}
+
             <div className="mb-10 text-center md:text-left">
               <h1 className="text-3xl md:text-5xl font-heading font-extrabold text-[#2C1810] mb-2">Créez votre compte</h1>
               <p className="text-[#52433B] text-base">Rejoignez le club de sorties au restaurant Bouffe &amp; Amitié.</p>
@@ -245,7 +274,7 @@ export function Register() {
                   }
                 </Button>
                 <p className="text-center text-xs text-[#52433B]">
-                  Déjà membre ? <Link to="/login" className="text-[#E86225] font-bold hover:underline">Se connecter</Link>
+                  Déjà membre ? <Link to="/login" state={{ from: rawFrom }} className="text-[#E86225] font-bold hover:underline">Se connecter</Link>
                 </p>
               </div>
 

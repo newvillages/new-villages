@@ -17,6 +17,8 @@ export function VerifyEmail() {
   const resend = useResendVerification();
   const [resendEmail, setResendEmail] = useState(emailFromState ?? '');
 
+  const stateFrom = (location.state as any)?.from;
+
   if (token) {
     if (verifyEmailQuery.isLoading) {
       return (
@@ -35,7 +37,7 @@ export function VerifyEmail() {
               </div>
               <h1 className="text-2xl font-heading font-extrabold text-[#2C1810] mb-3">Courriel vérifié !</h1>
               <p className="text-xs text-[#52433B] mb-8">Votre compte est activé. Vous pouvez maintenant vous connecter.</p>
-              <Button className="w-full bg-[#E86225] hover:bg-[#D0521B] text-white font-bold py-3.5 rounded-xl" onClick={() => navigate('/login')}>Se connecter</Button>
+              <Button className="w-full bg-[#E86225] hover:bg-[#D0521B] text-white font-bold py-3.5 rounded-xl" onClick={() => navigate('/login', { state: { from: stateFrom } })}>Se connecter</Button>
             </CardContent>
           </Card>
         </div>
@@ -52,7 +54,7 @@ export function VerifyEmail() {
             <p className="text-xs text-[#52433B] mb-8">
               {verifyEmailQuery.error instanceof ApiError ? verifyEmailQuery.error.message : 'Ce lien de vérification n\'est plus valide.'}
             </p>
-            <Button variant="outline" className="w-full border-[#E86225] text-[#E86225] font-bold" onClick={() => navigate('/login')}>Retour à la connexion</Button>
+            <Button variant="outline" className="w-full border-[#E86225] text-[#E86225] font-bold" onClick={() => navigate('/login', { state: { from: stateFrom } })}>Retour à la connexion</Button>
           </CardContent>
         </Card>
       </div>

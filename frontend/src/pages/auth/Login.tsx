@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation, useNavigate } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Button } from '../../components/ui/Button';
 import { Input } from '../../components/ui/Input';
 import { Card, CardContent } from '../../components/ui/Card';
@@ -10,7 +10,13 @@ import { Loader2, ArrowLeft } from 'lucide-react';
 export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
-  const fromPath = (location.state as { from?: { pathname: string } })?.from?.pathname || '/dashboard';
+  const [searchParams] = useSearchParams();
+  const queryFrom = searchParams.get('from') || searchParams.get('redirect');
+  const communityParam = searchParams.get('communityId');
+  const fallbackFrom = communityParam ? `/communities/${communityParam}` : queryFrom;
+  const stateFrom = (location.state as any)?.from;
+  const rawFrom = stateFrom || fallbackFrom;
+  const fromPath = typeof rawFrom === 'string' ? rawFrom : rawFrom?.pathname || '/dashboard';
   const loginMutation = useLogin();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -48,7 +54,6 @@ export function Login() {
     );
   };
 
-  const searchParams = new URLSearchParams(location.search);
   const reason = searchParams.get('reason');
 
   return (
@@ -130,7 +135,7 @@ export function Login() {
             </div>
 
             <p className="text-center text-xs text-[#52433B] mt-6">
-              Vous n'avez pas de compte ? <Link to="/register" className="text-[#E86225] hover:underline font-bold">S'inscrire</Link>
+              Vous n'avez pas de compte ? <Link to="/register" state={{ from: rawFrom }} className="text-[#E86225] hover:underline font-bold">S'inscrire</Link>
             </p>
           </form>
         </CardContent>

@@ -53,7 +53,7 @@ export function CommunityDirectory() {
 
   const handleJoin = (id: string, name: string) => {
     if (isGuest) {
-      navigate('/login', { state: { from: `/communities/${id}` } });
+      navigate('/register', { state: { from: `/communities/${id}` } });
       return;
     }
     setPaymentCommunity({ id, name });

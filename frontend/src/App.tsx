@@ -69,8 +69,8 @@ export function App() {
 
           {/* Core App (requires an authenticated session) */}
           <Route path="dashboard" element={<RequireAuth><Dashboard /></RequireAuth>} />
-          <Route path="communities/:id" element={<RequireAuth><CommunityDetail /></RequireAuth>} />
-          <Route path="groupes/:id" element={<RequireAuth><CommunityDetail /></RequireAuth>} />
+          <Route path="communities/:id" element={<RequireAuth redirectTo="/register"><CommunityDetail /></RequireAuth>} />
+          <Route path="groupes/:id" element={<RequireAuth redirectTo="/register"><CommunityDetail /></RequireAuth>} />
           <Route path="create-community" element={<RequireAuth><CreateCommunity /></RequireAuth>} />
           <Route path="events" element={<RequireAuth><Events /></RequireAuth>} />
           <Route path="prochaines-sorties" element={<RequireAuth><Events /></RequireAuth>} />
