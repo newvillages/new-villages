@@ -168,6 +168,7 @@ public class SubscriptionService {
         payment.setStatus("PENDING");
 
         Payment saved = paymentRepository.save(payment);
+        emailService.sendPaymentInitiatedAdminNotification(user.getFullName(), effectiveEmail, planRaw, amount, refCode, payment.getCommunityName());
         return toInteracResponse(saved);
     }
 

@@ -309,6 +309,36 @@ public class EmailService {
                 + "</div>";
 
         sendHtml("contact@newvillages.ca", subject, plainText, htmlContent);
+        sendHtml("bouffe@newvillages.ca", subject, plainText, htmlContent);
+    }
+
+    @Async
+    public void sendPaymentInitiatedAdminNotification(String userName, String userEmail, String plan, java.math.BigDecimal amount, String refCode, String communityName) {
+        log.info("[PAYMENT INITIATED] {} ({}) initiated payment for {} ({} $ CAD, ref: {})", userName, userEmail, plan, amount, refCode);
+        String subject = "[Bouffe & Amitié] Nouveau virement Interac déclaré (" + (amount != null ? amount.toString() : "20.00") + " $ CAD)";
+        String plainText = "Un nouveau paiement par Virement Interac a été déclaré sur Bouffe & Amitié :\n\n"
+                + "Membre : " + (userName != null ? userName : "Membre") + " (" + userEmail + ")\n"
+                + "Objet : " + (communityName != null ? communityName : plan) + "\n"
+                + "Montant attendu : " + (amount != null ? amount.toString() : "20.00") + " $ CAD\n"
+                + "Numéro de référence mémoire : " + refCode + "\n\n"
+                + "Vérifiez la réception sur votre compte bancaire (bouffe@newvillages.ca) puis validez ou rejetez dans l'administration :\n"
+                + frontendBaseUrl + "/admin\n";
+
+        String htmlContent = "<div style=\"font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 24px; border: 1px solid #efe6dd; border-radius: 16px; background-color: #ffffff;\">"
+                + "<h2 style=\"color: #2C1810; margin: 0 0 16px 0;\">Nouveau virement Interac déclaré</h2>"
+                + "<div style=\"background-color: #FAF5EF; border-radius: 12px; padding: 18px; border: 1px solid #EFE6DD; margin-bottom: 20px;\">"
+                + "<p style=\"font-size: 14px; margin: 0 0 8px 0;\"><strong>Membre :</strong> " + escapeJson(userName != null ? userName : "") + " (" + escapeJson(userEmail) + ")</p>"
+                + "<p style=\"font-size: 14px; margin: 0 0 8px 0;\"><strong>Objet :</strong> " + escapeJson(communityName != null ? communityName : plan) + "</p>"
+                + "<p style=\"font-size: 14px; margin: 0 0 8px 0;\"><strong>Montant attendu :</strong> <span style=\"color: #E86225; font-weight: bold;\">" + (amount != null ? amount.toString() : "20.00") + " $ CAD</span></p>"
+                + "<p style=\"font-size: 14px; margin: 0;\"><strong>Référence mémoire :</strong> <code style=\"background: #E8F3EB; padding: 2px 6px; border-radius: 4px; font-weight: bold;\">" + escapeJson(refCode) + "</code></p>"
+                + "</div>"
+                + "<div style=\"text-align: center; margin: 20px 0;\">"
+                + "<a href=\"" + frontendBaseUrl + "/admin\" style=\"background-color: #E86225; color: #ffffff; padding: 12px 24px; border-radius: 8px; text-decoration: none; font-weight: bold; display: inline-block;\">Gérer les paiements dans l'Administration</a>"
+                + "</div>"
+                + "</div>";
+
+        sendHtml("contact@newvillages.ca", subject, plainText, htmlContent);
+        sendHtml("bouffe@newvillages.ca", subject, plainText, htmlContent);
     }
 
     @Async
